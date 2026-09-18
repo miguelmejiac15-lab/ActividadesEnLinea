@@ -1,0 +1,59 @@
+# =====================================================================
+#  Lo que NO entra en la imagen
+# =====================================================================
+#
+# Dos razones distintas, y la primera es de seguridad.
+#
+# La imagen se publica en GHCR y sus capas quedan en caché en cada máquina
+# que la baje. Un secreto copiado dentro no se borra: hay que rotarlo. Y
+# `COPY . /var/www/html` copia TODO lo que no esté aquí listado.
+
+# ── Secretos ─────────────────────────────────────────────────────────
+# La configuración del contenedor llega por variables de entorno
+# (config/entorno.php). Este archivo es el de la máquina de desarrollo y
+# lleva la contraseña de MySQL local y el app_key.
+config/credenciales.php
+.env
+.env.*
+
+# ── Datos de la instalación local ────────────────────────────────────
+# Logs con rutas y trazas de la máquina de desarrollo.
+almacen/
+
+# ── Historia de git ──────────────────────────────────────────────────
+# `.git` puede pesar más que el proyecto y, sobre todo, contiene TODO el
+# historial: si alguna vez se llegó a versionar un secreto y se borró
+# después, sigue ahí dentro. No tiene nada que hacer en la imagen.
+.git
+.gitignore
+.gitattributes
+.github
+
+# ── Material que no es código ────────────────────────────────────────
+MallasPrimaria/
+legacy/
+
+# ── Lo que solo sirve para construir ─────────────────────────────────
+#
+# Nota: `Dockerfile` y `docker/` NO se excluyen, aunque no formen parte
+# del sitio. `.dockerignore` no filtra lo que va al webroot: filtra lo que
+# entra en el CONTEXTO de construcción, y un archivo fuera del contexto no
+# existe para `COPY`. Excluirlos hace fallar el build con
+# «COPY docker/apache-ael.conf: not found», que suena a ruta mal escrita.
+#
+# Se copian, se usan, y el propio Dockerfile los borra del webroot al
+# final.
+README.md
+docs/
+.dockerignore
+
+# ── Temporales ───────────────────────────────────────────────────────
+*.log
+*.bak
+*.orig
+*.sql.gz
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/

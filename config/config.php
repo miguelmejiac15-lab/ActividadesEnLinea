@@ -26,7 +26,24 @@ define('RUTA_LEGACY',   RUTA_RAIZ . '/legacy');
 // ── 2. Credenciales ──────────────────────────────────────────────────
 $archivoCredenciales = RUTA_CONFIG . '/credenciales.php';
 
-if (!is_file($archivoCredenciales)) {
+/*
+ * Dos orígenes posibles, y el archivo gana.
+ *
+ * En XAMPP existe `credenciales.php` y se usa ese. En un contenedor no
+ * existe —no puede: la imagen es pública y un secreto dentro viaja con
+ * ella— y la configuración llega por variables de entorno.
+ *
+ * El orden importa y es a propósito: si el entorno ganara, unas variables
+ * olvidadas en el perfil del sistema podrían secuestrar la conexión de
+ * una máquina de desarrollo y hacer que las pruebas escribieran en la
+ * base de producción.
+ */
+require_once RUTA_CONFIG . '/entorno.php';
+
+if (!is_file($archivoCredenciales) && hayConfiguracionEnEntorno()) {
+    $config = configuracionDesdeEntorno();
+
+} elseif (!is_file($archivoCredenciales)) {
     // La plataforma todavía no está instalada.
     //
     // Nota: aquí NO se responde con un código 500. Apache descarta el
@@ -56,7 +73,10 @@ if (!is_file($archivoCredenciales)) {
     );
 }
 
-$config = require $archivoCredenciales;
+// Solo si vino del archivo: en el caso del contenedor ya está armada.
+if (is_file($archivoCredenciales)) {
+    $config = require $archivoCredenciales;
+}
 
 define('ENTORNO',  $config['entorno']  ?? 'produccion');
 define('URL_BASE', rtrim($config['url_base'] ?? '', '/'));
@@ -105,12 +125,37 @@ if ($hayPeticionWeb && session_status() === PHP_SESSION_NONE) {
     // el identificador dentro acaba pegada en un chat o en un log.
     ini_set('session.use_only_cookies', '1');
 
+    /*
+     * ¿Se marca la cookie como `Secure`?
+     *
+     * ─────────────────────────────────────────────────────────────────
+     *  POR QUÉ NO BASTA CON $_SERVER['HTTPS']
+     * ─────────────────────────────────────────────────────────────────
+     *
+     * Antes se miraba solo eso, y en un despliegue detrás de proxy
+     * —Coolify, Traefik, cualquier CDN— es falso aunque el visitante esté
+     * en HTTPS: el TLS lo termina el proxy y a PHP le llega una petición
+     * HTTP normal por la red interna. El resultado es que en producción
+     * la cookie de sesión salía SIN la marca `Secure`, o sea que el
+     * navegador la enviaría también por HTTP si algo degradara la
+     * conexión. Es justo la protección que aquí se creía puesta.
+     *
+     * La fuente fiable es `URL_BASE`: dice con qué esquema se publica el
+     * sitio, la escribimos nosotros en la configuración, y —a diferencia
+     * de una cabecera `X-Forwarded-Proto`— no la puede tocar quien llama.
+     * Confiar en la cabecera sería dejar que el cliente opine sobre su
+     * propia seguridad.
+     *
+     * En XAMPP (`http://localhost/...`) sigue dando false, que es lo que
+     * debe: con `Secure` puesto sobre HTTP el navegador descarta la
+     * cookie y no se puede ni iniciar sesión.
+     */
+    $porHttps = str_starts_with(URL_BASE, 'https://') || !empty($_SERVER['HTTPS']);
+
     session_set_cookie_params([
         'lifetime' => 0,
         'path'     => '/',
-        // Solo por HTTPS cuando la conexión es segura. En XAMPP local
-        // (http://localhost) debe quedar en false o la sesión no se guarda.
-        'secure'   => !empty($_SERVER['HTTPS']),
+        'secure'   => $porHttps,
         // El JavaScript del navegador no puede leer la cookie de sesión:
         // esto corta el robo de sesión por XSS.
         'httponly' => true,

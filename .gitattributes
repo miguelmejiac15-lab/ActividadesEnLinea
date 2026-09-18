@@ -1,0 +1,47 @@
+# =====================================================================
+#  Saltos de línea
+# =====================================================================
+#
+# Esto no es cosmético. Se desarrolla en Windows, donde Git guarda los
+# archivos con CRLF, y se ejecuta en un contenedor Linux.
+#
+# Un script de shell con CRLF **no arranca**: el intérprete lee la primera
+# línea como `/bin/sh\r`, busca un programa con un retorno de carro en el
+# nombre y contesta:
+#
+#     exec /usr/local/bin/entrypoint.sh: no such file or directory
+#
+# Que es exactamente el error que se obtiene si el archivo no existiera.
+# Se han perdido tardes enteras con esto, porque el mensaje señala al
+# sitio equivocado: el archivo está ahí y se ve bien.
+
+# Por defecto, que Git decida y normalice a LF en el repositorio.
+* text=auto eol=lf
+
+# Estos SIEMPRE con LF, sin importar la plataforma ni la configuración
+# local de `core.autocrlf`.
+*.sh            text eol=lf
+Dockerfile      text eol=lf
+*.ini           text eol=lf
+*.conf          text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+.gitattributes  text eol=lf
+.gitignore      text eol=lf
+.dockerignore   text eol=lf
+
+# El .htaccess lo lee Apache en Linux.
+.htaccess       text eol=lf
+
+# Binarios: que Git no los toque nunca.
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.webp   binary
+*.gif    binary
+*.ico    binary
+*.pdf    binary
+*.docx   binary
+*.woff   binary
+*.woff2  binary
+*.ttf    binary

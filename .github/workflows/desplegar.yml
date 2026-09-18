@@ -1,0 +1,203 @@
+# =====================================================================
+#  Construir la imagen y desplegar
+# =====================================================================
+#
+# ─────────────────────────────────────────────────────────────────────
+#  POR QUÉ SE CONSTRUYE AQUÍ Y NO EN EL SERVIDOR
+# ─────────────────────────────────────────────────────────────────────
+#
+# El servidor es una t3.small: 2 vCPU, 2 GB de RAM, de los que Coolify ya
+# ocupa buena parte. Un build ahí —apt-get, compilar extensiones de PHP—
+# pelea por esa memoria con el sitio que está atendiendo visitas, y cuando
+# se agota el kernel no mata al build: mata al proceso más grande, que
+# suele ser MariaDB. El sitio se cae por publicar una corrección.
+#
+# Aquí el runner es gratis, tiene 4 GB y no atiende a nadie. El servidor
+# solo hace `docker pull` de una imagen ya hecha: segundos en vez de
+# minutos, y sin riesgo de tumbar nada.
+
+name: Desplegar
+
+on:
+  push:
+    branches: [main]
+    # Cambiar un .md no justifica reconstruir y reiniciar el sitio.
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+      - 'MallasPrimaria/**'
+  # Permite lanzarlo a mano desde la pestaña Actions, que es lo que se
+  # quiere cuando hay que volver a desplegar sin cambiar código.
+  workflow_dispatch:
+
+# Si se empujan dos commits seguidos, el segundo cancela el primero: no
+# tiene sentido desplegar una versión que ya está superada, y dos
+# despliegues a la vez pueden dejar el contenedor a medias.
+concurrency:
+  group: desplegar-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGEN: ghcr.io/${{ github.repository }}
+
+jobs:
+
+  # ── 1. Que no se despliegue código roto ────────────────────────────
+  #
+  # Va en un job aparte y ANTES de construir. Un error de sintaxis en PHP
+  # no rompe el build de Docker —la imagen se crea igual, nadie compila
+  # nada— y se descubriría como un 500 en producción. Treinta segundos
+  # aquí valen la pena.
+  revisar:
+    name: Revisar sintaxis PHP
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Instalar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          # La misma extensión que usa la aplicación, para que un
+          # `require` de algo ausente se note aquí.
+          extensions: pdo_mysql, mbstring, curl
+          coverage: none
+
+      - name: php -l en todos los archivos
+        run: |
+          set -e
+          fallos=0
+          total=0
+          while IFS= read -r f; do
+            total=$((total + 1))
+            if ! salida=$(php -l "$f" 2>&1); then
+              echo "::error file=$f::$salida"
+              fallos=$((fallos + 1))
+            fi
+          done < <(find . -name '*.php' -not -path './.git/*')
+
+          echo "Revisados $total archivos PHP."
+
+          if [ "$fallos" -gt 0 ]; then
+            echo "✗ $fallos archivo(s) con error de sintaxis."
+            exit 1
+          fi
+          echo "✓ Sin errores de sintaxis."
+
+      - name: Comprobar que no se cuela un secreto
+        run: |
+          set -e
+
+          # `credenciales.php` nunca debe estar versionado: lleva la
+          # contraseña de MySQL. Si aparece, el despliegue se para —es
+          # más fácil arreglarlo ahora que rotar credenciales después.
+          if git ls-files --error-unmatch config/credenciales.php 2>/dev/null; then
+            echo "::error::config/credenciales.php está versionado. Sácalo del repositorio y rota la contraseña."
+            exit 1
+          fi
+
+          # Tokens de pasarela o de GitHub escritos a mano en el código.
+          # Se excluyen los comentarios que solo NOMBRAN el prefijo.
+          if git grep -nIE '(APP_USR|TEST)-[0-9]{12,}|ghp_[A-Za-z0-9]{30,}' -- . ':!*.md' > /tmp/hallado 2>/dev/null; then
+            echo "::error::Hay algo con forma de credencial en el código:"
+            cat /tmp/hallado
+            exit 1
+          fi
+
+          echo "✓ Sin secretos en el código."
+
+  # ── 2. Construir y publicar la imagen ──────────────────────────────
+  construir:
+    name: Construir imagen
+    needs: revisar
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      # Para publicar en GHCR. No hace falta ningún token personal: el
+      # GITHUB_TOKEN de la propia ejecución basta, y se caduca al acabar.
+      packages: write
+
+    outputs:
+      etiqueta: ${{ steps.meta.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Preparar Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Entrar en GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Nombres y etiquetas
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # En minúsculas obligatoriamente: GHCR rechaza mayúsculas en el
+          # nombre, y el repositorio se llama «ActividadesEnLinea».
+          images: ${{ env.IMAGEN }}
+          tags: |
+            type=raw,value=latest
+            type=sha,format=short
+
+      - name: Construir y publicar
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          # Solo amd64: la EC2 es t3, que es Intel. Añadir arm64
+          # duplicaría el tiempo de build para una imagen que nadie
+          # ejecutaría.
+          platforms: linux/amd64
+          # La caché vive en GitHub, así que un despliegue que solo cambia
+          # PHP no vuelve a instalar los paquetes de Debian.
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ── 3. Decirle a Coolify que baje la nueva ─────────────────────────
+  desplegar:
+    name: Desplegar en Coolify
+    needs: construir
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Disparar el despliegue
+        env:
+          COOLIFY_URL:  ${{ secrets.COOLIFY_URL }}
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          APP_UUID:     ${{ secrets.COOLIFY_APP_UUID }}
+        run: |
+          set -euo pipefail
+
+          if [ -z "${COOLIFY_TOKEN:-}" ] || [ -z "${APP_UUID:-}" ]; then
+            echo "::error::Faltan los secretos COOLIFY_TOKEN o COOLIFY_APP_UUID."
+            echo "Se ponen en Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+
+          # `-w` para capturar el código HTTP: curl devuelve 0 aunque el
+          # servidor conteste 401, así que sin esto un token caducado
+          # daría un despliegue «correcto» que nunca ocurrió.
+          codigo=$(curl -sS -o /tmp/respuesta -w '%{http_code}' \
+            --max-time 60 \
+            -X POST \
+            -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
+            "${COOLIFY_URL}/api/v1/deploy?uuid=${APP_UUID}&force=false")
+
+          echo "Coolify respondió $codigo"
+          cat /tmp/respuesta || true
+          echo
+
+          if [ "$codigo" -lt 200 ] || [ "$codigo" -ge 300 ]; then
+            echo "::error::Coolify rechazó el despliegue (HTTP $codigo)."
+            exit 1
+          fi
+
+          echo "✓ Despliegue lanzado. Coolify baja la imagen y reinicia el contenedor."

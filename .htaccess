@@ -1,0 +1,51 @@
+# =====================================================================
+#  ACTIVIDADES EN LÍNEA · Proyecto Final
+#  Configuración de Apache
+# =====================================================================
+
+# ── Índices de directorio ────────────────────────────────────────────
+# Sin esto, entrar a una carpeta sin index.php lista sus archivos.
+Options -Indexes
+
+DirectoryIndex index.php index.html
+
+# ── Codificación ─────────────────────────────────────────────────────
+AddDefaultCharset UTF-8
+
+# ── Archivos que nunca deben servirse ────────────────────────────────
+<FilesMatch "\.(sql|log|md|ini|example\.php)$">
+    Require all denied
+</FilesMatch>
+
+<Files "credenciales.php">
+    Require all denied
+</Files>
+
+# ── Cabeceras de seguridad ───────────────────────────────────────────
+<IfModule mod_headers.c>
+    # Impide que el navegador adivine el tipo de archivo.
+    Header set X-Content-Type-Options "nosniff"
+    # Bloquea que el sitio se incruste en un iframe ajeno (clickjacking).
+    Header always set X-Frame-Options "SAMEORIGIN"
+    # No filtra la URL completa hacia sitios externos.
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+    # La plataforma trata datos de menores: se desactiva de entrada todo
+    # lo que no necesita (Decreto 0769 de 2026).
+    Header set Permissions-Policy "geolocation=(), camera=(), payment=(), interest-cohort=()"
+</IfModule>
+
+# ── Compresión ───────────────────────────────────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/css text/plain application/javascript application/json
+</IfModule>
+
+# ── Caché de recursos estáticos ──────────────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType text/css                "access plus 7 days"
+    ExpiresByType application/javascript  "access plus 7 days"
+    ExpiresByType image/png               "access plus 30 days"
+    ExpiresByType image/jpeg              "access plus 30 days"
+    ExpiresByType image/svg+xml           "access plus 30 days"
+    ExpiresByType image/webp              "access plus 30 days"
+</IfModule>

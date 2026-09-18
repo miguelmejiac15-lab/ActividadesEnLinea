@@ -1,0 +1,2020 @@
+/* =====================================================================
+   ACTIVIDADES EN LÍNEA · Proyecto Final
+   estilo.css — Sistema visual
+
+   Los colores y la tipografía vienen del sitio publicado: no se inventan
+   colores nuevos. Lo que cambia es cómo se usan — más aire, jerarquía
+   más clara y componentes reutilizables.
+
+   Buscamos: educativo, moderno, interactivo, amigable.
+   Evitamos: LMS corporativo frío, caricatura infantil, plantilla genérica.
+   ===================================================================== */
+
+/* ── 1. Tokens ────────────────────────────────────────────────────── */
+:root {
+    /* Marca */
+    --azul:    #29b6f6;
+    --naranja: #ff9800;
+    --morado:  #ab47bc;
+    --verde:   #4caf50;
+    --rojo:    #e53935;
+    --oscuro:  #2f3b52;
+
+    /* Superficies */
+    --fondo:        #f8fafc;
+    --fondo-suave:  #eef4fa;
+    --blanco:       #ffffff;
+    --borde:        #e2e8f0;
+    --borde-suave:  #f1f5f9;
+    /* Un paso más marcado que --borde, para el contorno de algo que el
+       cursor está señalando sin llegar a estar activo. */
+    --borde-fuerte: #cbd5e1;
+
+    /* Texto */
+    --texto:        #4a5568;
+    --texto-tenue:  #8b95a5;
+
+    /* Acentos por categoría */
+    --c-letras:     #29b6f6;
+    --c-matematica: #ff9800;
+    --c-artistica:  #ab47bc;
+    --c-tecnologia: #4caf50;
+    --c-ciencias:   #26a69a;
+    --c-valores:    #ef5350;
+    --c-juegos:     #ffa726;
+    --c-dua:        #4dd0e1;
+
+    /* Forma */
+    --radio:        24px;
+    --radio-medio:  16px;
+    --radio-chico:  12px;
+    --radio-pildora: 50px;
+
+    /* Sombra */
+    --sombra:       0 6px 24px rgba(47, 59, 82, .07);
+    --sombra-alta:  0 14px 40px rgba(47, 59, 82, .13);
+
+    /* Movimiento */
+    --salto: cubic-bezier(.175, .885, .32, 1.275);
+
+    --ancho: 1240px;
+}
+
+/* ── 2. Base ──────────────────────────────────────────────────────── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: 'Fredoka', system-ui, -apple-system, sans-serif;
+    background: var(--fondo);
+    color: var(--texto);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+img { max-width: 100%; display: block; }
+a   { color: inherit; text-decoration: none; }
+
+/* Foco siempre visible: quien navega con teclado debe saber dónde está. */
+:focus-visible {
+    outline: 3px solid var(--azul);
+    outline-offset: 3px;
+    border-radius: 4px;
+}
+
+.contenedor {
+    width: 92%;
+    max-width: var(--ancho);
+    margin: 0 auto;
+}
+
+/* Enlace de salto para lectores de pantalla y teclado. */
+.saltar {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    background: var(--oscuro);
+    color: #fff;
+    padding: 12px 22px;
+    border-radius: 0 0 var(--radio-chico) 0;
+    z-index: 200;
+}
+.saltar:focus { left: 0; }
+
+/* ── 3. Cabecera ──────────────────────────────────────────────────── */
+.cabecera {
+    background: var(--blanco);
+    border-bottom: 2px solid var(--borde-suave);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.cabecera-fila {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 14px 0;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: 1.22rem;
+    font-weight: 700;
+    letter-spacing: .01em;
+    flex-shrink: 0;
+}
+.logo .a { color: var(--azul); }
+.logo .b { color: var(--naranja); }
+.logo .c { color: var(--morado); }
+.logo small {
+    display: block;
+    font-size: .62rem;
+    font-weight: 500;
+    color: var(--texto-tenue);
+    letter-spacing: .02em;
+    margin-top: -2px;
+}
+
+.menu {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    flex-wrap: wrap;
+}
+
+.menu a {
+    padding: 9px 15px;
+    border-radius: var(--radio-pildora);
+    font-size: .93rem;
+    font-weight: 600;
+    color: var(--texto);
+    transition: background .18s ease, color .18s ease;
+}
+.menu a:hover  { background: var(--fondo-suave); color: var(--oscuro); }
+.menu a.activo { background: var(--fondo-suave); color: var(--azul); }
+
+.menu .btn-menu {
+    background: linear-gradient(135deg, var(--azul), var(--morado));
+    color: #fff;
+    padding: 10px 20px;
+}
+.menu .btn-menu:hover { background: linear-gradient(135deg, var(--azul), var(--morado)); filter: brightness(1.08); color: #fff; }
+
+/* Menú móvil: casilla oculta, sin JavaScript. */
+.menu-toggle { display: none; }
+.menu-boton  { display: none; }
+
+/* ── 4. Botones ───────────────────────────────────────────────────── */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 13px 26px;
+    border: none;
+    border-radius: var(--radio-pildora);
+    font-family: inherit;
+    font-size: .97rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform .18s var(--salto), box-shadow .18s ease, filter .18s ease;
+    text-align: center;
+}
+
+.btn-principal {
+    background: linear-gradient(135deg, var(--azul), var(--morado));
+    color: #fff;
+    box-shadow: 0 5px 18px rgba(41, 182, 246, .32);
+}
+.btn-principal:hover { transform: translateY(-3px); filter: brightness(1.07); }
+
+.btn-secundario {
+    background: var(--blanco);
+    color: var(--oscuro);
+    border: 2px solid var(--borde);
+}
+.btn-secundario:hover { transform: translateY(-3px); border-color: var(--azul); color: var(--azul); }
+
+.btn-oro {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: #3a2a00;
+    box-shadow: 0 5px 18px rgba(251, 191, 36, .35);
+}
+.btn-oro:hover { transform: translateY(-3px); filter: brightness(1.05); }
+
+.btn-bloque { width: 100%; }
+.btn-chico  { padding: 9px 18px; font-size: .87rem; }
+
+/* ── 5. Hero ──────────────────────────────────────────────────────── */
+.hero {
+    position: relative;
+    background:
+        radial-gradient(circle at 12% 18%, rgba(41, 182, 246, .14), transparent 45%),
+        radial-gradient(circle at 88% 26%, rgba(171, 71, 188, .13), transparent 45%),
+        radial-gradient(circle at 50% 96%, rgba(255, 152, 0, .10), transparent 50%),
+        var(--blanco);
+    padding: 66px 0 76px;
+    overflow: hidden;
+    text-align: center;
+}
+
+.hero-inner { position: relative; z-index: 2; max-width: 780px; margin: 0 auto; }
+
+.etiqueta-hero {
+    display: inline-block;
+    background: var(--fondo-suave);
+    border: 2px solid rgba(41, 182, 246, .22);
+    color: var(--oscuro);
+    padding: 8px 20px;
+    border-radius: var(--radio-pildora);
+    font-size: .87rem;
+    font-weight: 600;
+    margin-bottom: 22px;
+}
+
+.hero h1 {
+    font-size: clamp(2.1rem, 5.4vw, 3.5rem);
+    line-height: 1.15;
+    color: var(--oscuro);
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+.hero h1 .resalte {
+    background: linear-gradient(135deg, var(--azul), var(--morado));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.hero p.entrada {
+    font-size: clamp(1rem, 2.1vw, 1.16rem);
+    color: var(--texto);
+    max-width: 620px;
+    margin: 0 auto 30px;
+}
+
+.hero-acciones {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 30px;
+}
+
+.hero-cifras {
+    display: flex;
+    gap: 34px;
+    justify-content: center;
+    flex-wrap: wrap;
+    color: var(--texto-tenue);
+    font-size: .88rem;
+}
+.hero-cifras b { display: block; font-size: 1.5rem; color: var(--oscuro); line-height: 1.2; }
+
+/* Elementos flotantes: guiño lúdico, discreto. */
+.flotante {
+    position: absolute;
+    font-size: 2.2rem;
+    opacity: .18;
+    animation: flotar 6s ease-in-out infinite;
+    pointer-events: none;
+    user-select: none;
+}
+.flotante.f1 { top: 14%;  left: 7%;  animation-delay: 0s;   }
+.flotante.f2 { top: 22%;  right: 9%; animation-delay: 1.4s; }
+.flotante.f3 { bottom: 18%; left: 13%; animation-delay: 2.8s; }
+.flotante.f4 { bottom: 24%; right: 12%; animation-delay: 4.2s; }
+
+@keyframes flotar {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50%      { transform: translateY(-16px) rotate(7deg); }
+}
+
+/* ── 6. Secciones ─────────────────────────────────────────────────── */
+.seccion { padding: 60px 0; }
+.seccion.tenue { background: var(--blanco); }
+
+.titulo-seccion { text-align: center; margin-bottom: 38px; }
+.titulo-seccion small {
+    display: block;
+    color: var(--azul);
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+}
+.titulo-seccion h2 {
+    color: var(--oscuro);
+    font-size: clamp(1.5rem, 3.4vw, 2.05rem);
+    font-weight: 700;
+    line-height: 1.25;
+}
+.titulo-seccion p {
+    color: var(--texto-tenue);
+    max-width: 580px;
+    margin: 10px auto 0;
+    font-size: .97rem;
+}
+.titulo-seccion.izquierda { text-align: left; }
+.titulo-seccion.izquierda p { margin-left: 0; }
+
+/* ── 7. ¿Qué puedo hacer? ─────────────────────────────────────────── */
+.acciones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(158px, 1fr));
+    gap: 16px;
+}
+
+.accion {
+    background: var(--blanco);
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-medio);
+    padding: 26px 16px;
+    text-align: center;
+    transition: transform .22s var(--salto), border-color .22s ease, box-shadow .22s ease;
+}
+.accion:hover { transform: translateY(-6px); box-shadow: var(--sombra); }
+.accion .ico { font-size: 2.8rem; display: block; margin-bottom: 9px; }
+.accion b    { color: var(--oscuro); font-size: 1rem; display: block; }
+
+.accion:nth-child(1):hover { border-color: var(--azul); }
+.accion:nth-child(2):hover { border-color: var(--naranja); }
+.accion:nth-child(3):hover { border-color: var(--morado); }
+.accion:nth-child(4):hover { border-color: var(--verde); }
+.accion:nth-child(5):hover { border-color: var(--c-ciencias); }
+.accion:nth-child(6):hover { border-color: var(--c-valores); }
+
+/* ── 7b. Pasos numerados ──────────────────────────────────────────── */
+.pasos {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(268px, 1fr));
+    gap: 20px;
+    counter-reset: paso;
+}
+
+.paso {
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+    background: var(--blanco);
+    border-radius: var(--radio-medio);
+    padding: 24px 22px;
+    box-shadow: var(--sombra);
+}
+
+.paso-num {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--azul), var(--morado));
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.05rem;
+}
+
+.paso b { display: block; color: var(--oscuro); font-size: 1.03rem; margin-bottom: 5px; }
+.paso p { font-size: .9rem; color: var(--texto-tenue); line-height: 1.55; }
+
+/* ── 7c. Materias (vistazo al catálogo desde la home) ─────────────── */
+/* Enlaces compactos, no tarjetas: dan la medida de lo que hay sin
+   convertir la home en un segundo catálogo. */
+.materias {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+    gap: 12px;
+}
+
+.materia {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 15px 17px;
+    background: var(--blanco);
+    border: 2px solid var(--borde);
+    border-left: 5px solid var(--acento, var(--azul));
+    border-radius: var(--radio-chico);
+    transition: transform .18s var(--salto), box-shadow .18s ease;
+}
+.materia:hover { transform: translateY(-4px); box-shadow: var(--sombra); }
+
+.materia-ico    { font-size: 2.2rem; line-height: 1; flex-shrink: 0; }
+.materia-nombre { flex: 1; font-weight: 600; color: var(--oscuro); font-size: .93rem; line-height: 1.3; }
+.materia-conteo {
+    flex-shrink: 0;
+    background: var(--fondo-suave);
+    color: var(--texto-tenue);
+    padding: 2px 10px;
+    border-radius: var(--radio-pildora);
+    font-size: .78rem;
+    font-weight: 700;
+}
+
+/* ── 7d. Espacio personal ─────────────────────────────────────────── */
+.panel-bienvenida {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    flex-wrap: wrap;
+    background: var(--blanco);
+    border-radius: var(--radio);
+    padding: 28px 30px;
+    box-shadow: var(--sombra);
+    border-left: 6px solid var(--azul);
+}
+
+.bienvenida-texto { flex: 1; min-width: 280px; }
+.bienvenida-texto h1 {
+    color: var(--oscuro);
+    font-size: clamp(1.4rem, 3.2vw, 1.85rem);
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+.bienvenida-texto p { font-size: 1rem; line-height: 1.55; }
+.bienvenida-texto .vigencia { font-size: .88rem; color: var(--texto-tenue); margin-top: 5px; }
+
+.bienvenida-medidor { width: 100%; max-width: 260px; }
+
+.medidor {
+    height: 12px;
+    background: var(--borde-suave);
+    border-radius: var(--radio-pildora);
+    overflow: hidden;
+}
+.medidor-relleno {
+    height: 100%;
+    background: linear-gradient(90deg, var(--verde), #8bc34a);
+    border-radius: var(--radio-pildora);
+    transition: width .5s ease;
+}
+.medidor-pie {
+    font-size: .82rem;
+    color: var(--texto-tenue);
+    margin: 8px 0 12px;
+    text-align: center;
+}
+
+/* Atajos a los bloques desde el espacio personal. */
+.bloques-atajo {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(238px, 1fr));
+    gap: 13px;
+}
+
+.atajo {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 17px 19px;
+    background: var(--blanco);
+    border-radius: var(--radio-medio);
+    box-shadow: var(--sombra);
+    transition: transform .2s var(--salto), box-shadow .2s ease;
+}
+.atajo:hover { transform: translateY(-5px); box-shadow: var(--sombra-alta); }
+
+.atajo-ico   { font-size: 2.5rem; line-height: 1; flex-shrink: 0; }
+.atajo-texto { min-width: 0; }
+.atajo-texto b     { display: block; color: var(--oscuro); font-size: 1rem; line-height: 1.3; }
+.atajo-texto small { color: var(--texto-tenue); font-size: .82rem; }
+
+/* ── 8. Tarjeta de actividad ──────────────────────────────────────── */
+.rejilla-actividades {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+    gap: 20px;
+}
+
+.tarjeta {
+    background: var(--blanco);
+    border-radius: var(--radio-medio);
+    box-shadow: var(--sombra);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border-top: 4px solid var(--borde);
+    transition: transform .24s var(--salto), box-shadow .24s ease;
+}
+.tarjeta:hover { transform: translateY(-7px); box-shadow: var(--sombra-alta); }
+
+/*
+ * La cara de la tarjeta.
+ *
+ * El dibujo es lo primero —y muchas veces lo único— que lee un niño de
+ * cuatro años: a 3rem competía con el título y perdía. Ocupa ahora casi
+ * la mitad de la altura de la tarjeta, que es la proporción que tenía el
+ * sitio anterior y la razón por la que se veía tan vivo.
+ */
+.tarjeta-cara {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4.6rem;
+    background: var(--fondo-suave);
+    position: relative;
+}
+
+.tarjeta-cuerpo { padding: 17px 18px 19px; display: flex; flex-direction: column; flex: 1; gap: 9px; }
+
+.tarjeta h3 {
+    color: var(--oscuro);
+    font-size: 1.04rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.tarjeta p {
+    font-size: .87rem;
+    color: var(--texto-tenue);
+    line-height: 1.45;
+    flex: 1;
+}
+
+.tarjeta-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    font-size: .74rem;
+}
+
+.meta {
+    background: var(--fondo-suave);
+    color: var(--texto);
+    padding: 3px 10px;
+    border-radius: var(--radio-pildora);
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Progreso dentro de la tarjeta, en «sigue donde lo dejaste». */
+.tarjeta-progreso { display: flex; flex-direction: column; gap: 4px; }
+.tarjeta-progreso-barra {
+    height: 6px;
+    background: var(--borde-suave);
+    border-radius: var(--radio-pildora);
+    overflow: hidden;
+}
+.tarjeta-progreso-barra > div {
+    height: 100%;
+    background: linear-gradient(90deg, var(--verde), #8bc34a);
+    border-radius: var(--radio-pildora);
+}
+.tarjeta-progreso span { font-size: .75rem; color: var(--texto-tenue); font-weight: 600; }
+
+/* Etiquetas de acceso: comunican el modelo freemium de un vistazo. */
+.acceso {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 4px 12px;
+    border-radius: var(--radio-pildora);
+    font-size: .72rem;
+    font-weight: 700;
+    backdrop-filter: blur(6px);
+}
+.acceso.gratis   { background: rgba(76, 175, 80, .16);  color: #2e7d32; }
+.acceso.parcial  { background: rgba(255, 152, 0, .18);  color: #e65100; }
+.acceso.premium  { background: rgba(171, 71, 188, .16); color: #7b1fa2; }
+.acceso.incluida { background: rgba(41, 182, 246, .16); color: #0277bd; }
+
+.insignia-nueva {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: linear-gradient(135deg, var(--verde), #66bb6a);
+    color: #fff;
+    padding: 4px 12px;
+    border-radius: var(--radio-pildora);
+    font-size: .7rem;
+    font-weight: 700;
+}
+
+/* Borde superior por categoría. */
+.tarjeta.cat-letras     { border-top-color: var(--c-letras); }
+.tarjeta.cat-matematica { border-top-color: var(--c-matematica); }
+.tarjeta.cat-artistica  { border-top-color: var(--c-artistica); }
+.tarjeta.cat-tecnologia { border-top-color: var(--c-tecnologia); }
+.tarjeta.cat-ciencias   { border-top-color: var(--c-ciencias); }
+.tarjeta.cat-valores    { border-top-color: var(--c-valores); }
+.tarjeta.cat-juegos     { border-top-color: var(--c-juegos); }
+.tarjeta.cat-dua        { border-top-color: var(--c-dua); }
+
+/* ── 9. Categorías ────────────────────────────────────────────────── */
+.rejilla-categorias {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(215px, 1fr));
+    gap: 17px;
+}
+
+.categoria {
+    background: var(--blanco);
+    border-radius: var(--radio-medio);
+    padding: 24px 21px;
+    box-shadow: var(--sombra);
+    border-bottom: 4px solid var(--borde);
+    transition: transform .24s var(--salto), box-shadow .24s ease;
+    display: block;
+}
+.categoria:hover { transform: translateY(-7px); box-shadow: var(--sombra-alta); }
+.categoria .ico  { font-size: 2.8rem; display: block; margin-bottom: 11px; }
+.categoria h3    { color: var(--oscuro); font-size: 1.06rem; font-weight: 700; margin-bottom: 4px; }
+.categoria p     { font-size: .85rem; color: var(--texto-tenue); }
+.categoria .conteo {
+    display: inline-block;
+    margin-top: 11px;
+    background: var(--fondo-suave);
+    padding: 3px 12px;
+    border-radius: var(--radio-pildora);
+    font-size: .77rem;
+    font-weight: 600;
+    color: var(--texto);
+}
+
+/* ── 10. Filtros del catálogo ─────────────────────────────────────── */
+/*
+ * El panel llegó a mostrar más de cuarenta pastillas idénticas antes de
+ * la primera actividad. El arreglo no es adelgazar los bordes: es dar
+ * jerarquía. Categoría y bloque son navegación y se ven siempre; edad,
+ * habilidad, acceso y orden son afinado y van plegados.
+ *
+ * Lo que queda visible se aligera: borde de 1px en vez de 2, fondo
+ * blanco sobre panel blanco (el contorno basta), y los conteos en un
+ * tono mucho más tenue para que la palabra pese más que el número.
+ */
+.panel-filtros {
+    background: var(--blanco);
+    border-radius: var(--radio-medio);
+    padding: 22px 24px;
+    box-shadow: var(--sombra);
+    margin-bottom: 26px;
+}
+
+/* Buscador: el ícono va dentro del campo y el botón pegado al lado, no
+   suelto al otro extremo de la fila. */
+.fila-buscar { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+
+.caja-buscar {
+    flex: 1;
+    min-width: 220px;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 0 16px;
+    background: var(--fondo);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-pildora);
+    transition: border-color .16s, background .16s;
+}
+.caja-buscar:focus-within { border-color: var(--azul); background: var(--blanco); }
+.caja-buscar .lupa { font-size: .95rem; opacity: .5; flex-shrink: 0; }
+
+.caja-buscar input {
+    flex: 1;
+    min-width: 0;
+    padding: 11px 0;
+    border: none;
+    background: none;
+    font-family: inherit;
+    font-size: .95rem;
+    color: var(--texto);
+}
+.caja-buscar input:focus { outline: none; }
+.caja-buscar input::-webkit-search-cancel-button { cursor: pointer; }
+
+.oculto-visual {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.grupo-filtro { margin-bottom: 16px; }
+.grupo-filtro:last-child { margin-bottom: 0; }
+
+.rotulo {
+    display: block;
+    font-size: .68rem;
+    font-weight: 700;
+    color: var(--texto-tenue);
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 9px;
+    opacity: .75;
+}
+
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.chip {
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    color: var(--texto);
+    padding: 7px 14px;
+    border-radius: var(--radio-pildora);
+    font-family: inherit;
+    font-size: .845rem;
+    font-weight: 600;
+    line-height: 1.3;
+    cursor: pointer;
+    transition: background .15s ease, border-color .15s ease, color .15s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+.chip:hover  { background: var(--fondo-suave); border-color: var(--borde-fuerte); color: var(--oscuro); }
+.chip.activo { background: var(--oscuro); border-color: var(--oscuro); color: #fff; }
+
+/* El conteo acompaña, no compite: mismo tamaño no, mismo peso tampoco. */
+.chip small { font-size: .74rem; font-weight: 600; opacity: .45; }
+.chip.activo small { opacity: .6; }
+
+/* ── Filtros puestos ──────────────────────────────────────────────── */
+/* Se ven aunque su grupo esté plegado: nadie debería mirar un catálogo
+   recortado sin saber por qué. Cada ficha se quita con un clic. */
+.filtros-puestos {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    background: var(--fondo-suave);
+    border-radius: var(--radio-chico);
+}
+.filtros-puestos .rotulo { margin: 0 4px 0 0; }
+
+.ficha-puesta {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-pildora);
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--texto);
+    transition: border-color .15s, color .15s;
+}
+.ficha-puesta span[aria-hidden] { font-size: 1rem; line-height: 1; opacity: .45; }
+.ficha-puesta:hover { border-color: var(--rojo); color: var(--rojo); }
+.ficha-puesta:hover span[aria-hidden] { opacity: 1; }
+
+.limpiar-todo {
+    margin-left: auto;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--texto-tenue);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.limpiar-todo:hover { color: var(--rojo); }
+
+/* ── Plegado de los filtros de afinado ────────────────────────────── */
+/* <details> nativo: va con teclado, lo lee un lector de pantalla y no
+   depende de que cargue ningún script. */
+.mas-filtros {
+    margin-top: 18px;
+    border-top: 1px solid var(--borde);
+    padding-top: 14px;
+}
+
+.mas-filtros > summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 15px 7px 12px;
+    border-radius: var(--radio-pildora);
+    background: var(--fondo-suave);
+    font-size: .86rem;
+    font-weight: 600;
+    color: var(--texto);
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: background .15s, color .15s;
+}
+.mas-filtros > summary::-webkit-details-marker { display: none; }
+.mas-filtros > summary:hover { background: var(--borde); color: var(--oscuro); }
+
+.mas-icono { font-size: .95rem; line-height: 1; }
+
+/* Flecha propia, que gira al abrir.
+   `▾` y no `⌄`: el segundo se apoya en la línea base y al rotarlo queda
+   descolgado, obligando a compensarlo con márgenes a ojo. */
+.mas-filtros > summary::after {
+    content: '▾';
+    font-size: .8rem;
+    line-height: 1;
+    opacity: .55;
+    transition: transform .2s ease;
+}
+.mas-filtros[open] > summary { background: var(--oscuro); color: #fff; }
+.mas-filtros[open] > summary::after { transform: rotate(180deg); opacity: .8; }
+
+/* Cuántos filtros hay puestos ahí dentro. */
+.mas-cuenta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 19px;
+    height: 19px;
+    padding: 0 5px;
+    border-radius: 999px;
+    background: var(--azul);
+    color: #fff;
+    font-size: .72rem;
+    font-weight: 700;
+}
+
+.mas-cuerpo { padding-top: 18px; }
+
+.resumen-resultados {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+    color: var(--texto-tenue);
+    font-size: .92rem;
+}
+.resumen-resultados b { color: var(--oscuro); }
+
+/* ── 10b. Bloques del catálogo ────────────────────────────────────── */
+/* Agrupan las actividades dentro de una categoría. Sin ellos, «Aventura
+   de las Letras» sería una pared de casi 40 tarjetas iguales. */
+.bloque-catalogo { margin-bottom: 40px; }
+.bloque-catalogo:last-of-type { margin-bottom: 0; }
+
+.bloque-cabeza {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 14px 20px;
+    margin-bottom: 18px;
+    background: var(--blanco);
+    border-radius: var(--radio-medio);
+    box-shadow: var(--sombra);
+    border-left: 5px solid var(--azul);
+    flex-wrap: wrap;
+}
+.bloque-cabeza.sencilla { border-left-color: var(--borde); background: transparent; box-shadow: none; padding-left: 0; }
+
+.bloque-icono { font-size: 2.7rem; line-height: 1; flex-shrink: 0; }
+
+.bloque-cabeza h3 {
+    color: var(--oscuro);
+    font-size: 1.12rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+.bloque-cabeza p { font-size: .85rem; color: var(--texto-tenue); margin-top: 1px; }
+.bloque-cabeza > div { flex: 1; min-width: 140px; }
+.bloque-cabeza .btn { flex-shrink: 0; }
+
+/* Cada bloque hereda el color de su categoría. */
+.bloque-catalogo:nth-of-type(1) .bloque-cabeza { border-left-color: var(--azul); }
+.bloque-catalogo:nth-of-type(2) .bloque-cabeza { border-left-color: var(--naranja); }
+.bloque-catalogo:nth-of-type(3) .bloque-cabeza { border-left-color: var(--morado); }
+.bloque-catalogo:nth-of-type(4) .bloque-cabeza { border-left-color: var(--verde); }
+
+/* «+ 3 actividades más en este bloque», cuando el bloque va recortado. */
+.bloque-mas { margin-top: 14px; text-align: center; }
+.bloque-mas a {
+    display: inline-block;
+    padding: 8px 20px;
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--azul);
+    border: 1px dashed var(--borde);
+    border-radius: 999px;
+    transition: background .18s, border-color .18s;
+}
+.bloque-mas a:hover { background: var(--fondo-suave); border-color: var(--azul); }
+
+/* ── 10bis. Directorio de materias ────────────────────────────────── */
+/* La portada del catálogo cuando no hay ningún filtro puesto: una ficha
+   por materia con sus bloques dentro, en vez de 149 tarjetas seguidas.
+   Es la estructura que el visitante ya tiene en la cabeza al buscar. */
+.directorio {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 18px;
+}
+
+.linea {
+    background: var(--blanco);
+    border-radius: var(--radio-medio);
+    box-shadow: var(--sombra);
+    border-left: 5px solid var(--acento, var(--azul));
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: box-shadow .18s, transform .18s;
+}
+.linea:hover { box-shadow: var(--sombra-alta, 0 8px 24px rgba(0,0,0,.10)); transform: translateY(-2px); }
+
+.linea-cabeza {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    color: inherit;
+}
+.linea-ico { font-size: 2.7rem; line-height: 1; flex-shrink: 0; }
+.linea-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+
+.linea-nombre {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--oscuro);
+    line-height: 1.25;
+}
+.linea-bajada {
+    font-size: .8rem;
+    color: var(--texto-tenue);
+    line-height: 1.35;
+}
+.linea-conteo {
+    flex-shrink: 0;
+    min-width: 34px;
+    text-align: center;
+    padding: 3px 9px;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--acento, var(--azul));
+    background: var(--fondo-suave);
+    border-radius: 999px;
+}
+.linea-cabeza:hover .linea-nombre { color: var(--acento, var(--azul)); }
+
+/* Los bloques de la materia: los «submundos» de la versión anterior. */
+.submundos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    padding-top: 11px;
+    border-top: 1px solid var(--borde-suave, var(--borde));
+}
+.submundo {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 11px;
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--texto-tenue);
+    background: var(--fondo-suave);
+    border-radius: 999px;
+    transition: background .16s, color .16s;
+}
+.submundo small { opacity: .6; font-weight: 700; }
+.submundo:hover { background: var(--acento, var(--azul)); color: #fff; }
+.submundo:hover small { opacity: .85; }
+.submundo.todos { background: transparent; color: var(--acento, var(--azul)); }
+.submundo.todos:hover { background: var(--fondo-suave); color: var(--acento, var(--azul)); }
+
+/* ── 10d. Gamificación ────────────────────────────────────────────── */
+/*
+ * El personaje: la cara con su accesorio encima. Se compone con emojis
+ * superpuestos en vez de una imagen por combinación — 12 personajes × 12
+ * accesorios serían 144 dibujos que mantener.
+ */
+/* ── El personaje y lo que lleva puesto ───────────────────────────────
+
+   Todo se mide en `em`, así que el accesorio sigue al personaje sea del
+   tamaño que sea: el mismo HTML vale para el marcador de la cabecera
+   (2.1rem) y para la celebración a pantalla completa (8rem).
+
+   Antes TODOS los accesorios se pegaban en la esquina superior derecha
+   con la misma regla. El sombrero flotaba al lado de la cabeza, las
+   gafas flotaban al lado de la cabeza y la bufanda también: parecía que
+   al personaje le hubieran caído cosas encima, no que las llevara.
+
+   Ahora cada uno va donde va, y eso solo se puede afinar mirándolo. Las
+   caras de animal del emoji ocupan casi todo el cuadro y tienen los ojos
+   hacia el tercio superior; de ahí salen estas medidas. */
+
+.personaje { position: relative; display: inline-block; line-height: 1; }
+
+/* La cara va por delante de los accesorios que se llevan a la espalda.
+   Se hace subiendo la cara y no bajando la mochila: con `z-index:-1` la
+   mochila se iría detrás del fondo de la tarjeta y desaparecería. */
+.personaje-cara { display: block; font-size: 1em; position: relative; z-index: 1; }
+
+.personaje-accesorio {
+    position: absolute;
+    line-height: 1;
+    /* Un contorno claro lo separa de la cara que tiene debajo. */
+    filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff);
+    pointer-events: none;
+
+    /* Por defecto, arriba y centrado: es donde va lo que se pone en la
+       cabeza, que son la mitad de los accesorios de la tienda. Un slug
+       nuevo aterriza en un sitio razonable sin tocar nada. */
+    top: -.30em;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: .58em;
+}
+
+/* Sombreros y coronas: apoyados en la cabeza, no encima del aire. */
+.personaje-accesorio.acc-gorra    { top: -.26em; font-size: .60em; }
+.personaje-accesorio.acc-sombrero { top: -.34em; font-size: .58em; }
+.personaje-accesorio.acc-corona   { top: -.28em; font-size: .52em; }
+.personaje-accesorio.acc-casco    { top: -.24em; font-size: .62em; }
+
+/* Gafas: sobre los ojos. En las caras de animal quedan hacia un tercio
+   de la altura, no en el centro. */
+.personaje-accesorio.acc-gafas {
+    top: .30em;
+    font-size: .54em;
+    filter: none;   /* aquí el contorno blanco las despega de la cara */
+}
+
+/* Bufanda: en el cuello, o sea abajo y por delante. */
+.personaje-accesorio.acc-bufanda {
+    top: auto;
+    bottom: -.06em;
+    font-size: .50em;
+}
+
+/* Medalla: al pecho, ligeramente a un lado. */
+.personaje-accesorio.acc-medalla {
+    top: auto;
+    bottom: -.02em;
+    left: auto;
+    right: .04em;
+    transform: none;
+    font-size: .40em;
+}
+
+/* Mochila: al hombro. Queda detrás porque la cara sube, no porque esta
+   baje — ver la nota de `.personaje-cara`. */
+.personaje-accesorio.acc-mochila {
+    top: auto;
+    bottom: .04em;
+    left: -.16em;
+    transform: none;
+    font-size: .44em;
+}
+
+/* Flor: en la oreja. */
+.personaje-accesorio.acc-flor {
+    top: .02em;
+    left: -.06em;
+    transform: none;
+    font-size: .38em;
+}
+
+/* Los que no se «llevan puestos» acompañan al lado, y eso está bien:
+   nadie se pone un cohete. */
+.personaje-accesorio.acc-estrella {
+    top: -.08em; left: auto; right: -.08em; transform: none; font-size: .40em;
+}
+.personaje-accesorio.acc-cohete {
+    top: -.02em; left: auto; right: -.22em; transform: none; font-size: .46em;
+}
+.personaje-accesorio.acc-trofeo {
+    top: auto; bottom: -.04em; left: auto; right: -.14em;
+    transform: none; font-size: .44em;
+}
+
+.personaje.chico  { font-size: 2.1rem; }
+.personaje.grande { font-size: 8rem; }
+
+/* Marcador de la cabecera: estado, no navegación. */
+.marcador {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 5px 14px 5px 8px;
+    margin-right: 4px;
+    background: var(--fondo-suave);
+    border-radius: var(--radio-pildora);
+    color: var(--texto);
+    transition: background .16s;
+}
+.marcador:hover { background: var(--borde); }
+
+.marcador-dato {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--oscuro);
+}
+.marcador-dato.racha { color: #e8590c; }
+
+/* Tira de juego en «Mi espacio»: lo que llevas hecho, de un vistazo. */
+.tira-juego {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 26px;
+    margin-top: 16px;
+    padding: 16px 22px;
+    background: var(--blanco);
+    border-radius: var(--radio-medio);
+    box-shadow: var(--sombra);
+    color: var(--texto);
+    transition: box-shadow .18s;
+}
+.tira-juego:hover { box-shadow: var(--sombra-alta); }
+
+.tj-dato { display: inline-flex; align-items: baseline; gap: 6px; }
+.tj-ico  { font-size: 1.6rem; }
+.tj-dato b { font-size: 1.35rem; color: var(--oscuro); }
+.tj-dato small { font-size: .8rem; color: var(--texto-tenue); }
+
+.tj-semana { display: inline-flex; gap: 4px; }
+.tj-dia {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: var(--fondo);
+    border: 1px solid var(--borde);
+    font-size: .68rem;
+    font-weight: 700;
+    color: var(--texto-tenue);
+}
+.tj-dia.jugado { background: #fff4e6; border-color: #ffc078; color: #e8590c; }
+.tj-dia.hoy    { border-color: var(--azul); }
+
+.tj-ir {
+    margin-left: auto;
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--azul);
+}
+
+/* ── Panel del personaje ──────────────────────────────────────────── */
+.panel-personaje {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 24px 30px;
+    align-items: center;
+    background: var(--blanco);
+    border-radius: var(--radio-medio);
+    box-shadow: var(--sombra);
+    padding: 26px 28px;
+}
+
+.retrato { text-align: center; }
+.retrato-nombre { margin-top: 8px; font-weight: 700; color: var(--oscuro); }
+.retrato form { margin-top: 10px; }
+
+.marcador-grande {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 18px;
+}
+.marcador-grande .dato {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    line-height: 1.3;
+}
+.marcador-grande .ico { font-size: 2.1rem; }
+.marcador-grande b { font-size: 1.9rem; color: var(--oscuro); }
+.marcador-grande span { font-size: .88rem; color: var(--texto-tenue); }
+.marcador-grande small { font-size: .78rem; color: var(--texto-tenue); opacity: .8; margin-top: 3px; }
+
+/* La semana de la racha: se ve, no solo se cuenta. */
+.semana {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    padding-top: 18px;
+    border-top: 1px solid var(--borde);
+}
+.semana .dia {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    width: 42px;
+    padding: 7px 0;
+    border-radius: var(--radio-chico);
+    background: var(--fondo);
+    border: 1px solid var(--borde);
+    font-size: 1rem;
+}
+.semana .dia small { font-size: .68rem; font-weight: 700; color: var(--texto-tenue); }
+.semana .dia.jugado { background: #fff4e6; border-color: #ffc078; }
+.semana .dia.hoy    { border-color: var(--azul); border-width: 2px; }
+.semana-pie {
+    flex: 1;
+    min-width: 190px;
+    margin-left: 8px;
+    font-size: .88rem;
+    color: var(--texto-tenue);
+}
+
+/* ── Rejilla de la tienda ─────────────────────────────────────────── */
+.rejilla-tienda {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(158px, 1fr));
+    gap: 14px;
+}
+
+.articulo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 18px 14px 16px;
+    background: var(--blanco);
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-medio);
+    text-align: center;
+    transition: border-color .16s, transform .16s;
+}
+.articulo:hover { transform: translateY(-2px); }
+.articulo.mio   { border-color: var(--borde-fuerte); }
+.articulo.puesto { border-color: var(--verde); background: rgba(76, 175, 80, .06); }
+
+.articulo-cara { font-size: 4.4rem; line-height: 1; }
+
+/* La vista previa del accesorio sobre el personaje actual. El tamaño va
+   aquí y no en el `span` para que herede las medidas en `em` de
+   `.personaje-accesorio`, que es lo que mantiene el sombrero en su
+   sitio a cualquier escala. */
+.personaje.mediano { font-size: 4.4rem; }
+
+/* Al ponerse algo, el retrato lo celebra. Es un segundo, pero es el
+   momento en el que el niño ve el resultado de haber estado jugando
+   para ahorrar. */
+@keyframes estrenar {
+    0%   { transform: scale(.86) rotate(-6deg); }
+    45%  { transform: scale(1.10) rotate(4deg); }
+    70%  { transform: scale(.97) rotate(-2deg); }
+    100% { transform: scale(1)   rotate(0deg); }
+}
+
+.retrato.estrenando .personaje { animation: estrenar .75s var(--salto) 1 both; }
+
+@media (prefers-reduced-motion: reduce) {
+    .retrato.estrenando .personaje { animation: none; }
+}
+.articulo b { font-size: .95rem; color: var(--oscuro); }
+.articulo p { font-size: .78rem; color: var(--texto-tenue); line-height: 1.35; }
+.articulo form { width: 100%; margin-top: auto; padding-top: 6px; }
+
+.sello-puesto {
+    margin-top: auto;
+    padding-top: 8px;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--verde);
+}
+.precio {
+    margin-top: auto;
+    padding-top: 8px;
+    font-size: .88rem;
+    font-weight: 700;
+    color: var(--oscuro);
+}
+.precio.bloqueado { color: var(--texto-tenue); }
+.faltan { font-size: .74rem; color: var(--texto-tenue); }
+
+/* ── Logros ───────────────────────────────────────────────────────── */
+.rejilla-logros {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+    gap: 12px;
+}
+
+.logro {
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    padding: 14px 16px;
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-medio);
+}
+/* Los que faltan se ven apagados, pero se ven: saber qué viene después
+   es parte de lo que empuja a seguir. */
+.logro:not(.hecho) { opacity: .62; }
+.logro.hecho { border-color: #ffc078; background: #fffaf3; opacity: 1; }
+
+.logro-cara { font-size: 2.5rem; line-height: 1; flex-shrink: 0; }
+.logro-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.logro-texto b { font-size: .92rem; color: var(--oscuro); }
+.logro-texto small { font-size: .78rem; color: var(--texto-tenue); line-height: 1.35; }
+
+.logro-barra {
+    height: 6px;
+    margin-top: 5px;
+    background: var(--borde);
+    border-radius: 99px;
+    overflow: hidden;
+}
+.logro-barra > div { height: 100%; background: var(--azul); border-radius: 99px; }
+.logro-cuenta { font-size: .72rem !important; }
+.logro-sello { font-size: .8rem; font-weight: 700; color: #e8590c; margin-top: 4px; }
+
+@media (max-width: 620px) {
+    .panel-personaje { grid-template-columns: 1fr; text-align: center; }
+    .marcador-grande .dato { align-items: center; }
+    .semana { justify-content: center; }
+    .semana-pie { text-align: center; margin-left: 0; }
+}
+
+/* ── 10c. Etiquetas transversales ─────────────────────────────────── */
+/* La categoría dice de qué trata la actividad; la etiqueta, qué pone en
+   juego. Por eso se ven distintas de los chips de filtro: no son
+   navegación principal, son señas de la actividad. */
+.etiquetas { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 14px; }
+.etiqueta {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 11px;
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--texto-tenue);
+    background: var(--fondo-suave);
+    border: 1px solid var(--borde);
+    border-radius: 999px;
+    transition: color .18s, border-color .18s;
+}
+a.etiqueta:hover { color: var(--azul); border-color: var(--azul); }
+
+/* ── 11. Ficha de actividad ───────────────────────────────────────── */
+.ficha {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 30px;
+    align-items: start;
+}
+
+.ficha-cara {
+    background: var(--fondo-suave);
+    border-radius: var(--radio);
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* En la ficha el dibujo es el protagonista: es la única imagen que
+       tiene la página, y es lo que un niño mira antes de decidir si
+       quiere jugar. */
+    font-size: 7.5rem;
+    margin-bottom: 22px;
+    position: relative;
+}
+
+.ficha h1 {
+    color: var(--oscuro);
+    font-size: clamp(1.6rem, 3.6vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.22;
+    margin-bottom: 12px;
+}
+
+.ficha .descripcion { font-size: 1.03rem; margin-bottom: 20px; }
+
+.bloque {
+    background: var(--blanco);
+    border-radius: var(--radio-medio);
+    padding: 22px 24px;
+    box-shadow: var(--sombra);
+    margin-bottom: 18px;
+}
+.bloque h2 {
+    color: var(--oscuro);
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin-bottom: 13px;
+    padding-bottom: 9px;
+    border-bottom: 2px solid var(--borde-suave);
+}
+
+.datos-ficha { display: grid; gap: 1px; background: var(--borde-suave); border-radius: var(--radio-chico); overflow: hidden; }
+.datos-ficha div {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    background: var(--blanco);
+    padding: 11px 15px;
+    font-size: .92rem;
+}
+.datos-ficha b { color: var(--oscuro); text-align: right; }
+
+/* Barra de estaciones: hace visible el modelo 30%. */
+.estaciones { display: flex; flex-direction: column; gap: 9px; }
+
+.estacion {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    padding: 12px 15px;
+    border-radius: var(--radio-chico);
+    background: var(--fondo);
+    border: 2px solid var(--borde);
+    font-size: .93rem;
+}
+.estacion.abierta { border-color: rgba(76, 175, 80, .4); background: rgba(76, 175, 80, .05); }
+.estacion.cerrada { opacity: .62; }
+
+.estacion .num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--borde);
+    color: var(--oscuro);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .8rem;
+    font-weight: 700;
+}
+.estacion.abierta .num { background: var(--verde); color: #fff; }
+.estacion .titulo { flex: 1; color: var(--oscuro); font-weight: 600; }
+.estacion .marca  { flex-shrink: 0; font-size: 1rem; }
+
+/* ── 12. Invitación a suscribirse ─────────────────────────────────── */
+/* Cuando el usuario Free llega al límite, esto es una oportunidad
+   comercial, no un mensaje de error. */
+.invitacion {
+    background: linear-gradient(135deg, #1e1b4b 0%, #4c1d95 55%, #6d28d9 100%);
+    border-radius: var(--radio);
+    padding: 32px 30px;
+    color: #fff;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.invitacion::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 18% 22%, rgba(251, 191, 36, .18), transparent 42%),
+        radial-gradient(circle at 82% 78%, rgba(41, 182, 246, .16), transparent 42%);
+    pointer-events: none;
+}
+.invitacion > * { position: relative; z-index: 1; }
+
+.invitacion .sello {
+    display: inline-block;
+    background: rgba(251, 191, 36, .17);
+    border: 1px solid rgba(251, 191, 36, .34);
+    color: #fbbf24;
+    padding: 6px 17px;
+    border-radius: var(--radio-pildora);
+    font-size: .76rem;
+    font-weight: 700;
+    letter-spacing: .07em;
+    margin-bottom: 15px;
+}
+.invitacion h2 { font-size: clamp(1.3rem, 3vw, 1.75rem); font-weight: 700; margin-bottom: 11px; line-height: 1.3; }
+.invitacion p  { color: rgba(255, 255, 255, .78); max-width: 520px; margin: 0 auto 22px; font-size: .97rem; }
+
+/* ── 13. Planes ───────────────────────────────────────────────────── */
+.rejilla-planes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(272px, 1fr));
+    gap: 22px;
+    align-items: start;
+}
+
+.plan {
+    background: var(--blanco);
+    border-radius: var(--radio);
+    padding: 30px 26px;
+    box-shadow: var(--sombra);
+    border: 3px solid transparent;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform .24s var(--salto), box-shadow .24s ease;
+}
+.plan:hover { transform: translateY(-6px); box-shadow: var(--sombra-alta); }
+
+/* La Biblioteca Completa se destaca: es el plan que queremos vender. */
+.plan.recomendado {
+    border-color: var(--azul);
+    box-shadow: 0 14px 44px rgba(41, 182, 246, .21);
+    transform: scale(1.03);
+}
+.plan.recomendado:hover { transform: scale(1.03) translateY(-6px); }
+
+.plan .cinta {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--azul), var(--morado));
+    color: #fff;
+    padding: 6px 20px;
+    border-radius: var(--radio-pildora);
+    font-size: .74rem;
+    font-weight: 700;
+    letter-spacing: .06em;
+    white-space: nowrap;
+}
+
+.plan .nivel {
+    color: var(--azul);
+    font-size: .77rem;
+    font-weight: 700;
+    letter-spacing: .11em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+.plan h3 { color: var(--oscuro); font-size: 1.35rem; font-weight: 700; margin-bottom: 6px; }
+.plan .lema { color: var(--texto-tenue); font-size: .89rem; margin-bottom: 18px; min-height: 40px; }
+
+.precio { margin-bottom: 6px; }
+.precio .cifra { font-size: 2.5rem; font-weight: 700; color: var(--oscuro); line-height: 1.05; }
+.precio .periodo { color: var(--texto-tenue); font-size: .93rem; font-weight: 500; }
+
+.precio-alterno {
+    font-size: .84rem;
+    color: var(--texto-tenue);
+    margin-bottom: 6px;
+}
+
+.ahorro {
+    display: inline-block;
+    background: rgba(76, 175, 80, .13);
+    color: #2e7d32;
+    padding: 4px 13px;
+    border-radius: var(--radio-pildora);
+    font-size: .79rem;
+    font-weight: 700;
+    margin-bottom: 18px;
+}
+
+.beneficios { list-style: none; margin-bottom: 22px; flex: 1; }
+.beneficios li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 7px 0;
+    font-size: .91rem;
+    line-height: 1.45;
+}
+.beneficios li::before {
+    content: '✓';
+    color: var(--verde);
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+/* ── 14. Mensaje clave ────────────────────────────────────────────── */
+.mensaje-clave {
+    background: var(--blanco);
+    border: 3px dashed rgba(41, 182, 246, .34);
+    border-radius: var(--radio);
+    padding: 30px;
+    text-align: center;
+}
+.mensaje-clave h2 {
+    color: var(--oscuro);
+    font-size: clamp(1.15rem, 2.7vw, 1.5rem);
+    font-weight: 700;
+    margin-bottom: 9px;
+    line-height: 1.35;
+}
+.mensaje-clave p { color: var(--texto-tenue); max-width: 560px; margin: 0 auto; font-size: .96rem; }
+
+/* ── 15. Avisos ───────────────────────────────────────────────────── */
+.aviso {
+    padding: 14px 19px;
+    border-radius: var(--radio-chico);
+    font-size: .93rem;
+    margin-bottom: 18px;
+    border-left: 4px solid;
+}
+.aviso.ok   { background: rgba(76, 175, 80, .1);  border-color: var(--verde);  color: #1b5e20; }
+.aviso.info { background: rgba(41, 182, 246, .1); border-color: var(--azul);   color: #01579b; }
+.aviso.mal  { background: rgba(229, 57, 53, .09); border-color: var(--rojo);   color: #b71c1c; }
+
+.vacio {
+    text-align: center;
+    padding: 56px 22px;
+    color: var(--texto-tenue);
+}
+.vacio .ico { font-size: 4.2rem; display: block; margin-bottom: 14px; opacity: .55; }
+.vacio h3   { color: var(--oscuro); font-size: 1.15rem; margin-bottom: 7px; }
+
+/* ── 16. Migas y paginación ───────────────────────────────────────── */
+.migas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    align-items: center;
+    font-size: .87rem;
+    color: var(--texto-tenue);
+    margin-bottom: 20px;
+}
+.migas a:hover { color: var(--azul); }
+.migas span.sep { opacity: .5; }
+
+
+/* ── 17. Guía de apoyos ───────────────────────────────────────────────
+   La página para adultos que explica qué apoyo sirve para qué. Usa el
+   morado de «Aprender sin Barreras» como hilo, para que se lea como
+   parte de esa categoría y no como un anexo suelto.
+   ------------------------------------------------------------------- */
+
+.pagina-apoyos { padding: 40px 0 70px; }
+
+.apoyos-cabeza {
+    text-align: center;
+    max-width: 62ch;
+    margin: 0 auto 32px;
+}
+
+.apoyos-cabeza .apoyos-emoji { font-size: 3rem; display: block; margin-bottom: 10px; }
+
+.apoyos-cabeza h1 {
+    font-size: 2.1rem;
+    font-weight: 700;
+    color: var(--oscuro);
+    margin-bottom: 10px;
+}
+
+.apoyos-bajada { color: var(--texto-tenue); font-size: 1.02rem; }
+
+/* El aviso de «esto no es un diagnóstico». Va destacado a propósito. */
+.apoyos-aclaracion {
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-left: 5px solid #5e35b1;
+    border-radius: var(--radio-medio);
+    padding: 26px 28px;
+    margin-bottom: 36px;
+    box-shadow: var(--sombra);
+}
+
+.apoyos-aclaracion h2 {
+    font-size: 1.05rem;
+    color: var(--oscuro);
+    margin-bottom: 12px;
+}
+
+.apoyos-aclaracion p { margin-bottom: 12px; max-width: 78ch; }
+.apoyos-aclaracion p:last-child { margin-bottom: 0; }
+.apoyos-aclaracion strong { color: var(--oscuro); }
+
+.apoyos-nota {
+    font-size: .92rem;
+    color: var(--texto-tenue);
+    padding-top: 12px;
+    border-top: 1px solid var(--borde-suave);
+}
+
+.apoyos-grupo {
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-medio);
+    padding: 26px 28px;
+    margin-bottom: 22px;
+    box-shadow: var(--sombra);
+}
+
+.apoyos-grupo h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--oscuro);
+    margin-bottom: 8px;
+}
+
+.apoyos-texto { max-width: 78ch; margin-bottom: 10px; }
+
+.apoyos-perfiles {
+    background: var(--fondo-suave);
+    border-radius: var(--radio-chico);
+    padding: 11px 16px;
+    font-size: .92rem;
+    color: var(--texto);
+    max-width: 78ch;
+    margin-bottom: 18px;
+}
+
+.apoyos-filtros {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+}
+
+.apoyos-rotulo {
+    font-size: .8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--texto-tenue);
+}
+
+.apoyos-bloques {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(215px, 1fr));
+    gap: 12px;
+}
+
+.apoyo-tarjeta {
+    display: block;
+    background: var(--fondo-suave);
+    border: 2px solid transparent;
+    border-radius: var(--radio-chico);
+    padding: 16px;
+    transition: border-color .2s, transform .2s var(--salto);
+}
+
+.apoyo-tarjeta:hover {
+    border-color: #5e35b1;
+    transform: translateY(-2px);
+}
+
+.apoyo-tarjeta .apoyo-icono { font-size: 1.6rem; display: block; margin-bottom: 6px; }
+
+.apoyo-tarjeta .apoyo-nombre {
+    display: block;
+    font-weight: 600;
+    color: var(--oscuro);
+    margin-bottom: 4px;
+}
+
+.apoyo-tarjeta .apoyo-pie {
+    display: block;
+    font-size: .84rem;
+    color: var(--texto-tenue);
+    line-height: 1.45;
+}
+
+.apoyos-cierre {
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-medio);
+    padding: 26px 28px;
+    margin-top: 30px;
+    box-shadow: var(--sombra);
+}
+
+.apoyos-cierre h2 { font-size: 1.15rem; color: var(--oscuro); margin-bottom: 14px; }
+
+.apoyos-consejos { list-style: none; display: grid; gap: 12px; margin-bottom: 24px; }
+
+.apoyos-consejos li {
+    padding-left: 26px;
+    position: relative;
+    max-width: 82ch;
+}
+
+.apoyos-consejos li::before {
+    content: '·';
+    position: absolute;
+    left: 8px;
+    color: #5e35b1;
+    font-size: 1.6rem;
+    line-height: 1;
+}
+
+.apoyos-consejos strong { color: var(--oscuro); }
+
+.apoyos-acciones { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* La tira que lleva de «Aprender sin Barreras» a la guía de apoyos. */
+.tira-apoyos {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-left: 5px solid #5e35b1;
+    border-radius: var(--radio-medio);
+    padding: 18px 22px;
+    margin-bottom: 24px;
+    box-shadow: var(--sombra);
+    transition: border-color .2s, transform .2s var(--salto);
+}
+
+.tira-apoyos:hover { transform: translateY(-2px); box-shadow: var(--sombra-alta); }
+.tira-apoyos strong { display: block; color: var(--oscuro); margin-bottom: 2px; }
+.tira-apoyos span:nth-child(2) { font-size: .93rem; color: var(--texto-tenue); }
+.tira-apoyos .tira-apoyos-ico { font-size: 1.9rem; flex: none; }
+.tira-apoyos .tira-apoyos-ir  { font-size: 1.4rem; color: #5e35b1; flex: none; margin-left: auto; }
+
+@media (max-width: 620px) {
+    .tira-apoyos { flex-wrap: wrap; }
+    .tira-apoyos .tira-apoyos-ir { display: none; }
+}
+
+/* El «¿qué es esto?» junto al rótulo «Apoyos» en los filtros del catálogo. */
+.grupo-filtro .rotulo .enlace-rotulo {
+    margin-left: 8px;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--azul);
+}
+
+.grupo-filtro .rotulo .enlace-rotulo:hover { text-decoration: underline; }
+
+@media (max-width: 700px) {
+    .apoyos-cabeza h1 { font-size: 1.6rem; }
+    .apoyos-aclaracion,
+    .apoyos-grupo,
+    .apoyos-cierre { padding: 20px 18px; }
+    .apoyos-bloques { grid-template-columns: 1fr; }
+}
+
+.paginacion {
+    display: flex;
+    justify-content: center;
+    gap: 7px;
+    flex-wrap: wrap;
+    margin-top: 34px;
+}
+.paginacion a, .paginacion span {
+    min-width: 41px;
+    padding: 9px 14px;
+    border-radius: var(--radio-chico);
+    background: var(--blanco);
+    border: 2px solid var(--borde);
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--texto);
+    text-align: center;
+}
+.paginacion a:hover { border-color: var(--azul); color: var(--azul); }
+.paginacion .actual { background: var(--oscuro); border-color: var(--oscuro); color: #fff; }
+
+/* ── 17. Pie ──────────────────────────────────────────────────────── */
+.pie {
+    background: var(--oscuro);
+    color: rgba(255, 255, 255, .68);
+    padding: 46px 0 26px;
+    margin-top: 60px;
+}
+/*
+ * Cuatro columnas: la marca ancha y las tres listas de enlaces iguales.
+ *
+ * Antes decía `1.7fr repeat(auto-fit, minmax(145px, 1fr))`, que parece
+ * razonable y no lo es: la especificación de Grid prohíbe combinar
+ * `auto-fit` con pistas flexibles (`fr`). La declaración entera quedaba
+ * inválida, el navegador la descartaba, y la rejilla caía a UNA columna
+ * — por eso el pie se veía como una tira larguísima.
+ *
+ * Con la cuenta de repeticiones explícita la regla es válida y hace lo
+ * que decía querer hacer.
+ */
+.pie-rejilla {
+    display: grid;
+    grid-template-columns: 1.4fr repeat(3, minmax(130px, 1fr));
+    gap: 30px 36px;
+    margin-bottom: 30px;
+    align-items: start;
+}
+
+/* El tope acompaña al ancho que da 1.4fr en pantallas normales, para que
+   no quede un hueco muerto entre la marca y la primera lista. En
+   pantallas muy anchas evita que el texto se estire de lado a lado, que
+   a esa medida sería incómodo de leer. */
+.pie-marca { max-width: 380px; }
+.pie h4 {
+    color: #fff;
+    font-size: .95rem;
+    font-weight: 700;
+    margin-bottom: 13px;
+}
+.pie ul { list-style: none; }
+.pie li { margin-bottom: 8px; font-size: .89rem; }
+.pie a:hover { color: var(--azul); }
+.pie .marca-pie { font-size: 1.15rem; font-weight: 700; margin-bottom: 9px; }
+.pie .marca-pie .a { color: var(--azul); }
+.pie .marca-pie .b { color: var(--naranja); }
+.pie .marca-pie .c { color: var(--morado); }
+.pie .lema-pie { font-size: .87rem; max-width: 300px; }
+
+.pie-abajo {
+    border-top: 1px solid rgba(255, 255, 255, .12);
+    padding-top: 20px;
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: .82rem;
+    color: rgba(255, 255, 255, .45);
+}
+
+/* ── 18. Adaptación a pantallas pequeñas ──────────────────────────── */
+@media (max-width: 900px) {
+    .ficha { grid-template-columns: 1fr; }
+    .plan.recomendado { transform: none; }
+    .plan.recomendado:hover { transform: translateY(-6px); }
+}
+
+@media (max-width: 760px) {
+    /* El menú pasa a desplegarse con una casilla oculta: sin JavaScript,
+       así funciona aunque el script falle o tarde en cargar. */
+    .menu-boton {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: auto;
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radio-chico);
+        background: var(--fondo-suave);
+        font-size: 1.35rem;
+        cursor: pointer;
+        color: var(--oscuro);
+    }
+    .menu {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 3px;
+        padding: 10px 0 4px;
+        margin-left: 0;
+    }
+    .menu a { padding: 12px 16px; border-radius: var(--radio-chico); }
+    .menu-toggle:checked ~ .menu { display: flex; }
+    .cabecera-fila { flex-wrap: wrap; gap: 10px; }
+
+    .seccion { padding: 44px 0; }
+    .hero { padding: 46px 0 54px; }
+    .hero-acciones .btn { width: 100%; }
+    .hero-cifras { gap: 22px; }
+    .flotante { display: none; }
+
+    .rejilla-actividades { grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 13px; }
+    .tarjeta-cara { height: 112px; font-size: 3.4rem; }
+    .tarjeta-cuerpo { padding: 13px 14px 15px; }
+    .tarjeta h3 { font-size: .95rem; }
+    .tarjeta p { display: none; }
+
+    .ficha-cara { height: 180px; font-size: 5rem; }
+
+    /* La marca pasa a ocupar el ancho entero y las tres listas quedan en
+       fila debajo: se conserva la lectura en columnas hasta donde cabe. */
+    .pie-rejilla { grid-template-columns: repeat(3, 1fr); gap: 24px 26px; }
+    .pie-marca   { grid-column: 1 / -1; max-width: none; }
+
+    /* En pantalla estrecha el panel gana el espacio de sus márgenes, y el
+       campo de búsqueda se encoge lo justo para que el botón quepa a su
+       lado. Con el mínimo de escritorio el botón caía a un renglón propio
+       y se quedaba solo, alineado a la izquierda, como si sobrara. */
+    .panel-filtros { padding: 18px 16px; }
+    .caja-buscar   { min-width: 130px; }
+    .fila-buscar .btn { padding-left: 20px; padding-right: 20px; }
+
+    /* Los filtros puestos, en columna: en una fila de 360 px cada ficha
+       acabaría partida en dos líneas. */
+    .filtros-puestos { padding: 11px 12px; }
+    .limpiar-todo { margin-left: 0; }
+}
+
+@media (max-width: 560px) {
+    /* Dos columnas antes de rendirse a una sola: «Explorar» y «Cuenta»
+       son listas cortas y caben de sobra al lado de otra. */
+    .pie-rejilla { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 420px) {
+    .rejilla-actividades { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 380px) {
+    .pie-rejilla { grid-template-columns: 1fr; gap: 20px; }
+}
+
+/* Quien pidió menos movimiento en su sistema, no debe recibirlo. */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+        scroll-behavior: auto !important;
+    }
+}

@@ -1,0 +1,25 @@
+# =====================================================================
+#  colegio/ — La puerta de un colegio
+# =====================================================================
+
+# Detrás de esta dirección hay clases con menores. Fuera de buscadores.
+<IfModule mod_headers.c>
+    Header set X-Robots-Tag "noindex, nofollow, noarchive"
+</IfModule>
+
+# ── Dirección corta ───────────────────────────────────────────────────
+#
+# /colegio/ds-schule-bq  →  /colegio/index.php?c=ds-schule-bq
+#
+# Se reparte una vez y sirve todo el año, así que tiene que poder
+# escribirse en una circular sin signos raros.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /proyecto-final/colegio/
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Solo letras, números y guiones: la forma de un slug.
+    RewriteRule ^([A-Za-z0-9-]{2,160})/?$ index.php?c=$1 [L,QSA]
+</IfModule>

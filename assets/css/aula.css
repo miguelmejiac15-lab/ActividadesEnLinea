@@ -1,0 +1,255 @@
+/* =====================================================================
+   ACTIVIDADES EN LÍNEA · Proyecto Final
+   aula.css — La pantalla por la que entra un niño de seis años
+
+   Todo está dimensionado para eso y no para un adulto con ratón:
+
+     · Los botones ocupan la fila entera y miden 64 px de alto. El dedo
+       de un niño de primero no acierta un botón de 32.
+     · Una sola cosa que hacer por pantalla.
+     · Texto grande y poco: quien lo lee está aprendiendo a leer.
+     · Contraste alto, porque esto se usa en un aula con la persiana
+       subida y proyector encendido.
+   ===================================================================== */
+
+:root {
+    --azul:    #29b6f6;
+    --azul-h:  #039be5;
+    --verde:   #4caf50;
+    --rojo:    #e53935;
+    --oscuro:  #2f3b52;
+    --texto:   #4a5568;
+    --tenue:   #8b95a5;
+    --borde:   #e2e8f0;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Fredoka', system-ui, -apple-system, sans-serif;
+    background: var(--azul);
+    /* Los puntos son de Kodable y funcionan: dan textura sin distraer. */
+    background-image: radial-gradient(rgba(0,0,0,.06) 2px, transparent 2px);
+    background-size: 26px 26px;
+    color: var(--texto);
+    min-height: 100vh;
+    line-height: 1.5;
+}
+
+/* Foco siempre visible y GRUESO: en un aula hay teclados sin ratón. */
+:focus-visible {
+    outline: 4px solid #ffffff;
+    outline-offset: 3px;
+}
+
+
+/* ── Cabecera ─────────────────────────────────────────────────────── */
+
+.aula-cabeza {
+    background: #ffffff;
+    padding: 14px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.aula-logo  { font-weight: 700; color: var(--oscuro); font-size: 1.05rem; }
+.aula-clase { color: var(--tenue); font-size: .95rem; }
+
+
+/* ── Cuerpo ───────────────────────────────────────────────────────── */
+
+.aula-cuerpo {
+    display: flex;
+    justify-content: center;
+    padding: 34px 16px 60px;
+}
+
+.tarjeta-codigo,
+.tarjeta-lista {
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 14px 44px rgba(0, 0, 0, .16);
+    width: 100%;
+    max-width: 560px;
+    padding: 34px 28px;
+    text-align: center;
+}
+
+.tarjeta-lista { max-width: 640px; padding: 28px 20px; }
+
+h1 {
+    font-size: 1.65rem;
+    color: var(--oscuro);
+    margin-bottom: 10px;
+    line-height: 1.25;
+}
+
+.tarjeta-codigo p,
+.aula-vacio { color: var(--texto); font-size: 1.02rem; margin-bottom: 20px; }
+
+
+/* ── El código ────────────────────────────────────────────────────── */
+
+.campo-codigo {
+    width: 100%;
+    font-family: inherit;
+    /* Enorme y con las letras separadas: se copia de un tablero. */
+    font-size: 2.1rem;
+    font-weight: 700;
+    letter-spacing: .18em;
+    text-align: center;
+    text-transform: uppercase;
+    color: var(--oscuro);
+    background: #f8fafc;
+    border: 3px solid var(--borde);
+    border-radius: 16px;
+    padding: 16px 12px;
+    margin-bottom: 16px;
+}
+
+.campo-codigo:focus { border-color: var(--azul); outline: none; background: #fff; }
+.campo-codigo::placeholder { color: #cbd5e1; letter-spacing: .18em; }
+
+.campo-pin { letter-spacing: .5em; font-size: 2.4rem; }
+
+
+/* ── Botón grande ─────────────────────────────────────────────────── */
+
+.boton-grande {
+    width: 100%;
+    font-family: inherit;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffffff;
+    background: var(--azul);
+    border: none;
+    border-radius: 50px;
+    padding: 18px 24px;
+    cursor: pointer;
+    transition: background .15s, transform .1s;
+}
+
+.boton-grande:hover  { background: var(--azul-h); }
+.boton-grande:active { transform: scale(.98); }
+
+
+/* ── La lista de niños ────────────────────────────────────────────── */
+
+.lista-ninos { list-style: none; }
+
+.lista-ninos li + li { border-top: 2px solid #f1f5f9; }
+
+.fila-nino {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    /* 64 px de alto de verdad: es la medida que acierta un dedo pequeño. */
+    min-height: 64px;
+    padding: 12px 10px;
+    background: transparent;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    transition: background .12s;
+}
+
+.fila-nino:hover  { background: #f0f9ff; }
+.fila-nino:active { background: #e0f2fe; }
+
+.fila-nino .cara {
+    flex: none;
+    width: 52px;
+    height: 52px;
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+}
+
+.fila-nino .cara img,
+.fila-nino .cara svg { width: 100%; height: 100%; }
+
+.fila-nino .nombre {
+    flex: 1;
+    /* Mayúsculas como en Kodable: un niño que empieza a leer reconoce
+       antes su nombre en mayúsculas que en minúsculas. */
+    text-transform: uppercase;
+    font-size: 1.12rem;
+    font-weight: 600;
+    color: var(--oscuro);
+    line-height: 1.25;
+}
+
+.fila-nino .jugar {
+    flex: none;
+    background: var(--azul);
+    color: #ffffff;
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    border-radius: 50px;
+    padding: 9px 20px;
+}
+
+.fila-nino:hover .jugar { background: var(--azul-h); }
+
+.cara-grande { font-size: 4rem; margin-bottom: 8px; }
+
+/* El docente debajo del nombre de la clase, en la puerta del colegio. */
+.fila-nino .fila-sub {
+    display: block;
+    text-transform: none;
+    font-size: .82rem;
+    font-weight: 400;
+    color: var(--tenue);
+    margin-top: 2px;
+}
+
+
+/* ── Avisos y pie ─────────────────────────────────────────────────── */
+
+.aula-error {
+    background: #fdeaea;
+    color: #b3261e;
+    border-radius: 14px;
+    padding: 13px 16px;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.aula-vacio { color: var(--tenue); padding: 20px 0; }
+
+.aula-pie {
+    margin-top: 22px;
+    font-size: .9rem;
+    color: var(--tenue);
+}
+
+.aula-pie a { color: var(--azul); font-weight: 600; }
+.aula-pie a:hover { text-decoration: underline; }
+
+
+/* ── Pantallas pequeñas ───────────────────────────────────────────── */
+
+@media (max-width: 520px) {
+    .aula-cuerpo { padding: 20px 10px 40px; }
+    .tarjeta-codigo, .tarjeta-lista { padding: 24px 16px; border-radius: 20px; }
+    h1 { font-size: 1.4rem; }
+    .campo-codigo { font-size: 1.7rem; }
+
+    /* El botón JUGAR estorba en una pantalla estrecha: la fila entera ya
+       es el botón, así que se quita y queda más sitio para el nombre. */
+    .fila-nino .jugar { display: none; }
+    .fila-nino .nombre { font-size: 1.05rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .boton-grande, .fila-nino { transition: none; }
+    .boton-grande:active { transform: none; }
+}

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Ñame">
+  <!-- Ñame. Es de las poquísimas palabras con Ñ que un niño colombiano
+       reconoce, y aparece en cinco estaciones de la actividad de la Ñ.
+       Hasta ahora se ilustraba con 🌿, una hierba genérica que compartía
+       con «yuca», «tallo», «hierba», «wasabi» e «invierno». -->
+  <ellipse cx="64" cy="112" rx="34" ry="6" fill="#000" opacity=".08"/>
+
+  <!-- Tubérculo alargado y algo irregular, como es de verdad. -->
+  <path d="M44 100
+           C30 88 30 60 42 42
+           C50 30 62 24 72 28
+           C86 34 92 52 90 72
+           C88 92 74 108 62 108
+           C55 108 49 105 44 100 Z"
+        fill="#8d6e63"/>
+  <!-- Luz por el lado izquierdo -->
+  <path d="M44 100 C30 88 30 60 42 42 C48 33 56 27 64 26
+           C54 40 46 62 46 80 C46 88 45 95 44 100 Z"
+        fill="#a1887f"/>
+  <!-- Piel rugosa -->
+  <path d="M56 46 q6 5 4 12 M68 58 q7 4 5 12 M54 72 q7 4 5 12"
+        stroke="#6d4c41" stroke-width="3" stroke-linecap="round" fill="none" opacity=".55"/>
+  <!-- Raicillas -->
+  <path d="M72 28 q3 -9 9 -13 M66 26 q-2 -9 -7 -12"
+        stroke="#6d4c41" stroke-width="3.4" stroke-linecap="round" fill="none"/>
+</svg>

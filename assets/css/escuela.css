@@ -1,0 +1,1131 @@
+/* =====================================================================
+   ACTIVIDADES EN LÍNEA · Proyecto Final
+   escuela.css — Área del docente
+
+   Se carga DESPUÉS de estilo.css y admin.css, y da por hechos sus tokens
+   y su armazón: `.panel-marco`, `.lateral`, `.area`, `.btn`, `.aviso`.
+   Aquí solo va lo que el panel de administración no tiene, porque las dos
+   áreas responden a preguntas distintas: el admin gestiona el catálogo,
+   esto mira a treinta niños.
+
+   Un principio recorre todo el archivo: **el color nunca es el único
+   dato**. Cada celda de progreso lleva su número y su texto; el verde y
+   el gris son un atajo para quien los distingue, no la información.
+   ===================================================================== */
+
+
+/* ── 1. Cabecera de página ──────────────────────────────────────────── */
+
+.area > .cabeza {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-bottom: 24px;
+}
+
+.area > .cabeza h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--oscuro);
+    line-height: 1.25;
+}
+
+.area > .cabeza .bajada {
+    color: var(--texto-tenue);
+    font-size: .95rem;
+    margin-top: 4px;
+}
+
+
+/* ── 2. Tarjetas de curso ───────────────────────────────────────────── */
+
+.rejilla-cursos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
+}
+
+.tarjeta-curso {
+    display: block;
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-medio);
+    padding: 22px;
+    box-shadow: var(--sombra);
+    transition: transform .2s var(--salto), box-shadow .2s, border-color .2s;
+}
+
+.tarjeta-curso:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--sombra-alta);
+    border-color: var(--azul);
+}
+
+.tarjeta-curso h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--oscuro);
+    margin-bottom: 6px;
+}
+
+.tarjeta-curso .curso-meta {
+    font-size: .85rem;
+    color: var(--texto-tenue);
+    margin-bottom: 14px;
+}
+
+.tarjeta-curso .curso-cifras {
+    display: flex;
+    gap: 16px;
+    font-size: .85rem;
+    color: var(--texto);
+    padding-top: 12px;
+    border-top: 1px solid var(--borde-suave);
+}
+
+.tarjeta-curso .curso-cifras strong {
+    color: var(--oscuro);
+    font-weight: 700;
+}
+
+/* Un curso archivado sigue ahí, solo deja de pedir atención. */
+.tarjeta-curso.archivado { opacity: .62; }
+.tarjeta-curso.archivado:hover { opacity: 1; }
+
+.etiqueta-archivado {
+    display: inline-block;
+    background: var(--fondo-suave);
+    color: var(--texto-tenue);
+    border-radius: var(--radio-pildora);
+    padding: 1px 10px;
+    font-size: .72rem;
+    font-weight: 600;
+}
+
+
+/* ── 3. Pantalla vacía ──────────────────────────────────────────────── */
+
+.vacio-escuela {
+    background: var(--blanco);
+    border: 2px dashed var(--borde-fuerte);
+    border-radius: var(--radio-medio);
+    padding: 48px 28px;
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.vacio-escuela .vacio-emoji {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 12px;
+}
+
+.vacio-escuela h2 {
+    font-size: 1.25rem;
+    color: var(--oscuro);
+    margin-bottom: 8px;
+}
+
+.vacio-escuela p {
+    color: var(--texto-tenue);
+    max-width: 46ch;
+    margin: 0 auto;
+}
+
+
+/* ── 4. Bloques del panel ───────────────────────────────────────────── */
+
+.bloque-panel {
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-medio);
+    padding: 24px;
+    margin-bottom: 22px;
+    box-shadow: var(--sombra);
+}
+
+.bloque-panel > h2 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--oscuro);
+    margin-bottom: 14px;
+}
+
+.nota-panel {
+    color: var(--texto-tenue);
+    font-size: .9rem;
+    margin-bottom: 14px;
+    max-width: 70ch;
+}
+
+.nota-panel a { color: var(--azul); font-weight: 600; }
+.nota-panel a:hover { text-decoration: underline; }
+
+/* El bloque de «llevan una semana sin entrar». Se marca con un borde
+   lateral, no con un fondo rojo: es información para el docente, no una
+   alarma sobre un niño. */
+.bloque-panel.aviso-atencion {
+    border-left: 4px solid var(--naranja);
+}
+
+
+/* ── 5. Formularios en línea ────────────────────────────────────────── */
+
+.form-linea {
+    display: flex;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.form-linea label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--texto);
+}
+
+.form-linea input[type=text],
+.form-linea input[type=email],
+.form-linea input[type=search],
+.form-linea input[type=number],
+.form-linea input[type=date],
+.form-linea select {
+    font-family: inherit;
+    font-size: .92rem;
+    color: var(--texto);
+    background: var(--blanco);
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-chico);
+    padding: 9px 12px;
+    min-width: 180px;
+    transition: border-color .2s;
+}
+
+.form-linea input:focus,
+.form-linea select:focus {
+    border-color: var(--azul);
+    outline: none;
+}
+
+.form-fecha {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-fecha input[type=date] {
+    font-family: inherit;
+    font-size: .82rem;
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-chico);
+    padding: 5px 8px;
+    color: var(--texto);
+}
+
+
+/* ── 6. Tira de cifras ──────────────────────────────────────────────── */
+
+.tira-cifras {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 14px;
+    margin-bottom: 22px;
+}
+
+.cifra {
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-medio);
+    padding: 18px;
+    text-align: center;
+    box-shadow: var(--sombra);
+}
+
+.cifra .cifra-num {
+    display: block;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--oscuro);
+    line-height: 1.1;
+}
+
+.cifra .cifra-eti {
+    display: block;
+    font-size: .78rem;
+    color: var(--texto-tenue);
+    margin-top: 4px;
+}
+
+
+/* ── 7. Pasos para empezar ──────────────────────────────────────────── */
+
+.pasos-escuela {
+    list-style: none;
+    counter-reset: paso;
+    display: grid;
+    gap: 10px;
+}
+
+.pasos-escuela li {
+    counter-increment: paso;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--fondo-suave);
+    border-radius: var(--radio-chico);
+    color: var(--texto);
+}
+
+.pasos-escuela li::before {
+    content: counter(paso);
+    flex: none;
+    width: 26px;
+    height: 26px;
+    display: grid;
+    place-items: center;
+    background: var(--blanco);
+    border: 2px solid var(--borde-fuerte);
+    border-radius: 50%;
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--texto-tenue);
+}
+
+.pasos-escuela li.hecho::before {
+    background: var(--verde);
+    border-color: var(--verde);
+    color: var(--blanco);
+}
+
+.pasos-escuela li a { font-weight: 600; color: var(--azul); }
+.pasos-escuela li a:hover { text-decoration: underline; }
+
+
+/* ── 8. Lista de ausentes ───────────────────────────────────────────── */
+
+.lista-ausentes {
+    list-style: none;
+    display: grid;
+    gap: 8px;
+}
+
+.lista-ausentes li {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+    background: var(--fondo-suave);
+    border-radius: var(--radio-chico);
+}
+
+.lista-ausentes li a {
+    font-weight: 600;
+    color: var(--oscuro);
+}
+
+.lista-ausentes li a:hover { color: var(--azul); text-decoration: underline; }
+
+
+/* ── 9. Tablas ──────────────────────────────────────────────────────── */
+
+.tabla-panel {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: .9rem;
+}
+
+.tabla-panel th,
+.tabla-panel td {
+    padding: 11px 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--borde-suave);
+    vertical-align: middle;
+}
+
+.tabla-panel thead th {
+    font-size: .74rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--texto-tenue);
+    border-bottom: 2px solid var(--borde);
+    white-space: nowrap;
+}
+
+.tabla-panel tbody tr:hover { background: var(--fondo-suave); }
+.tabla-panel tbody tr:last-child td { border-bottom: none; }
+
+.tabla-panel .num { text-align: right; font-variant-numeric: tabular-nums; }
+.tabla-panel a    { color: var(--azul); font-weight: 600; }
+.tabla-panel a:hover { text-decoration: underline; }
+
+.tenue { color: var(--texto-tenue); }
+
+/* Una fila que ya no pide acción —una actividad ya asignada dentro del
+   buscador— se apaga sin desaparecer: sigue siendo la respuesta a
+   «¿la tengo puesta?». */
+.fila-tenue { opacity: .55; }
+.fila-tenue:hover { opacity: 1; }
+
+/* Resultado de la búsqueda por correo */
+.hallazgo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    padding: 14px 18px;
+    background: var(--fondo-suave);
+    border: 2px solid var(--azul);
+    border-radius: var(--radio-chico);
+}
+
+.hallazgo strong { color: var(--oscuro); display: block; }
+.hallazgo .tenue { font-size: .85rem; }
+
+
+/* ── 10. Rejilla de progreso ────────────────────────────────────────── */
+
+/* La tabla puede ser muy ancha —una columna por actividad— así que se
+   desplaza dentro de su caja. El documento nunca se desplaza en
+   horizontal: eso rompe la lectura de todo lo demás. */
+.envoltorio-rejilla {
+    overflow-x: auto;
+    margin: 0 -8px;
+    padding: 0 8px;
+}
+
+.rejilla-progreso {
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: .85rem;
+    min-width: 100%;
+}
+
+.rejilla-progreso th,
+.rejilla-progreso td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--borde-suave);
+    text-align: center;
+}
+
+/* La columna del nombre se queda fija al desplazar: sin esto, al llegar a
+   la actividad número doce ya no se sabe de quién es la fila. */
+.rejilla-progreso .esquina,
+.rejilla-progreso .celda-nombre {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    background: var(--blanco);
+    text-align: left;
+    min-width: 170px;
+    border-right: 1px solid var(--borde);
+}
+
+.rejilla-progreso thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--blanco);
+    border-bottom: 2px solid var(--borde);
+    font-size: .72rem;
+    font-weight: 700;
+    color: var(--texto-tenue);
+}
+
+.rejilla-progreso .esquina { z-index: 3; }
+
+.rejilla-progreso .col-actividad {
+    max-width: 90px;
+    min-width: 66px;
+    vertical-align: bottom;
+}
+
+.rejilla-progreso .col-icono {
+    display: block;
+    font-size: 1.15rem;
+    margin-bottom: 2px;
+}
+
+/* El título completo queda en el `title` de la celda; aquí se recorta
+   a dos líneas para que la tabla siga siendo legible. */
+.rejilla-progreso .col-nombre {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-weight: 600;
+    line-height: 1.25;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+.rejilla-progreso .celda-nombre a {
+    font-weight: 600;
+    color: var(--oscuro);
+}
+
+.rejilla-progreso .celda-nombre a:hover { color: var(--azul); text-decoration: underline; }
+
+.rejilla-progreso tbody tr:hover .celda-nombre,
+.rejilla-progreso tbody tr:hover td { background: var(--fondo-suave); }
+
+.rejilla-progreso .celda {
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Los cuatro estados. El texto de la celda («7/10») dice lo mismo que el
+   color, así que quien no distingue estos tonos no pierde nada. */
+.rejilla-progreso .celda.completa { background: #e8f5e9; color: #2e7d32; }
+.rejilla-progreso .celda.media    { background: #fff8e1; color: #ef6c00; }
+.rejilla-progreso .celda.poca     { background: #fff3e0; color: #bf6516; }
+.rejilla-progreso .celda.nada     { color: var(--texto-tenue); }
+
+.rejilla-progreso tfoot td,
+.rejilla-progreso tfoot th {
+    border-top: 2px solid var(--borde);
+    border-bottom: none;
+    font-size: .78rem;
+    color: var(--texto-tenue);
+}
+
+.leyenda-progreso {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 16px;
+    font-size: .8rem;
+    color: var(--texto-tenue);
+}
+
+.leyenda-progreso span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.leyenda-progreso .pt {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+    border: 1px solid var(--borde);
+}
+
+.leyenda-progreso .pt.completa { background: #e8f5e9; }
+.leyenda-progreso .pt.media    { background: #fff8e1; }
+.leyenda-progreso .pt.poca     { background: #fff3e0; }
+.leyenda-progreso .pt.nada     { background: var(--blanco); }
+
+/* La casita de «también lo hizo por su cuenta»: pequeña y discreta —es
+   un matiz, no el dato— pero visible al recorrer la fila. */
+/* ── La barra de avance de cada estudiante ────────────────────────────
+
+   Va en la lista general, no solo dentro de la rejilla, porque es donde
+   el docente mira primero: con treinta números en una columna hay que
+   compararlos de cabeza; con treinta barras se ve de un vistazo quién
+   tira del grupo y quién se está quedando.
+
+   Los colores son los MISMOS que los de la rejilla de progreso. Que un
+   verde signifique lo mismo en las dos pantallas es la mitad del valor
+   de tenerlo. */
+
+.barra-alumno {
+    height: 12px;
+    width: 100%;
+    max-width: 180px;
+    border-radius: var(--radio-pildora);
+    background: var(--borde-suave);
+    overflow: hidden;
+}
+
+.barra-alumno span {
+    display: block;
+    height: 100%;
+    border-radius: var(--radio-pildora);
+    transition: width .4s ease;
+}
+
+.barra-alumno.completa span { background: #2e7d32; }
+.barra-alumno.media    span { background: #ef6c00; }
+.barra-alumno.poca     span { background: #bf6516; }
+.barra-alumno.nada     span { background: transparent; }
+
+.barra-cifra {
+    display: inline-block;
+    margin-top: 3px;
+    font-size: .8rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.marca-casa {
+    font-size: .7rem;
+    margin-left: 3px;
+    opacity: .75;
+    vertical-align: super;
+}
+
+
+/* ── 11. Detalle de un estudiante ───────────────────────────────────── */
+
+.actividad-alumno.completa { border-left: 4px solid var(--verde); }
+
+.cabeza-actividad {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.cabeza-actividad h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--oscuro);
+    margin: 0;
+}
+
+.cabeza-actividad h2 a { color: inherit; }
+.cabeza-actividad h2 a:hover { color: var(--azul); text-decoration: underline; }
+
+.marca-avance {
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--texto-tenue);
+    background: var(--fondo-suave);
+    border-radius: var(--radio-pildora);
+    padding: 4px 14px;
+    white-space: nowrap;
+}
+
+.marca-avance.lista { background: #e8f5e9; color: #2e7d32; }
+
+.barra-avance {
+    height: 8px;
+    background: var(--borde-suave);
+    border-radius: var(--radio-pildora);
+    overflow: hidden;
+    margin-bottom: 16px;
+}
+
+.barra-avance span {
+    display: block;
+    height: 100%;
+    background: linear-gradient(90deg, var(--azul), var(--verde));
+    border-radius: var(--radio-pildora);
+    transition: width .4s ease;
+}
+
+.tabla-estaciones { font-size: .85rem; }
+
+.pastilla {
+    display: inline-block;
+    border-radius: var(--radio-pildora);
+    padding: 2px 12px;
+    font-size: .74rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.pastilla.lista { background: #e8f5e9; color: #2e7d32; }
+.pastilla.curso { background: #fff8e1; color: #ef6c00; }
+.pastilla.nada  { background: var(--fondo-suave); color: var(--texto-tenue); }
+
+
+/* ── 12. Pantallas estrechas ────────────────────────────────────────── */
+
+@media (max-width: 700px) {
+
+    .area > .cabeza { flex-direction: column; align-items: stretch; }
+
+    .form-linea { flex-direction: column; align-items: stretch; }
+    .form-linea label { width: 100%; }
+    .form-linea input,
+    .form-linea select { min-width: 0; width: 100%; }
+
+    .tira-cifras { grid-template-columns: repeat(2, 1fr); }
+
+    /* Las tablas anchas se desplazan dentro de su caja en vez de empujar
+       la página entera. */
+    .bloque-panel { padding: 18px 14px; }
+    .bloque-panel > .tabla-panel { display: block; overflow-x: auto; }
+
+    .rejilla-progreso .esquina,
+    .rejilla-progreso .celda-nombre { min-width: 130px; }
+
+    .hallazgo { flex-direction: column; align-items: stretch; }
+}
+
+
+/* ── 13. Montar el curso deprisa ──────────────────────────────────────
+   Lo que convierte «treinta búsquedas y treinta clics» en unos pocos:
+   pegar la lista de nombres, marcar estudiantes y añadir paquetes
+   enteros.
+   ------------------------------------------------------------------- */
+
+.area-nombres {
+    width: 100%;
+    font-family: inherit;
+    font-size: .95rem;
+    line-height: 1.7;
+    color: var(--texto);
+    background: var(--blanco);
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-chico);
+    padding: 12px 14px;
+    resize: vertical;
+}
+
+.area-nombres:focus { border-color: var(--azul); outline: none; }
+
+.pie-bloque {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.pie-bloque .tenue { font-size: .84rem; }
+
+.fecha-opcional {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: .84rem;
+    color: var(--texto-tenue);
+    margin-left: auto;
+}
+
+.fecha-opcional input {
+    font-family: inherit;
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-chico);
+    padding: 5px 9px;
+    color: var(--texto);
+}
+
+/* Credenciales recién creadas: hay que copiarlas ahora o se pierden. */
+.credenciales-nuevas {
+    border: 2px solid var(--naranja);
+    background: #fffdf7;
+}
+
+.credenciales-nuevas .clave-nueva {
+    font-weight: 700;
+    color: var(--oscuro);
+    letter-spacing: .02em;
+}
+
+.tabla-panel .mono,
+.mono {
+    font-family: ui-monospace, Consolas, "Courier New", monospace;
+    font-size: .86rem;
+}
+
+/* Los estudiantes que ya están en otros cursos del mismo docente. */
+.rejilla-alumnos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.ficha-alumno {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--fondo-suave);
+    border: 2px solid transparent;
+    border-radius: var(--radio-chico);
+    padding: 11px 14px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+}
+
+.ficha-alumno:hover { border-color: var(--borde-fuerte); }
+
+.ficha-alumno:has(input:checked) {
+    border-color: var(--azul);
+    background: var(--blanco);
+}
+
+.ficha-alumno input { flex: none; width: 17px; height: 17px; accent-color: var(--azul); }
+.ficha-alumno b     { display: block; color: var(--oscuro); font-size: .92rem; }
+.ficha-alumno small { color: var(--texto-tenue); font-size: .78rem; }
+
+/* ── Paquetes de actividades ──────────────────────────────────────── */
+
+.materia {
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-chico);
+    margin-bottom: 10px;
+    background: var(--blanco);
+}
+
+.materia > summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+    list-style: none;
+    border-radius: var(--radio-chico);
+}
+
+.materia > summary::-webkit-details-marker { display: none; }
+.materia > summary:hover { background: var(--fondo-suave); }
+.materia[open] > summary { border-bottom: 1px solid var(--borde-suave); }
+
+.materia-icono  { font-size: 1.4rem; }
+.materia-nombre { font-weight: 600; color: var(--oscuro); }
+.materia-total  { margin-left: auto; font-size: .82rem; color: var(--texto-tenue); }
+
+.materia-cuerpo { padding: 16px; }
+
+.fila-materia {
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid var(--borde-suave);
+}
+
+.rejilla-paquetes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+}
+
+.paquete {
+    display: flex;
+    flex-direction: column;
+    background: var(--fondo-suave);
+    border: 2px solid transparent;
+    border-radius: var(--radio-chico);
+    padding: 14px;
+}
+
+.paquete.completo { border-color: var(--verde); background: #f4faf5; }
+
+.paquete-cabeza {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.paquete-cabeza b { color: var(--oscuro); font-size: .93rem; }
+
+.paquete-pie {
+    font-size: .82rem;
+    color: var(--texto-tenue);
+    line-height: 1.45;
+    margin-bottom: 12px;
+    flex: 1;
+}
+
+.paquete-acciones {
+    display: flex;
+    align-items: center;
+    /* Los botones se agrupan a la derecha y el conteo empuja desde la
+       izquierda con `margin-right:auto`. Con `space-between` y tres
+       elementos —conteo, «Completo ✓» y «Quitar»— el del medio quedaba
+       flotando en mitad de la tarjeta. */
+    justify-content: flex-start;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.paquete-acciones .tenue {
+    font-size: .78rem;
+    margin-right: auto;
+}
+
+/* ── Quitar una columna desde la rejilla ──────────────────────────── */
+
+.acciones-cabeza { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.acciones-fila { display: flex; gap: 6px; justify-content: flex-end; }
+
+.quitar-col { margin-top: 4px; }
+
+.quitar-col button {
+    border: none;
+    background: transparent;
+    color: var(--texto-tenue);
+    font-size: .8rem;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    /* Discreto hasta que se busca: es una acción destructiva y no debe
+       competir con la lectura de la tabla. */
+    opacity: .35;
+    transition: opacity .15s, color .15s, background .15s;
+}
+
+.col-actividad:hover .quitar-col button { opacity: 1; }
+
+.quitar-col button:hover { color: var(--rojo); background: #fdeaea; }
+.quitar-col button:focus-visible { opacity: 1; }
+
+@media (max-width: 700px) {
+    .rejilla-alumnos,
+    .rejilla-paquetes { grid-template-columns: 1fr; }
+    .fecha-opcional { margin-left: 0; }
+}
+
+/* Al imprimir las credenciales, solo se lleva eso. */
+@media print {
+    .lateral, .cabeza, .aviso, .pie-bloque,
+    .bloque-panel:not(.credenciales-nuevas) { display: none !important; }
+
+    .panel-marco, .area { display: block; margin: 0; padding: 0; }
+    .credenciales-nuevas { border: none; background: #fff; box-shadow: none; }
+}
+
+
+/* ── 14. Código de clase ──────────────────────────────────────────── */
+
+.bloque-aula { border-left: 4px solid var(--azul); }
+
+.codigo-caja {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 26px;
+    background: var(--fondo-suave);
+    border-radius: var(--radio-chico);
+    padding: 18px 22px;
+    margin-bottom: 14px;
+}
+
+.rotulo-codigo {
+    display: block;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--texto-tenue);
+    margin-bottom: 4px;
+}
+
+/* El código va enorme: se lee de lejos para copiarlo al tablero. */
+.codigo-grande {
+    display: block;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    color: var(--oscuro);
+}
+
+.url-aula {
+    display: block;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: .92rem;
+    color: var(--azul);
+    word-break: break-all;
+    padding-top: 6px;
+}
+
+.opcion-aula {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--fondo-suave);
+    border: 2px solid transparent;
+    border-radius: var(--radio-chico);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+}
+
+.opcion-aula:has(input:checked) { border-color: var(--azul); background: var(--blanco); }
+.opcion-aula input { flex: none; width: 18px; height: 18px; margin-top: 2px; accent-color: var(--azul); }
+.opcion-aula b     { display: block; color: var(--oscuro); font-size: .95rem; margin-bottom: 2px; }
+.opcion-aula > span > span { display: block; font-size: .85rem; color: var(--texto-tenue); line-height: 1.5; }
+
+
+/* El código en el menú lateral: siempre a mano para copiarlo al tablero. */
+.codigo-lateral {
+    margin: 10px 14px 4px;
+    padding: 11px 13px;
+    background: rgba(41, 182, 246, .12);
+    border: 1px solid rgba(41, 182, 246, .35);
+    border-radius: var(--radio-chico);
+}
+
+.codigo-eti {
+    display: block;
+    font-size: .66rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    opacity: .75;
+    margin-bottom: 2px;
+}
+
+.codigo-valor {
+    display: block;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    color: inherit;
+}
+
+.codigo-valor:hover { text-decoration: underline; }
+
+.codigo-url {
+    display: block;
+    font-size: .66rem;
+    opacity: .6;
+    word-break: break-all;
+    margin-top: 3px;
+    line-height: 1.35;
+}
+
+
+/* ── Elegir cómo entran ───────────────────────────────────────────── */
+
+.opcion-acceso-curso {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    background: var(--fondo-suave);
+    border: 2px solid transparent;
+    border-radius: var(--radio-chico);
+    padding: 16px 18px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+}
+
+.opcion-acceso-curso:hover { border-color: var(--borde-fuerte); }
+
+.opcion-acceso-curso.elegida,
+.opcion-acceso-curso:has(input:checked) {
+    border-color: var(--azul);
+    background: var(--blanco);
+}
+
+.opcion-acceso-curso input { flex: none; width: 19px; height: 19px; margin-top: 2px; accent-color: var(--azul); }
+.opcion-acceso-curso b { display: block; color: var(--oscuro); font-size: 1rem; margin-bottom: 3px; }
+.opcion-acceso-curso > span > span { display: block; font-size: .88rem; color: var(--texto-tenue); line-height: 1.55; }
+
+/* El PIN cuelga de la elección: apagado cuando no aplica. */
+.sub-opcion { margin: 4px 0 0 34px; }
+.sub-opcion.apagada { opacity: .45; pointer-events: none; }
+
+
+/* ── Clase abierta o cerrada ──────────────────────────────────────── */
+
+.estado-clase {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border-radius: var(--radio-chico);
+    padding: 15px 18px;
+    margin: 16px 0;
+}
+
+.estado-clase.abierta { background: #e8f5e9; }
+.estado-clase.cerrada { background: var(--fondo-suave); }
+
+.estado-clase .punto {
+    flex: none;
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+}
+
+.estado-clase.abierta .punto { background: var(--verde); }
+.estado-clase.cerrada .punto { background: var(--borde-fuerte); }
+
+.estado-clase b { display: block; color: var(--oscuro); font-size: 1rem; }
+.estado-clase span span,
+.estado-clase div > span { display: block; font-size: .87rem; color: var(--texto-tenue); }
+
+.codigo-lateral.cerrada { background: rgba(139,149,165,.14); border-color: rgba(139,149,165,.3); }
+
+
+/* ── Hoja de tarjetas para repartir ───────────────────────────────── */
+
+.hoja-tarjetas {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+}
+
+.tarjeta-alumno {
+    background: var(--blanco);
+    border: 2px dashed var(--borde-fuerte);
+    border-radius: var(--radio-chico);
+    padding: 16px 18px;
+}
+
+.tarjeta-nombre {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--borde-suave);
+}
+
+.tarjeta-cara { font-size: 1.7rem; }
+.tarjeta-nombre b { color: var(--oscuro); font-size: .98rem; line-height: 1.25; }
+
+.tarjeta-linea { margin-bottom: 8px; }
+
+.tl-eti {
+    display: block;
+    font-size: .68rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--texto-tenue);
+}
+
+.tl-val { display: block; font-size: .88rem; color: var(--texto); word-break: break-all; }
+.tl-val.url { color: var(--azul); }
+
+/* El PIN, enorme: es lo que el niño va a leer del papel. */
+.tl-pin {
+    display: block;
+    font-family: ui-monospace, Consolas, monospace;
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: .22em;
+    color: var(--oscuro);
+}
+
+.tarjeta-nota { font-size: .8rem; color: var(--texto-tenue); line-height: 1.5; }
+.tarjeta-accion { margin-top: 10px; }
+
+@media print {
+    .no-imprimir, .lateral, .aviso { display: none !important; }
+    .panel-marco, .area { display: block; margin: 0; padding: 0; }
+
+    .hoja-tarjetas { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .tarjeta-alumno { break-inside: avoid; border-color: #999; }
+}
+
+
+/* ── 15. Movimiento reducido ────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+    .tarjeta-curso,
+    .barra-avance span { transition: none; }
+    .tarjeta-curso:hover { transform: none; }
+}

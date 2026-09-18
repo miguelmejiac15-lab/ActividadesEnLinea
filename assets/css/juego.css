@@ -1,0 +1,1291 @@
+/* =====================================================================
+   ACTIVIDADES EN LÍNEA · Reproductor de actividades
+   juego.css — Se carga después de estilo.css y usa sus tokens.
+
+   La pantalla de juego prioriza el área jugable: elementos grandes,
+   objetivos de toque amplios y buen contraste, porque quien juega puede
+   tener cuatro años y estar en un teléfono.
+   ===================================================================== */
+
+body.jugando { background: var(--fondo); }
+
+/* ── Estructura ───────────────────────────────────────────────────── */
+.marco-juego {
+    display: grid;
+    grid-template-columns: 268px 1fr;
+    gap: 20px;
+    align-items: start;
+    padding: 22px 0 50px;
+}
+
+/* ── Mapa de estaciones ───────────────────────────────────────────── */
+.mapa {
+    background: var(--blanco);
+    border-radius: var(--radio-medio);
+    box-shadow: var(--sombra);
+    padding: 16px;
+    position: sticky;
+    top: 84px;
+    max-height: calc(100vh - 104px);
+    overflow-y: auto;
+}
+
+.mapa h2 {
+    color: var(--oscuro);
+    font-size: .96rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.mapa .resumen {
+    font-size: .81rem;
+    color: var(--texto-tenue);
+    margin-bottom: 13px;
+    padding-bottom: 11px;
+    border-bottom: 2px solid var(--borde-suave);
+}
+
+.mapa-estacion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 11px;
+    border-radius: var(--radio-chico);
+    cursor: pointer;
+    margin-bottom: 3px;
+    border: 2px solid transparent;
+    transition: background .15s ease, border-color .15s ease;
+    text-align: left;
+    width: 100%;
+    background: none;
+    font-family: inherit;
+}
+.mapa-estacion:hover  { background: var(--fondo-suave); }
+.mapa-estacion.activa { border-color: var(--azul); background: rgba(41, 182, 246, .07); }
+.mapa-estacion.bloqueada { opacity: .5; }
+.mapa-estacion.bloqueada:hover { background: rgba(251, 191, 36, .1); opacity: .75; }
+
+.mapa-estacion .num {
+    flex-shrink: 0;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--borde);
+    color: var(--oscuro);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .76rem; font-weight: 700;
+}
+.mapa-estacion.hecha .num { background: var(--verde); color: #fff; }
+.mapa-estacion.bloqueada .num { background: #e8eaf0; }
+
+.mapa-estacion .etiqueta {
+    flex: 1;
+    min-width: 0;
+    font-size: .87rem;
+    font-weight: 600;
+    color: var(--oscuro);
+    line-height: 1.3;
+}
+.mapa-estacion .marca { flex-shrink: 0; font-size: .9rem; }
+
+/* Corte entre lo gratuito y lo premium, dentro del mapa. */
+.mapa-corte {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin: 12px 0 10px;
+    color: var(--naranja);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+.mapa-corte::before, .mapa-corte::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--naranja) 0 6px, transparent 6px 12px);
+}
+
+.mapa-invitacion {
+    margin-top: 14px;
+    padding: 14px;
+    border-radius: var(--radio-chico);
+    background: linear-gradient(135deg, #1e1b4b, #6d28d9);
+    color: #fff;
+    text-align: center;
+}
+.mapa-invitacion p { font-size: .82rem; color: rgba(255, 255, 255, .8); margin-bottom: 11px; line-height: 1.45; }
+
+/* ── Escenario ────────────────────────────────────────────────────── */
+.escenario {
+    background: var(--blanco);
+    border-radius: var(--radio-medio);
+    box-shadow: var(--sombra);
+    overflow: hidden;
+    min-height: 520px;
+    display: flex;
+    flex-direction: column;
+}
+
+.escenario-cabeza {
+    padding: 15px 22px;
+    border-bottom: 2px solid var(--borde-suave);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+.escenario-cabeza h1 { color: var(--oscuro); font-size: 1.08rem; font-weight: 700; flex: 1; min-width: 0; }
+
+.barra-envoltorio {
+    flex: 1;
+    min-width: 130px;
+    height: 9px;
+    background: var(--borde-suave);
+    border-radius: 50px;
+    overflow: hidden;
+}
+.barra-envoltorio > div {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--azul), var(--morado));
+    border-radius: 50px;
+    transition: width .35s ease;
+}
+.escenario-cabeza .contador { font-size: .82rem; font-weight: 700; color: var(--texto-tenue); white-space: nowrap; }
+
+#zona-juego {
+    flex: 1;
+    padding: 26px 22px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* ── Piezas del juego ─────────────────────────────────────────────── */
+.juego-titular { text-align: center; }
+.juego-titular h2 { color: var(--oscuro); font-size: clamp(1.15rem, 2.6vw, 1.5rem); font-weight: 700; line-height: 1.3; }
+.juego-titular p  { color: var(--texto-tenue); font-size: .92rem; margin-top: 4px; }
+
+
+/* ── Escuchar otra vez ────────────────────────────────────────────────
+
+   El altavoz aparece en TODAS las edades: un enunciado largo de tercero
+   también se agradece oído. Lo que cambia en preescolar es que además se
+   lee solo y que el botón se hace grande, porque ahí es el control más
+   importante de la pantalla — sin él, la instrucción pasa una vez y se
+   pierde.
+
+   Va dentro del `h2` y por eso es `inline-flex` con `vertical-align`:
+   suelto debajo rompería la línea del enunciado. */
+
+.btn-oir {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+    margin-left: 10px;
+    width: 38px;
+    height: 38px;
+    flex: none;
+    border: 2px solid var(--borde);
+    border-radius: 50%;
+    background: var(--blanco);
+    font-size: 1.05rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform .15s var(--salto), border-color .15s;
+}
+
+.btn-oir:hover  { border-color: var(--azul); transform: scale(1.08); }
+.btn-oir:active { transform: scale(.94); }
+
+.btn-oir:focus-visible {
+    outline: 3px solid var(--azul);
+    outline-offset: 2px;
+}
+
+.btn-oir.suelto { margin: 10px auto 0; display: flex; }
+
+
+/* ═════════════════════════════════════════════════════════════════════
+   EL PERSONAJE REACCIONA
+
+   El niño elige su personaje en la tienda y lo paga con las monedas que
+   gana jugando. Hasta ahora no volvía a verlo mientras jugaba: el final
+   de la estación felicitaba con un 🎉 igual para todos.
+
+   CUANDO FALLA, EL PERSONAJE ANIMA. NUNCA SE DECEPCIONA.
+
+   Es la decisión que manda sobre todo lo demás de aquí. Un personaje que
+   pone cara triste porque el niño no acertó convierte el error en un
+   castigo, y un niño castigado por equivocarse deja de intentarlo — que
+   es justo lo contrario de lo que hace falta para aprender. Por eso los
+   tres ánimos son celebrar, sonreír y animar: la diferencia entre el
+   40 % y el 100 % se ve en las estrellas, que es donde debe verse.
+   ═════════════════════════════════════════════════════════════════════ */
+
+.personaje-juego {
+    position: relative;
+    display: inline-block;
+    line-height: 1;
+    font-size: 3.4rem;
+    transform-origin: 50% 90%;   /* gira sobre los pies, no sobre el centro */
+}
+
+.personaje-juego .personaje-cara { display: block; position: relative; z-index: 1; }
+
+.personaje-juego .personaje-accesorio {
+    position: absolute;
+    top: -.30em;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: .58em;
+    line-height: 1;
+    filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff);
+}
+
+.personaje-juego.grande { font-size: 7rem; display: block; margin: 0 auto 4px; }
+.personaje-juego.mini   { font-size: 1.5rem; margin-right: 8px; vertical-align: middle; }
+
+
+/* ── Los ánimos ──────────────────────────────────────────────────── */
+
+/* Tres estrellas: salta y gira un poco. Es el único que hace las dos. */
+@keyframes celebrar {
+    0%   { transform: translateY(0)      rotate(0deg)   scale(1); }
+    15%  { transform: translateY(-26px)  rotate(-9deg)  scale(1.12); }
+    32%  { transform: translateY(0)      rotate(0deg)   scale(.96); }
+    47%  { transform: translateY(-18px)  rotate(8deg)   scale(1.08); }
+    62%  { transform: translateY(0)      rotate(0deg)   scale(.98); }
+    76%  { transform: translateY(-8px)   rotate(-4deg)  scale(1.03); }
+    100% { transform: translateY(0)      rotate(0deg)   scale(1); }
+}
+
+/* Bien, sin ser perfecto: un rebote corto y contento. */
+@keyframes contentito {
+    0%, 100% { transform: translateY(0)     scale(1); }
+    40%      { transform: translateY(-14px) scale(1.07); }
+    70%      { transform: translateY(0)     scale(.99); }
+}
+
+/* No llegó: el personaje se balancea como quien dice «venga, otra vez».
+   Deliberadamente NO cae ni se encoge. */
+@keyframes animando {
+    0%, 100% { transform: rotate(0deg)   translateY(0); }
+    20%      { transform: rotate(-7deg)  translateY(-5px); }
+    45%      { transform: rotate(7deg)   translateY(-5px); }
+    70%      { transform: rotate(-4deg)  translateY(-2px); }
+}
+
+/* Acierto suelto, dentro del aviso: un brinco muy corto. */
+@keyframes brinco {
+    0%, 100% { transform: translateY(0)    scale(1); }
+    45%      { transform: translateY(-7px) scale(1.14); }
+}
+
+.personaje-juego.celebra  { animation: celebrar 1.25s var(--salto) 1 both; }
+.personaje-juego.contento { animation: contentito .85s var(--salto) 1 both; }
+.personaje-juego.anima    { animation: animando .95s ease-in-out 1 both; }
+.personaje-juego.salta    { animation: brinco .5s var(--salto) 1 both; }
+
+
+/* ── Papelillos ──────────────────────────────────────────────────────
+
+   Solo con las tres estrellas. Si cayeran en cada estación terminada
+   dejarían de significar nada: lo que hace que una celebración se sienta
+   como tal es que se pueda no conseguir. */
+
+.papelillos {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    border-radius: inherit;
+}
+
+.papelillos span {
+    position: absolute;
+    top: -14px;
+    width: 9px;
+    height: 14px;
+    border-radius: 2px;
+    opacity: 0;
+    animation-name: caer;
+    animation-timing-function: linear;
+    animation-iteration-count: 1;
+    animation-fill-mode: forwards;
+}
+
+@keyframes caer {
+    0%   { opacity: 1; transform: translateY(0)     rotate(0deg); }
+    100% { opacity: 0; transform: translateY(340px) rotate(520deg); }
+}
+
+
+/* ── El logro recién conseguido ───────────────────────────────────────
+
+   Entra por la derecha, se queda un momento y se va. Va FUERA del flujo
+   para que no empuje la pantalla de resultado: lo que el niño estaba
+   mirando no debe moverse de sitio porque además haya ganado algo. */
+
+.logro-nuevo {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 320px;
+    padding: 14px 18px;
+    border-radius: var(--radio-medio);
+    background: linear-gradient(135deg, #fff8e1, #ffffff);
+    border: 2px solid var(--naranja);
+    box-shadow: var(--sombra-alta);
+    animation: entraLogro .5s var(--salto) 1 both;
+}
+
+.logro-nuevo.saliendo { animation: saleLogro .4s ease-in 1 both; }
+
+.logro-nuevo .logro-emoji {
+    font-size: 2.5rem;
+    line-height: 1;
+    flex: none;
+    animation: latir 1.1s ease-in-out 2 both;
+}
+
+.logro-nuevo .logro-texto { min-width: 0; }
+
+.logro-nuevo .logro-eti {
+    display: block;
+    font-size: .7rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--naranja);
+    font-weight: 700;
+}
+
+.logro-nuevo .logro-nombre {
+    display: block;
+    font-weight: 700;
+    color: var(--oscuro);
+    font-size: 1.02rem;
+    line-height: 1.25;
+}
+
+.logro-nuevo .logro-pista {
+    display: block;
+    font-size: .82rem;
+    color: var(--texto-tenue);
+    margin-top: 2px;
+}
+
+@keyframes entraLogro {
+    0%   { opacity: 0; transform: translateX(60px) scale(.9); }
+    100% { opacity: 1; transform: translateX(0)    scale(1); }
+}
+
+@keyframes saleLogro {
+    0%   { opacity: 1; transform: translateX(0)    scale(1); }
+    100% { opacity: 0; transform: translateX(60px) scale(.92); }
+}
+
+@keyframes latir {
+    0%, 100% { transform: scale(1)    rotate(0deg); }
+    30%      { transform: scale(1.22) rotate(-8deg); }
+    60%      { transform: scale(1.08) rotate(6deg); }
+}
+
+
+/* ── Las monedas que se acaban de ganar ──────────────────────────────
+
+   Suben desde el premio y se desvanecen. Es la única parte de la
+   recompensa que se puede ver moverse, y sirve para ligar el número que
+   sube en la cabecera con lo que el niño acaba de hacer. */
+
+.moneda-vuela {
+    position: fixed;
+    z-index: 59;
+    font-size: 1.6rem;
+    pointer-events: none;
+    animation: volarMoneda 1s ease-out 1 both;
+}
+
+@keyframes volarMoneda {
+    0%   { opacity: 0; transform: translateY(0)     scale(.6); }
+    20%  { opacity: 1; transform: translateY(-18px) scale(1.1); }
+    100% { opacity: 0; transform: translateY(-90px) scale(.8); }
+}
+
+
+/* ── Nadie tiene que marearse ─────────────────────────────────────────
+
+   Hay niños a los que el movimiento les molesta de verdad, y esta
+   plataforma tiene una categoría entera dedicada a quitar barreras. Si
+   el equipo pide menos movimiento, se quita: la celebración sigue
+   viéndose, pero quieta. */
+
+@media (prefers-reduced-motion: reduce) {
+    .personaje-juego.celebra,
+    .personaje-juego.contento,
+    .personaje-juego.anima,
+    .personaje-juego.salta,
+    .logro-nuevo,
+    .logro-nuevo .logro-emoji,
+    .moneda-vuela {
+        animation: none;
+    }
+
+    .papelillos { display: none; }
+}
+
+
+/* ── Fichas con dibujo y palabra ──────────────────────────────────────
+
+   Un paso de una secuencia era solo texto: «Despertarse». Para quien no
+   lee, eso es una ficha en blanco — podía oír la instrucción pero no
+   tenía forma de saber qué decía cada botón, así que ordenaba a ciegas.
+
+   Ahora el dibujo va encima y la palabra debajo, que es el orden en que
+   los usa un niño de cinco años: primero reconoce, después (si puede)
+   lee. */
+
+.juego-ficha.con-dibujo {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    line-height: 1.15;
+    padding: 12px 16px;
+}
+
+.ficha-dibujo {
+    font-size: 2.4rem;
+    line-height: 1;
+    display: block;
+}
+
+.ficha-palabra {
+    font-size: .95rem;
+    display: block;
+}
+
+/* En el hueco ya resuelto se ve más pequeño: ahí solo hace falta
+   reconocer que está puesto, no volver a leerlo. */
+.juego-hueco.lleno .ficha-dibujo { font-size: 1.7rem; }
+.juego-hueco.lleno .ficha-palabra { font-size: .72rem; }
+
+.juego-hueco.lleno {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+body.sin-lectura .ficha-dibujo  { font-size: 3.1rem; }
+body.sin-lectura .ficha-palabra { font-size: 1.05rem; }
+
+
+/* ── Sin lectura: preescolar ──────────────────────────────────────────
+
+   El texto NO se esconde, y es una decisión, no un olvido. Esconderlo
+   dejaría la actividad inservible en cualquier equipo sin voz sintética
+   instalada, y a un niño sordo lo dejaría fuera del todo. Lo que se hace
+   es invertir la jerarquía: manda el dibujo, manda la voz, y el texto se
+   queda como apoyo para el adulto que acompaña. */
+
+body.sin-lectura .btn-oir {
+    width: 54px;
+    height: 54px;
+    font-size: 1.5rem;
+    border-color: var(--azul);
+    background: #eaf6fe;
+}
+
+/* El enunciado, más grande y con aire: se lee acompañado, no solo. */
+body.sin-lectura .juego-titular h2 {
+    font-size: clamp(1.25rem, 3.2vw, 1.75rem);
+    line-height: 1.35;
+}
+
+/* «Pregunta 3 de 5» no le dice nada a quien no lee, y encima compite con
+   lo que importa. Se deja para el adulto, en pequeño y apagado. */
+body.sin-lectura .juego-titular p {
+    font-size: .8rem;
+    opacity: .65;
+}
+
+/* El dibujo es la pregunta de verdad a esta edad. */
+body.sin-lectura .juego-emoji { font-size: 7rem; }
+
+/* Botones grandes: los dedos de cinco años no aciertan en un botón de
+   texto normal, y fallar por no acertar no enseña nada. */
+body.sin-lectura .juego-boton {
+    font-size: 1.2rem;
+    padding: 18px 22px;
+    min-height: 64px;
+}
+
+.juego-centro {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+    justify-content: center;
+}
+
+.juego-emoji { font-size: 5.6rem; line-height: 1; user-select: none; }
+
+/* Dibujos propios, para las palabras que el emoji no cubre (mesa,
+   xilófono, flauta, ñandú). Se miden en `em` para que ocupen lo mismo
+   que el emoji al que sustituyen, sea cual sea el tamaño del sitio donde
+   aparezcan: la tarjeta grande, la carta de memoria o la ficha pequeña. */
+.juego-icono {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    object-fit: contain;
+    vertical-align: middle;
+}
+.juego-emoji.grande { font-size: 7.2rem; }
+
+.juego-palabra {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: var(--oscuro);
+    letter-spacing: .05em;
+}
+.juego-palabra.grande { font-size: 2.4rem; letter-spacing: .1em; }
+
+.juego-texto {
+    font-size: 1.05rem;
+    color: var(--texto);
+    text-align: center;
+    max-width: 540px;
+    line-height: 1.6;
+}
+
+.juego-opciones {
+    display: flex;
+    gap: 11px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.juego-opciones.vertical { flex-direction: column; width: 100%; max-width: 440px; }
+
+.juego-boton { min-width: 118px; }
+.juego-boton.acierto { background: var(--verde) !important; color: #fff !important; border-color: var(--verde) !important; }
+.juego-boton.error   { background: var(--rojo)  !important; color: #fff !important; border-color: var(--rojo)  !important; }
+
+/* Botones de sí y no.
+   Van en verde y rojo desde el principio, no solo al acertar: a los
+   cuatro años el color se lee antes que la palabra, y dos botones
+   idénticos obligan a leer para poder elegir — justo lo que el niño
+   está aprendiendo. El ✅ y el ❌ acompañan al color para quien no
+   distingue verde de rojo, que es cerca de uno de cada doce niños. */
+.juego-si, .juego-no {
+    color: #fff;
+    border: none;
+    font-weight: 700;
+    font-size: 1.05rem;
+    min-width: 132px;
+}
+.juego-si { background: var(--verde); box-shadow: 0 4px 0 rgba(0, 0, 0, .15); }
+.juego-no { background: var(--rojo);  box-shadow: 0 4px 0 rgba(0, 0, 0, .15); }
+
+.juego-si:hover, .juego-no:hover { filter: brightness(1.08); }
+.juego-si:active, .juego-no:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(0, 0, 0, .15); }
+
+/* ── Ayuda cuando el niño se atasca ───────────────────────────────── */
+/* Aparece al tercer fallo, no al primero: equivocarse forma parte de
+   aprender, y una salida inmediata enseña a comprarla en vez de a
+   intentarlo. Va en tono cálido y sin regañar. */
+.juego-ayuda {
+    width: 100%;
+    max-width: 460px;
+    margin: 4px auto 0;
+    padding: 14px 18px;
+    background: #fff8e6;
+    border: 2px dashed #ffc078;
+    border-radius: var(--radio-medio);
+    text-align: center;
+    animation: ayuda-entra .3s ease-out both;
+}
+@keyframes ayuda-entra {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: none; }
+}
+
+.juego-ayuda-titulo {
+    font-size: .95rem;
+    font-weight: 700;
+    color: #8a5a00;
+    margin-bottom: 11px;
+}
+.juego-ayuda-botones {
+    display: flex;
+    gap: 9px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.juego-ayuda-nota {
+    margin-top: 9px;
+    font-size: .76rem;
+    color: #a06a1a;
+}
+
+/* Opción apagada por una pista: se ve que estaba, pero ya no cuenta. */
+.juego-boton.descartada {
+    opacity: .32;
+    text-decoration: line-through;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+
+/* Las monedas ganadas, en la pantalla de final de estación.
+   Aparecen con un pequeño salto: el premio tiene que notarse. */
+.juego-premio {
+    margin-top: 6px;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #e8590c;
+    animation: premio-entra .45s var(--salto, ease-out) both;
+}
+@keyframes premio-entra {
+    from { transform: scale(.4); opacity: 0; }
+    to   { transform: scale(1);  opacity: 1; }
+}
+
+/* ── Laberinto del robot ──────────────────────────────────────────── */
+/*
+ * Esta pantalla reproduce la del sitio anterior (Ciber_Codigo_Robot.html):
+ * tablero a la izquierda, panel de comandos a la derecha, ambos en cajas
+ * turquesa con borde de 3px. Los valores de color son los mismos del
+ * archivo original, no aproximaciones — el sistema visual del sitio
+ * publicado es la fuente de verdad del rediseño, y una versión «parecida»
+ * habría sido una tercera paleta más que mantener.
+ */
+.laberinto-centro { gap: 14px; }
+
+.lab-marcador {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.lab-ficha {
+    background: hsl(180, 70%, 92%);
+    border: 2px solid hsl(180, 70%, 72%);
+    border-radius: 20px;
+    padding: 6px 18px;
+    font-weight: 700;
+    font-size: .95rem;
+    color: hsl(180, 60%, 18%);
+}
+
+.lab-mundo {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 6px 0;
+}
+
+.lab-caja {
+    background: hsl(180, 70%, 96%);
+    border: 3px solid hsl(180, 70%, 72%);
+    border-radius: 16px;
+    padding: 12px;
+}
+
+.laberinto {
+    display: grid;
+    gap: 4px;
+    grid-template-columns: repeat(var(--columnas, 4), var(--casilla, 56px));
+}
+
+.lab-casilla {
+    width: var(--casilla, 56px);
+    height: var(--casilla, 56px);
+    border-radius: 10px;
+    background: #fff;
+    border: 2px solid hsl(180, 70%, 82%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    line-height: 1;
+    transition: all .3s;
+}
+.lab-casilla.meta  { background: hsl(50, 90%, 88%);  border-color: hsl(50, 90%, 60%); }
+.lab-casilla.muro  { background: hsl(0, 0%, 25%);    border-color: hsl(0, 0%, 10%); }
+.lab-casilla.robot { background: hsl(200, 80%, 85%); border-color: hsl(200, 80%, 55%); }
+.lab-casilla.choque {
+    background: hsl(0, 70%, 88%);
+    border-color: hsl(0, 70%, 55%);
+    animation: lab-temblor .4s;
+}
+
+@keyframes lab-temblor {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-5px); }
+    75%      { transform: translateX(5px); }
+}
+
+/* Panel de comandos */
+.lab-panel {
+    background: hsl(180, 70%, 96%);
+    border: 3px solid hsl(180, 70%, 72%);
+    border-radius: 16px;
+    padding: 16px;
+    min-width: 200px;
+}
+.lab-titulo {
+    font-size: 1rem;
+    font-weight: 700;
+    color: hsl(180, 60%, 22%);
+    margin-bottom: 12px;
+    text-align: left;
+}
+.lab-titulo.chico { font-size: .85rem; }
+
+.lab-mandos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+.lab-flecha {
+    background: #fff;
+    border: 3px solid hsl(180, 70%, 72%);
+    border-radius: 10px;
+    padding: 10px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all .2s;
+    text-align: center;
+}
+.lab-flecha:hover { background: hsl(180, 70%, 90%); border-color: var(--azul); }
+.lab-flecha:active { transform: translateY(2px); }
+
+.lab-secuencia {
+    min-height: 44px;
+    background: #fff;
+    border: 2px solid hsl(180, 70%, 78%);
+    border-radius: 10px;
+    padding: 8px;
+    font-size: 1.4rem;
+    letter-spacing: 4px;
+    margin-bottom: 8px;
+    word-break: break-all;
+    text-align: left;
+    color: var(--oscuro);
+}
+
+.lab-acciones { display: flex; gap: 8px; }
+
+.lab-ejecutar {
+    flex: 1;
+    background: linear-gradient(135deg, hsl(120, 60%, 38%), hsl(100, 65%, 45%));
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 10px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: .95rem;
+    cursor: pointer;
+}
+.lab-ejecutar:hover { filter: brightness(1.07); }
+
+.lab-borrar {
+    background: #fff;
+    border: 2px solid hsl(0, 70%, 72%);
+    color: hsl(0, 70%, 45%);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: inherit;
+    font-weight: 700;
+    font-size: .9rem;
+    cursor: pointer;
+}
+.lab-borrar:hover { background: hsl(0, 70%, 96%); }
+
+.lab-pista {
+    margin-top: 4px;
+    font-size: .9rem;
+    font-weight: 600;
+    color: hsl(180, 60%, 22%);
+    text-align: center;
+}
+
+/* En pantalla estrecha el panel pasa debajo del tablero, y las casillas
+   se encogen para que la cuadrícula siga cabiendo entera: si hay que
+   desplazarse para ver la meta, el niño no puede planear el camino. */
+@media (max-width: 560px) {
+    .lab-mundo  { flex-direction: column; align-items: center; }
+    .lab-panel  { width: 100%; max-width: 320px; }
+    .lab-caja   { --casilla: 46px; }
+    .lab-casilla { font-size: 1.3rem; }
+}
+
+/* Opciones que son dibujos, no palabras.
+   En «¿cuál es más grande, 🐭 o 🐘?» el dibujo ES la pregunta. A tamaño
+   de texto los dos emojis miden lo mismo y el ejercicio se vuelve
+   imposible: hay que verlos grandes para poder compararlos. */
+.juego-opciones.dibujos .juego-boton,
+.juego-opciones.dibujos .juego-ficha {
+    font-size: 3.6rem;
+    line-height: 1.1;
+    min-width: 108px;
+    padding: 16px 22px;
+    letter-spacing: 0;
+}
+.juego-opciones.dibujos .juego-hueco { font-size: 3rem; }
+
+.juego-hueco.dibujo { min-width: 88px; height: 88px; font-size: 3rem; }
+
+@media (max-width: 640px) {
+    .juego-opciones.dibujos .juego-boton,
+    .juego-opciones.dibujos .juego-ficha { font-size: 3.4rem; min-width: 96px; padding: 12px 16px; }
+    .juego-hueco.dibujo { min-width: 72px; height: 72px; font-size: 2.4rem; }
+}
+
+/* Fichas: sílabas, letras, elementos de secuencia */
+.juego-ficha {
+    min-width: 62px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    padding: 13px 18px;
+}
+.juego-ficha.grande { font-size: 2.4rem; padding: 14px 22px; }
+.juego-ficha.usada { opacity: .3; }
+
+/* Huecos que se van llenando */
+.juego-huecos { display: flex; gap: 9px; flex-wrap: wrap; justify-content: center; }
+
+.juego-hueco {
+    min-width: 58px;
+    height: 58px;
+    border: 3px dashed var(--borde);
+    border-radius: var(--radio-chico);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--oscuro);
+    padding: 0 10px;
+}
+.juego-hueco.lleno {
+    border-style: solid;
+    border-color: var(--verde);
+    background: rgba(76, 175, 80, .1);
+}
+
+/* Rejilla de cartas */
+.juego-rejilla {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
+    gap: 12px;
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
+}
+.juego-rejilla.memoria { grid-template-columns: repeat(4, 1fr); max-width: 420px; }
+
+.juego-carta {
+    background: var(--blanco);
+    border: 3px solid var(--borde);
+    border-radius: var(--radio-medio);
+    padding: 16px 10px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    font-family: inherit;
+    transition: transform .18s var(--salto), border-color .18s ease;
+}
+.juego-carta:hover:not(:disabled) { transform: translateY(-4px); border-color: var(--azul); }
+.juego-carta .juego-emoji { font-size: 3.6rem; }
+.juego-carta .juego-nombre { font-size: .87rem; font-weight: 600; color: var(--oscuro); }
+.juego-carta.acierto { border-color: var(--verde); background: rgba(76, 175, 80, .1); }
+.juego-carta.error   { border-color: var(--rojo);  background: rgba(229, 57, 53, .08); }
+.juego-carta.oculta  { background: linear-gradient(135deg, var(--azul), var(--morado)); border-color: transparent; }
+.juego-carta.oculta .juego-emoji { color: rgba(255, 255, 255, .55); }
+.juego-carta:disabled { cursor: default; }
+
+/* Campo de escritura */
+.juego-campo {
+    padding: 14px 20px;
+    border: 3px solid var(--borde);
+    border-radius: var(--radio-chico);
+    font-family: inherit;
+    font-size: 1.5rem;
+    font-weight: 700;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    width: 100%;
+    max-width: 320px;
+    color: var(--oscuro);
+    background: var(--fondo);
+}
+.juego-campo:focus { outline: none; border-color: var(--azul); background: var(--blanco); }
+
+/* Sopa de letras */
+.juego-sopa {
+    display: grid;
+    gap: 5px;
+    max-width: 400px;
+    width: 100%;
+}
+.juego-celda {
+    aspect-ratio: 1;
+    border: 2px solid var(--borde);
+    border-radius: 9px;
+    background: var(--blanco);
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--oscuro);
+    cursor: pointer;
+    transition: all .13s ease;
+}
+.juego-celda:hover   { border-color: var(--azul); }
+.juego-celda.elegida { background: var(--azul); color: #fff; border-color: var(--azul); }
+.juego-celda.hallada { background: rgba(76, 175, 80, .22); border-color: var(--verde); color: #1b5e20; }
+
+.juego-lista-palabras { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+.juego-etiqueta {
+    background: var(--fondo-suave);
+    padding: 5px 14px;
+    border-radius: var(--radio-pildora);
+    font-size: .87rem;
+    font-weight: 700;
+    color: var(--oscuro);
+    letter-spacing: .04em;
+}
+.juego-etiqueta.tachada { text-decoration: line-through; opacity: .45; background: rgba(76, 175, 80, .14); }
+
+/* ── Completar huecos en un texto ─────────────────────────────────── */
+/* El texto se lee, así que manda la legibilidad: línea generosa, ancho
+   limitado y alineado a la izquierda. Un párrafo centrado obliga al ojo a
+   buscar dónde empieza cada línea, y aquí el ejercicio es justamente
+   leer. */
+.juego-cloze-titulo {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--oscuro);
+    text-align: center;
+}
+.juego-cloze {
+    max-width: 620px;
+    width: 100%;
+    text-align: left;
+    font-size: clamp(1.02rem, 2.3vw, 1.2rem);
+    line-height: 2.1;
+    color: var(--oscuro);
+}
+.juego-cloze-hueco {
+    display: inline-block;
+    min-width: 108px;
+    padding: 2px 10px;
+    margin: 0 3px;
+    border-bottom: 3px solid var(--borde);
+    text-align: center;
+    font-weight: 700;
+    vertical-align: baseline;
+}
+/* El hueco que toca ahora. Late despacio para que se vea sin distraer de
+   la lectura. */
+.juego-cloze-hueco.activo {
+    border-bottom-color: var(--azul);
+    background: rgba(41, 182, 246, .12);
+    border-radius: 6px 6px 0 0;
+    animation: cloze-latido 1.6s ease-in-out infinite;
+}
+.juego-cloze-hueco.lleno {
+    border-bottom-color: var(--verde);
+    background: rgba(76, 175, 80, .14);
+    border-radius: 6px 6px 0 0;
+    color: #1b5e20;
+}
+@keyframes cloze-latido {
+    0%, 100% { background: rgba(41, 182, 246, .12); }
+    50%      { background: rgba(41, 182, 246, .28); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .juego-cloze-hueco.activo { animation: none; }
+}
+
+/* ── Crucigrama ───────────────────────────────────────────────────── */
+.juego-crucigrama {
+    display: grid;
+    grid-template-columns: repeat(var(--columnas, 8), minmax(0, 1fr));
+    gap: 3px;
+    width: 100%;
+    max-width: 460px;
+}
+.cruci-celda {
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--borde);
+    border-radius: 6px;
+    background: var(--blanco);
+    font-weight: 700;
+    font-size: clamp(.8rem, 2.4vw, 1.15rem);
+    color: var(--oscuro);
+    transition: all .15s ease;
+}
+/* Las casillas que no son de ninguna palabra: sin borde ni fondo, para
+   que la forma del crucigrama se lea de un vistazo. */
+.cruci-celda.vacia { border-color: transparent; background: transparent; }
+
+.cruci-num {
+    position: absolute;
+    top: 1px;
+    left: 3px;
+    font-size: .55rem;
+    font-weight: 700;
+    color: var(--texto-tenue);
+    line-height: 1;
+}
+.cruci-celda.activa   { border-color: var(--azul); background: rgba(41, 182, 246, .14); }
+.cruci-celda.resuelta { border-color: var(--verde); background: rgba(76, 175, 80, .18); color: #1b5e20; }
+
+.cruci-pistas {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+}
+.cruci-grupo { flex: 1 1 240px; max-width: 320px; }
+.cruci-grupo-titulo {
+    font-size: .82rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--texto-tenue);
+    margin-bottom: 8px;
+}
+.cruci-pista {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 6px;
+    padding: 8px 11px;
+    font-size: .92rem;
+}
+.cruci-pista-num {
+    flex: 0 0 auto;
+    min-width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--fondo-suave);
+    font-size: .75rem;
+    font-weight: 700;
+}
+/* Cuando la pista es un dibujo, el dibujo manda: es lo único que puede
+   leer un niño que todavía no lee. */
+.cruci-pista-dibujo { font-size: 2.3rem; line-height: 1; }
+img.cruci-pista-dibujo { width: 2.3rem; height: 2.3rem; }
+.cruci-pista-texto { flex: 1 1 auto; }
+.cruci-pista.resuelta {
+    border-color: var(--verde);
+    background: rgba(76, 175, 80, .12);
+    opacity: .75;
+}
+.cruci-pista.resuelta .cruci-pista-texto { text-decoration: line-through; }
+
+.cruci-respuesta { width: 100%; display: flex; justify-content: center; }
+.cruci-caja {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 11px;
+    width: 100%;
+    max-width: 380px;
+    padding: 16px;
+    border: 2px dashed var(--borde);
+    border-radius: var(--radio);
+    background: var(--fondo-suave);
+}
+
+/* Operaciones aritméticas */
+.juego-operacion {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.juego-num {
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--oscuro);
+    min-width: 52px;
+    text-align: center;
+}
+.juego-signo { font-size: 2rem; font-weight: 700; color: var(--azul); }
+
+/* Objetos para contar */
+.juego-fichas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    justify-content: center;
+    max-width: 420px;
+}
+.juego-ficha-obj { font-size: 2.6rem; line-height: 1; }
+.juego-ficha-obj.tachado { opacity: .28; text-decoration: line-through; }
+
+/* Muestras de color */
+.juego-muestra {
+    width: 84px;
+    height: 84px;
+    border-radius: var(--radio-medio);
+    border: 3px solid var(--borde);
+    box-shadow: var(--sombra);
+}
+.juego-mezcla { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: center; }
+
+/* Lista de compra */
+.juego-compra {
+    background: var(--fondo);
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-medio);
+    padding: 14px 18px;
+    min-width: 240px;
+    max-width: 340px;
+    width: 100%;
+}
+.juego-compra-fila {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 6px 0;
+    font-size: 1rem;
+    border-bottom: 1px dashed var(--borde);
+}
+.juego-compra-fila:last-child { border-bottom: none; }
+.juego-compra-fila b { color: var(--oscuro); }
+
+/* Emparejar */
+.juego-emparejar {
+    display: flex;
+    gap: 26px;
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+.juego-columna { display: flex; flex-direction: column; gap: 10px; }
+.juego-carta.compacta { padding: 10px 16px; }
+.juego-carta.compacta .juego-emoji { font-size: 3rem; }
+.juego-carta.elegida { border-color: var(--azul); background: rgba(41, 182, 246, .1); }
+
+/* Ayuda cuando el ejercicio se atasca */
+.juego-ayuda {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    padding: 14px 18px;
+    background: rgba(255, 152, 0, .07);
+    border: 2px dashed rgba(255, 152, 0, .35);
+    border-radius: var(--radio-medio);
+    max-width: 380px;
+}
+.juego-ayuda:empty { display: none; }
+
+/* Reloj */
+.juego-reloj {
+    background: var(--fondo-suave);
+    padding: 6px 18px;
+    border-radius: var(--radio-pildora);
+    font-size: .95rem;
+    font-weight: 700;
+    color: var(--oscuro);
+}
+
+/* Avisos flotantes */
+.juego-aviso {
+    position: fixed;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%);
+    padding: 13px 28px;
+    border-radius: var(--radio-pildora);
+    font-weight: 700;
+    font-size: .97rem;
+    color: #fff;
+    z-index: 200;
+    box-shadow: 0 8px 26px rgba(0, 0, 0, .18);
+    animation: aparecer .28s var(--salto);
+}
+.juego-aviso.bien { background: var(--verde); }
+.juego-aviso.mal  { background: var(--naranja); }
+
+@keyframes aparecer {
+    from { opacity: 0; transform: translateX(-50%) translateY(14px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.juego-cargando { text-align: center; color: var(--texto-tenue); padding: 60px 0; font-size: .95rem; }
+
+/* Pantalla final de estación */
+.juego-final h2 { color: var(--oscuro); font-size: 1.5rem; font-weight: 700; }
+.juego-estrellas { font-size: 2rem; letter-spacing: .1em; }
+.juego-nota { font-size: .87rem; color: var(--texto-tenue); text-align: center; }
+.juego-nota a { color: var(--azul); font-weight: 600; }
+
+.invitacion-juego {
+    background: linear-gradient(135deg, #1e1b4b, #4c1d95, #6d28d9);
+    border-radius: var(--radio-medio);
+    padding: 40px 26px;
+    color: #fff;
+    text-align: center;
+}
+.invitacion-juego h2 { color: #fff; font-size: 1.35rem; font-weight: 700; max-width: 480px; line-height: 1.35; }
+.invitacion-juego .juego-texto { color: rgba(255, 255, 255, .78); }
+
+/* ── Pantallas pequeñas ───────────────────────────────────────────── */
+@media (max-width: 860px) {
+    .marco-juego { grid-template-columns: 1fr; gap: 14px; }
+    .mapa {
+        position: static;
+        max-height: none;
+        order: 2;
+    }
+    .escenario { order: 1; min-height: 440px; }
+    .juego-rejilla { grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); }
+    .juego-emoji { font-size: 4.4rem; }
+    .juego-emoji.grande { font-size: 5.4rem; }
+    .juego-ficha { min-width: 54px; font-size: 1.05rem; padding: 12px 15px; }
+    .juego-hueco { min-width: 50px; height: 50px; font-size: 1.1rem; }
+    #zona-juego { padding: 20px 15px 26px; }
+}
+
+@media (max-width: 420px) {
+    .juego-rejilla { grid-template-columns: 1fr 1fr; }
+    .juego-opciones .btn { width: 100%; }
+    .juego-sopa { max-width: 100%; }
+    .juego-celda { font-size: .92rem; }
+}

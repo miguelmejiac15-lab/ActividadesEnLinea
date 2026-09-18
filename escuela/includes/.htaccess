@@ -1,0 +1,2 @@
+# Plantillas del área Escuela: se cargan desde PHP, nunca por URL directa.
+Require all denied

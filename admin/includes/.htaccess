@@ -1,0 +1,2 @@
+# Plantillas del panel: se cargan desde PHP, nunca por URL directa.
+Require all denied

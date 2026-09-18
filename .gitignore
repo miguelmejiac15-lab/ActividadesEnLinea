@@ -1,0 +1,68 @@
+# =====================================================================
+#  Lo que NO se sube al repositorio
+# =====================================================================
+#
+# El repositorio es público (github.com/miguelmejiac15-lab/ActividadesEnLinea),
+# así que esta lista no es una preferencia de orden: es lo único que
+# separa los secretos de la plataforma de cualquiera que abra la página.
+#
+# Un secreto subido por error no se arregla borrándolo en el commit
+# siguiente. Queda en el historial, en los forks y en los espejos que
+# rastrean GitHub, y la única salida real es rotar la credencial.
+
+# ── Secretos ─────────────────────────────────────────────────────────
+# Conexión a la base de datos y app_key. La plantilla
+# `credenciales.example.php` SÍ se sube: es la que explica qué poner.
+config/credenciales.php
+
+# Variables de entorno, por si alguna vez se usan aquí.
+.env
+.env.*
+!.env.example
+
+# ── Datos de la instalación ──────────────────────────────────────────
+# Logs (con rutas del servidor y trazas de error), subidas de usuarios,
+# cachés. Nada de esto es código y parte son datos de menores.
+almacen/
+
+# ── Material de terceros ─────────────────────────────────────────────
+# Mallas curriculares del colegio (11 MB de .docx y .pdf, versionados
+# como «R52 - V3 MALLAS CURRICULARES 2025-2026»).
+#
+# No se suben por dos razones, y la primera basta: son documentos
+# internos de la institución, no de este proyecto. Publicarlos en un
+# repositorio público los pone a disposición de cualquiera de forma
+# permanente —quedan en los forks y en los espejos— y esa no es una
+# decisión que tome quien escribe el código.
+#
+# La segunda es que no son código: pesan el 73% del repositorio y
+# ninguna herramienta puede hacer nada útil con ellos.
+#
+# Si hay permiso expreso de la institución para publicarlos, se quita
+# esta línea.
+MallasPrimaria/
+
+# ── Volcados de base de datos ────────────────────────────────────────
+# `schema.sql` y `seed.sql` (en database/) sí se suben: son la estructura
+# y el contenido inicial. Lo que se excluye son los volcados de una
+# instalación viva, que llevan usuarios, correos y contraseñas hasheadas.
+*.sql.gz
+*.dump
+volcado*.sql
+backup*.sql
+respaldo*.sql
+
+# ── Sistema y editores ───────────────────────────────────────────────
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*~
+
+# ── Temporales de trabajo ────────────────────────────────────────────
+/tmp/
+*.log
+*.bak
+*.orig

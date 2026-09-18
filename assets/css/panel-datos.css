@@ -1,0 +1,604 @@
+/* =====================================================================
+   panel-datos.css — Métricas, cobros y fichas del panel
+
+   Se carga SOLO en las pantallas que lo necesitan, después de
+   admin.css. Todo lo de aquí es específico de datos: gráficas, líneas
+   de tiempo y fichas de detalle. Mezclarlo con admin.css obligaría a
+   descargarlo también en el editor de actividades, que no dibuja
+   ninguna gráfica.
+
+   Las gráficas no usan ninguna librería: una barra es un <span> con la
+   altura en porcentaje.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------
+   Rejillas del panel
+   --------------------------------------------------------------- */
+
+.rejilla-panel {
+    display: grid;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.rejilla-panel.dos  { grid-template-columns: 1fr 1fr; }
+.rejilla-panel.tres { grid-template-columns: repeat(3, 1fr); }
+.rejilla-panel.ancha-izq { grid-template-columns: 1.7fr 1fr; }
+
+.rejilla-panel > .caja { margin-bottom: 0; }
+
+@media (max-width: 1000px) {
+    .rejilla-panel.dos,
+    .rejilla-panel.tres,
+    .rejilla-panel.ancha-izq { grid-template-columns: 1fr; }
+}
+
+/* Pie de una cifra destacada: la variación respecto al periodo anterior. */
+.cifra-caja .p {
+    font-size: .78rem;
+    margin-top: 7px;
+    color: var(--texto-tenue);
+    line-height: 1.4;
+}
+.cifra-caja .p .sube  { color: #2e7d32; font-weight: 700; }
+.cifra-caja .p .baja  { color: #c62828; font-weight: 700; }
+.cifra-caja .n.moneda { font-size: 1.45rem; }
+
+
+/* ---------------------------------------------------------------
+   Gráfica de barras
+   --------------------------------------------------------------- */
+
+.gr { margin: 0; }
+
+.gr-lienzo {
+    position: relative;
+    /* La altura reservada incluye la banda del eje: si solo cubriera el
+       área de las barras, las etiquetas de los meses quedarían fuera y
+       la caja tendría su propio scroll vertical de 14 píxeles. */
+    padding: 22px 0 0 44px;
+}
+
+/* Guías horizontales. Hairlines sólidas — una guía punteada se lee como
+   una proyección o un umbral, y aquí solo marca una altura. */
+.gr-guias {
+    position: absolute;
+    inset: 22px 0 26px 44px;
+    pointer-events: none;
+}
+
+.gr-guia {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 1px solid var(--borde-suave);
+}
+
+.gr-guia span {
+    position: absolute;
+    right: calc(100% + 8px);
+    top: -.55em;
+    font-size: .7rem;
+    color: var(--texto-tenue);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.gr-barras {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: var(--gr-alto, 170px);
+    padding: 0 0 26px;
+    margin: 0;
+    list-style: none;
+    position: relative;
+}
+
+.gr-col {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    position: relative;
+    border-radius: 6px;
+    /* El área sensible es la columna entera, no solo la barra: apuntar a
+       una barra de 6 px de alto es imposible con el dedo. */
+    cursor: default;
+}
+
+.gr-col:hover,
+.gr-col:focus-visible { background: rgba(2, 136, 209, .06); outline: none; }
+.gr-col:focus-visible { box-shadow: 0 0 0 2px var(--azul); }
+
+.gr-barra {
+    display: block;
+    width: 100%;
+    max-width: 46px;
+    min-height: 3px;
+    /* Extremo redondeado arriba, plano contra la línea base. */
+    border-radius: 4px 4px 1px 1px;
+    transition: filter .15s;
+}
+
+.gr-col:hover .gr-barra { filter: brightness(1.15); }
+.gr-barra.cero { background: var(--borde-fuerte) !important; }
+
+.gr-cifra {
+    position: absolute;
+    bottom: calc(100% - 22px);
+    font-size: .68rem;
+    font-weight: 700;
+    color: var(--oscuro);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+.gr-col .gr-eje {
+    position: absolute;
+    bottom: -22px;
+    font-size: .7rem;
+    color: var(--texto-tenue);
+    white-space: nowrap;
+}
+
+.gr-globo {
+    position: absolute;
+    bottom: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--oscuro);
+    color: #fff;
+    font-size: .76rem;
+    line-height: 1.45;
+    padding: 7px 11px;
+    border-radius: 9px;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .12s;
+    z-index: 5;
+    box-shadow: 0 6px 18px rgba(47, 59, 82, .22);
+}
+
+.gr-globo b    { color: #fff; }
+.gr-globo span { opacity: .75; font-size: .72rem; }
+
+.gr-col:hover .gr-globo,
+.gr-col:focus-visible .gr-globo { opacity: 1; }
+
+/* El globo de las columnas de los extremos se saldría de la caja. */
+.gr-col:first-child .gr-globo { left: 0;    transform: none; }
+.gr-col:last-child  .gr-globo { left: auto; right: 0; transform: none; }
+
+.gr-vacia {
+    text-align: center;
+    color: var(--texto-tenue);
+    font-size: .88rem;
+    padding: 34px 10px;
+}
+
+
+/* ---------------------------------------------------------------
+   Tabla gemela de cada gráfica
+   --------------------------------------------------------------- */
+
+.gr-datos { margin-top: 16px; }
+
+.gr-datos > summary {
+    cursor: pointer;
+    font-size: .8rem;
+    color: var(--texto-tenue);
+    padding: 6px 0;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.gr-datos > summary::-webkit-details-marker { display: none; }
+.gr-datos > summary::before { content: '▸'; font-size: .8rem; }
+.gr-datos[open] > summary::before { content: '▾'; }
+.gr-datos > summary:hover { color: var(--azul); }
+
+.gr-datos table { margin-top: 8px; }
+
+.tabla .cifra {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+
+/* ---------------------------------------------------------------
+   Reparto: barra apilada + leyenda
+   --------------------------------------------------------------- */
+
+.gr-pila {
+    display: flex;
+    /* El hueco entre trozos es del color del fondo. Un borde oscuro
+       comería el color del segmento cuando este es estrecho. */
+    gap: 2px;
+    height: 30px;
+    border-radius: 6px;
+    overflow: hidden;
+    background: var(--borde-suave);
+}
+
+.gr-trozo { display: block; height: 100%; min-width: 3px; }
+
+.gr-leyenda {
+    list-style: none;
+    margin: 16px 0 0;
+    display: grid;
+    gap: 9px;
+}
+
+.gr-leyenda li {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-size: .87rem;
+}
+
+.gr-leyenda .punto {
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    flex-shrink: 0;
+}
+
+.gr-leyenda .nombre { color: var(--texto); flex: 1; min-width: 0; }
+.gr-leyenda b       { color: var(--oscuro); font-variant-numeric: tabular-nums; }
+
+.gr-leyenda .pct {
+    color: var(--texto-tenue);
+    font-size: .8rem;
+    width: 42px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+/* Barra de apoyo dentro de una celda de tabla. */
+.gr-fila {
+    display: block;
+    height: 7px;
+    border-radius: 50px;
+    background: var(--borde-suave);
+    overflow: hidden;
+    min-width: 70px;
+}
+
+.gr-fila > span { display: block; height: 100%; border-radius: 50px; }
+
+
+/* ---------------------------------------------------------------
+   Ficha de detalle (un pago, un usuario)
+   --------------------------------------------------------------- */
+
+.ficha-cabeza {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    flex-wrap: wrap;
+    margin-bottom: 18px;
+}
+
+.ficha-cabeza .identidad { flex: 1; min-width: 240px; }
+
+.ficha-cabeza h1 {
+    font-size: 1.5rem;
+    color: var(--oscuro);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.ficha-cabeza .referencia {
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: .95rem;
+    color: var(--texto-tenue);
+    letter-spacing: .02em;
+}
+
+.ficha-cabeza .acciones { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.datos-lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px 22px;
+}
+
+.datos-lista > div { min-width: 0; }
+
+.datos-lista dt,
+.datos-lista .rotulo {
+    font-size: .73rem;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    color: var(--texto-tenue);
+    margin-bottom: 3px;
+}
+
+.datos-lista dd,
+.datos-lista .dato {
+    color: var(--oscuro);
+    font-size: .95rem;
+    font-weight: 600;
+    margin: 0;
+    word-break: break-word;
+}
+
+.datos-lista .dato.suave { font-weight: 500; color: var(--texto); }
+.monto-grande { font-size: 1.9rem; font-weight: 700; color: var(--oscuro); line-height: 1.1; }
+
+
+/* ---------------------------------------------------------------
+   Línea de tiempo de un pago
+   --------------------------------------------------------------- */
+
+.linea-tiempo {
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 6px;
+}
+
+.linea-tiempo li {
+    position: relative;
+    padding: 0 0 18px 26px;
+    border-left: 2px solid var(--borde-suave);
+}
+
+.linea-tiempo li:last-child { border-left-color: transparent; padding-bottom: 0; }
+
+.linea-tiempo li::before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 3px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--borde-fuerte);
+    box-shadow: 0 0 0 3px #fff;
+}
+
+.linea-tiempo li.confirmado::before  { background: #2e7d32; }
+.linea-tiempo li.rechazado::before,
+.linea-tiempo li.anulado::before     { background: #c62828; }
+.linea-tiempo li.reembolsado::before { background: #8e24aa; }
+.linea-tiempo li.webhook::before     { background: #0288d1; }
+
+.linea-tiempo .que {
+    color: var(--oscuro);
+    font-weight: 700;
+    font-size: .92rem;
+    display: block;
+}
+
+.linea-tiempo .detalle {
+    color: var(--texto);
+    font-size: .87rem;
+    line-height: 1.5;
+    margin-top: 2px;
+    white-space: pre-wrap;
+}
+
+.linea-tiempo .cuando {
+    color: var(--texto-tenue);
+    font-size: .76rem;
+    margin-top: 3px;
+    display: block;
+}
+
+
+/* ---------------------------------------------------------------
+   Pestañas por rol (Usuarios)
+   --------------------------------------------------------------- */
+
+.pestanas {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+    border-bottom: 2px solid var(--borde-suave);
+    padding-bottom: 0;
+}
+
+.pestanas a {
+    padding: 9px 15px;
+    font-size: .87rem;
+    font-weight: 600;
+    color: var(--texto-tenue);
+    border-bottom: 3px solid transparent;
+    margin-bottom: -2px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    white-space: nowrap;
+}
+
+.pestanas a:hover  { color: var(--oscuro); }
+.pestanas a.activo { color: var(--azul); border-bottom-color: var(--azul); }
+
+.pestanas a .cuenta {
+    background: var(--fondo-suave);
+    color: var(--texto-tenue);
+    border-radius: 50px;
+    padding: 1px 8px;
+    font-size: .75rem;
+    font-variant-numeric: tabular-nums;
+}
+
+.pestanas a.activo .cuenta { background: rgba(41, 182, 246, .16); color: #0277bd; }
+
+
+/* ---------------------------------------------------------------
+   Bloque de acciones peligrosas / formularios en línea
+   --------------------------------------------------------------- */
+
+.acciones-caja {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+}
+
+.acciones-caja .campo { flex: 1; min-width: 160px; }
+
+.aviso-suave {
+    background: var(--fondo-suave);
+    border-radius: var(--radio-chico);
+    padding: 13px 15px;
+    font-size: .86rem;
+    color: var(--texto);
+    line-height: 1.55;
+}
+
+.aviso-suave b { color: var(--oscuro); }
+
+.dato-copiable {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--fondo-suave);
+    border-radius: var(--radio-chico);
+    padding: 11px 14px;
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    font-size: .9rem;
+    color: var(--oscuro);
+    word-break: break-all;
+}
+
+@media (max-width: 620px) {
+    .gr-barras { gap: 2px; }
+    .gr-cifra  { display: none; }
+    .datos-lista { grid-template-columns: 1fr 1fr; }
+}
+
+
+/* ── Menú de acciones de un curso ─────────────────────────────────────
+   Un desplegable en la propia fila: cambiar de docente o de colegio son
+   acciones raras, y sacarlas a una pantalla aparte por una vez al mes
+   sobra. Con `<details>` no hace falta JavaScript.
+   ------------------------------------------------------------------- */
+
+.menu-curso { position: relative; display: inline-block; }
+
+.menu-curso > summary {
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+.menu-curso > summary::-webkit-details-marker { display: none; }
+
+.menu-curso-cuerpo {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 20;
+    width: 232px;
+    background: var(--blanco, #fff);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-chico);
+    box-shadow: 0 10px 30px rgba(47, 59, 82, .16);
+    padding: 14px;
+    text-align: left;
+}
+
+.menu-curso-cuerpo label {
+    display: block;
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--texto-tenue);
+    margin-bottom: 4px;
+}
+
+.menu-curso-cuerpo select {
+    width: 100%;
+    font-family: inherit;
+    font-size: .85rem;
+    color: var(--texto);
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-chico);
+    padding: 6px 8px;
+    margin-bottom: 8px;
+}
+
+.menu-curso-cuerpo .btn-mini { width: 100%; justify-content: center; }
+
+
+/* ── Gráfica de uso día a día ─────────────────────────────────────────
+   Barras en HTML puro, sin librería. Cada barra es un día del rango,
+   incluidos los vacíos: sin los huecos, la gráfica junta el lunes con el
+   viernes y aparenta una constancia que no hubo.
+   ------------------------------------------------------------------- */
+
+.grafica-uso {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 130px;
+    padding: 10px 0 0;
+    border-bottom: 2px solid var(--borde);
+}
+
+.barra-dia {
+    flex: 1;
+    min-width: 3px;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    /* Un día sin nada tiene su columna igual, en blanco: el hueco es el
+       dato. */
+    background: linear-gradient(var(--borde-suave), var(--borde-suave)) bottom / 100% 1px no-repeat;
+}
+
+.barra-dia > span {
+    display: block;
+    width: 100%;
+    background: var(--borde-fuerte);
+    border-radius: 3px 3px 0 0;
+    transition: background .15s;
+}
+
+/* Los días en que además terminó estaciones se distinguen: entrar y
+   jugar no son lo mismo, y esa es justo la diferencia que se busca. */
+.barra-dia > span.jugo { background: var(--verde); }
+
+.barra-dia:hover > span { background: var(--azul); }
+
+.leyenda-uso {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 12px;
+    font-size: .78rem;
+    color: var(--texto-tenue);
+}
+
+.leyenda-uso span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.leyenda-uso .pt {
+    width: 11px;
+    height: 11px;
+    border-radius: 3px;
+    background: var(--borde-fuerte);
+}
+
+.leyenda-uso .pt.jugo { background: var(--verde); }
+
+@media (max-width: 620px) {
+    .grafica-uso { height: 100px; gap: 2px; }
+}

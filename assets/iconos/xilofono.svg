@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Xilófono">
+  <!-- Xilófono. El emoji no lo tiene: la palabra se ilustraba con una
+       nota musical 🎵, que no enseña qué es un xilófono.
+       Es de las pocas palabras con X que un niño reconoce, así que en la
+       actividad de la X hace falta de verdad. -->
+  <ellipse cx="64" cy="112" rx="46" ry="6" fill="#000" opacity=".08"/>
+
+  <!-- Láminas, de grave a agudo, con los colores del arcoíris. -->
+  <rect x="14" y="30" width="16" height="72" rx="6" fill="#e53935"/>
+  <rect x="34" y="34" width="16" height="66" rx="6" fill="#fb8c00"/>
+  <rect x="54" y="38" width="16" height="60" rx="6" fill="#fdd835"/>
+  <rect x="74" y="42" width="16" height="54" rx="6" fill="#43a047"/>
+  <rect x="94" y="46" width="16" height="48" rx="6" fill="#1e88e5"/>
+
+  <!-- Tornillos -->
+  <circle cx="22" cy="40" r="2.6" fill="#5d4037" opacity=".55"/>
+  <circle cx="42" cy="44" r="2.6" fill="#5d4037" opacity=".55"/>
+  <circle cx="62" cy="48" r="2.6" fill="#5d4037" opacity=".55"/>
+  <circle cx="82" cy="52" r="2.6" fill="#5d4037" opacity=".55"/>
+  <circle cx="102" cy="56" r="2.6" fill="#5d4037" opacity=".55"/>
+
+  <!-- Baqueta -->
+  <rect x="86" y="14" width="34" height="6" rx="3" fill="#a0672f" transform="rotate(28 103 17)"/>
+  <circle cx="90" cy="26" r="7" fill="#8d6e63"/>
+</svg>

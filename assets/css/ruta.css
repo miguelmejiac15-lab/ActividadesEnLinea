@@ -1,0 +1,251 @@
+/* =====================================================================
+   ruta.css — La ruta de aprendizaje del estudiante
+
+   Está escrita para un niño de seis años que apenas lee: pasos grandes,
+   numerados, uno debajo de otro, y UNA sola cosa encendida a la vez.
+
+   El paso que le toca es el único con color y con botón; los hechos se
+   apagan y los que faltan se quedan grises con un candado. Que solo haya
+   una cosa que tocar es la mitad del diseño.
+   ===================================================================== */
+
+.ruta-cabeza {
+    background: linear-gradient(135deg, var(--azul), var(--morado));
+    color: var(--blanco);
+    border-radius: var(--radio);
+    padding: 26px 30px;
+    margin-bottom: 26px;
+    box-shadow: var(--sombra-alta);
+}
+
+.ruta-cabeza h1 {
+    font-size: clamp(1.5rem, 4vw, 2.1rem);
+    margin: 0 0 6px;
+    color: var(--blanco);
+}
+
+.ruta-cabeza .ruta-clase {
+    font-size: 1rem;
+    opacity: .92;
+    margin: 0;
+}
+
+.ruta-medidor {
+    margin-top: 18px;
+    height: 14px;
+    border-radius: var(--radio-pildora);
+    background: rgba(255, 255, 255, .28);
+    overflow: hidden;
+}
+
+.ruta-medidor span {
+    display: block;
+    height: 100%;
+    border-radius: var(--radio-pildora);
+    background: var(--blanco);
+    transition: width .5s var(--salto);
+}
+
+.ruta-medidor-pie {
+    margin: 8px 0 0;
+    font-size: .9rem;
+    opacity: .92;
+}
+
+
+/* ── Los pasos ────────────────────────────────────────────────────── */
+
+.ruta-pasos {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 14px;
+}
+
+.ruta-paso {
+    display: grid;
+    grid-template-columns: 62px 1fr auto;
+    align-items: center;
+    gap: 18px;
+    background: var(--blanco);
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-medio);
+    padding: 16px 20px;
+}
+
+.ruta-numero {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: var(--fondo-suave);
+    color: var(--texto-tenue);
+    flex: none;
+}
+
+.ruta-paso h2 {
+    font-size: 1.15rem;
+    margin: 0 0 3px;
+    color: var(--oscuro);
+    line-height: 1.3;
+}
+
+.ruta-paso .ruta-meta {
+    margin: 0;
+    font-size: .9rem;
+    color: var(--texto-tenue);
+}
+
+.ruta-paso .btn {
+    white-space: nowrap;
+}
+
+
+/* El paso que le toca: el único encendido. */
+.ruta-paso.ahora {
+    border-color: var(--naranja);
+    box-shadow: 0 8px 26px rgba(255, 152, 0, .22);
+    background: #fffdf7;
+}
+
+.ruta-paso.ahora .ruta-numero {
+    background: var(--naranja);
+    color: var(--blanco);
+}
+
+.ruta-paso.ahora h2 {
+    font-size: 1.35rem;
+}
+
+
+/* Ya hecho. */
+.ruta-paso.hecha {
+    border-color: #cde9cf;
+    background: #f6fcf6;
+}
+
+.ruta-paso.hecha .ruta-numero {
+    background: var(--verde);
+    color: var(--blanco);
+}
+
+.ruta-paso.hecha h2 {
+    color: var(--texto);
+}
+
+
+/* Todavía no le toca. */
+.ruta-paso.cerrada {
+    opacity: .68;
+    background: var(--fondo);
+}
+
+.ruta-paso.cerrada h2 {
+    color: var(--texto-tenue);
+}
+
+
+/* La barrita de estaciones dentro de cada paso. */
+.ruta-barra {
+    margin-top: 8px;
+    height: 8px;
+    width: 100%;
+    max-width: 260px;
+    border-radius: var(--radio-pildora);
+    background: var(--borde-suave);
+    overflow: hidden;
+}
+
+.ruta-barra span {
+    display: block;
+    height: 100%;
+    border-radius: var(--radio-pildora);
+    background: var(--verde);
+}
+
+
+/* ── Fin de la ruta ───────────────────────────────────────────────── */
+
+.ruta-final {
+    text-align: center;
+    padding: 34px 24px;
+    background: var(--blanco);
+    border: 2px dashed var(--borde-fuerte);
+    border-radius: var(--radio);
+    margin-top: 22px;
+}
+
+.ruta-final .ruta-emoji {
+    font-size: 3.4rem;
+    display: block;
+    margin-bottom: 10px;
+}
+
+.ruta-final h2 {
+    margin: 0 0 8px;
+    color: var(--oscuro);
+}
+
+.ruta-final p {
+    margin: 0;
+    color: var(--texto-tenue);
+}
+
+
+/* ── Cambiar de clase ─────────────────────────────────────────────── */
+
+.ruta-clases {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.ruta-clases a {
+    padding: 8px 16px;
+    border-radius: var(--radio-pildora);
+    border: 2px solid var(--borde);
+    background: var(--blanco);
+    color: var(--texto);
+    font-weight: 600;
+    font-size: .92rem;
+}
+
+.ruta-clases a.activa {
+    border-color: var(--azul);
+    background: var(--azul);
+    color: var(--blanco);
+}
+
+
+/* ── Estrecho ─────────────────────────────────────────────────────── */
+
+@media (max-width: 620px) {
+    .ruta-paso {
+        grid-template-columns: 48px 1fr;
+        gap: 12px;
+        padding: 14px;
+    }
+
+    .ruta-numero {
+        width: 42px;
+        height: 42px;
+        font-size: 1.15rem;
+    }
+
+    /* El botón salta a una fila propia, a todo lo ancho: en un móvil es
+       lo único que el niño tiene que acertar. */
+    .ruta-paso .btn {
+        grid-column: 1 / -1;
+        width: 100%;
+        text-align: center;
+    }
+
+    .ruta-cabeza {
+        padding: 20px;
+    }
+}

@@ -1,0 +1,3 @@
+# La carpeta config/ contiene las credenciales de base de datos.
+# Nada de aquí debe ser accesible desde el navegador.
+Require all denied

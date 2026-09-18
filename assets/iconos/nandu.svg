@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Ñandú">
+  <!-- Ñandú. El emoji no lo tiene, y la palabra se ilustraba con un
+       flamenco 🦩 — que además es el dibujo de la F. En la actividad de
+       la Ñ es de las poquísimas palabras disponibles, así que merece
+       tener la suya. -->
+  <ellipse cx="64" cy="114" rx="34" ry="6" fill="#000" opacity=".08"/>
+
+  <!-- Patas -->
+  <path d="M56 92 v18" stroke="#c9a227" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M72 92 v18" stroke="#c9a227" stroke-width="5" stroke-linecap="round" fill="none"/>
+  <path d="M56 110 l-7 5 M56 110 l7 5" stroke="#c9a227" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <path d="M72 110 l-7 5 M72 110 l7 5" stroke="#c9a227" stroke-width="4" stroke-linecap="round" fill="none"/>
+
+  <!-- Cuerpo, con plumas mullidas -->
+  <ellipse cx="64" cy="76" rx="30" ry="24" fill="#a1887f"/>
+  <ellipse cx="52" cy="70" rx="13" ry="11" fill="#bcaaa4" opacity=".75"/>
+  <ellipse cx="76" cy="82" rx="15" ry="12" fill="#8d6e63" opacity=".55"/>
+
+  <!-- Cuello largo -->
+  <path d="M74 58 C74 40 78 30 84 24" stroke="#bcaaa4" stroke-width="11" stroke-linecap="round" fill="none"/>
+
+  <!-- Cabeza -->
+  <circle cx="86" cy="21" r="10" fill="#bcaaa4"/>
+  <circle cx="90" cy="19" r="2.3" fill="#3e2723"/>
+  <!-- Pico -->
+  <path d="M95 23 l11 3 -11 4 z" fill="#c9a227"/>
+</svg>

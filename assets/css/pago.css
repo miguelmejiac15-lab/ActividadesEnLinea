@@ -1,0 +1,420 @@
+/* =====================================================================
+   pago.css — Pantallas de contratación y pago
+
+   Se carga solo en planes/suscribir.php, planes/pagar.php y
+   usuario/pagos.php. Nadie más las necesita, y en un sitio donde la
+   mayoría de visitas van al catálogo no tiene sentido descargar los
+   estilos del pago en todas ellas.
+
+   El tono es más sobrio que el resto del sitio a propósito. El resto
+   es un producto para niños —colores vivos, dibujos grandes— pero esto
+   lo lee un adulto que está a punto de poner dinero, y ahí la
+   confianza se transmite con claridad, no con alegría.
+   ===================================================================== */
+
+/* ---------------------------------------------------------------
+   Las dos puertas: entrar o crear cuenta
+
+   Van lado a lado y con EXACTAMENTE el mismo peso visual. Si una
+   destacara sobre la otra volveríamos a adivinar quién es el que
+   llega, que es justo lo que esta pantalla existe para no hacer.
+
+   En pantalla estrecha se apilan; entonces el orden del HTML manda,
+   y «ya tengo cuenta» va primero porque quien vuelve suele tener más
+   prisa: ya decidió comprar una vez.
+   --------------------------------------------------------------- */
+
+.dos-puertas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+}
+
+.puerta {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 7px;
+    padding: 26px 20px 20px;
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-medio);
+    background: var(--blanco);
+    text-decoration: none;
+    transition: border-color .18s, transform .18s, box-shadow .18s;
+}
+
+.puerta:hover,
+.puerta:focus-visible {
+    border-color: var(--azul);
+    transform: translateY(-2px);
+    box-shadow: var(--sombra);
+}
+
+.puerta:focus-visible { outline: 3px solid var(--azul); outline-offset: 2px; }
+
+.puerta-ico { font-size: 2rem; line-height: 1; }
+
+.puerta b {
+    color: var(--oscuro);
+    font-size: 1.05rem;
+}
+
+.puerta-sub {
+    color: var(--texto-tenue);
+    font-size: .89rem;
+    line-height: 1.45;
+    flex: 1;
+}
+
+/* Parece un botón pero es parte del enlace: toda la tarjeta es el
+   área pulsable, que en un móvil es la diferencia entre acertar y
+   pulsar al lado. */
+.puerta-btn {
+    margin-top: 6px;
+    padding: 11px 18px;
+    border-radius: var(--radio-pildora);
+    background: linear-gradient(135deg, var(--azul), var(--morado));
+    color: #fff;
+    font-weight: 600;
+    font-size: .92rem;
+    width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .puerta { transition: none; }
+    .puerta:hover, .puerta:focus-visible { transform: none; }
+}
+
+/* ---------------------------------------------------------------
+   Elegir modalidad y forma de pago
+   --------------------------------------------------------------- */
+
+.opciones-plan { display: grid; gap: 11px; }
+
+.opcion-plan {
+    display: flex;
+    align-items: flex-start;
+    gap: 13px;
+    padding: 16px 18px;
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-medio);
+    cursor: pointer;
+    background: var(--blanco);
+    transition: border-color .16s, background .16s;
+}
+
+.opcion-plan:hover { border-color: var(--azul); }
+
+.opcion-plan input {
+    margin-top: 3px;
+    width: 20px;
+    height: 20px;
+    accent-color: var(--azul);
+    flex-shrink: 0;
+}
+
+/* El estado marcado se ve en el borde Y en el fondo, no solo en el
+   puntito del radio: a distancia de lectura normal, un radio de 20 px
+   no basta para saber qué se eligió. */
+.opcion-plan:has(input:checked) {
+    border-color: var(--azul);
+    background: rgba(41, 182, 246, .06);
+}
+
+.opcion-plan .cuerpo-opcion { min-width: 0; }
+
+.opcion-plan b {
+    display: block;
+    color: var(--oscuro);
+    font-size: 1.02rem;
+    margin-bottom: 3px;
+}
+
+.opcion-plan .cuerpo-opcion > span {
+    display: block;
+    font-size: .87rem;
+    color: var(--texto);
+    line-height: 1.55;
+}
+
+.campo-simple { display: block; }
+
+.campo-simple label {
+    display: block;
+    font-weight: 600;
+    color: var(--oscuro);
+    font-size: .92rem;
+    margin-bottom: 6px;
+}
+
+.campo-simple input,
+.campo-simple textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-chico);
+    font-family: inherit;
+    font-size: .95rem;
+    color: var(--oscuro);
+    background: var(--blanco);
+}
+
+.campo-simple input:focus,
+.campo-simple textarea:focus { outline: none; border-color: var(--azul); }
+
+.campo-simple .pista {
+    font-size: .82rem;
+    color: var(--texto-tenue);
+    margin-top: 6px;
+    line-height: 1.5;
+}
+
+
+/* ---------------------------------------------------------------
+   Pantalla de pago
+   --------------------------------------------------------------- */
+
+/* Los pasos numerados. Se ven los tres desde el principio para que
+   nadie se pregunte cuánto le falta: una barra de progreso que solo
+   enseña dónde estás no dice cuándo se acaba. */
+.pasos-pago {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 26px;
+    list-style: none;
+    flex-wrap: wrap;
+}
+
+.pasos-pago li {
+    flex: 1;
+    min-width: 130px;
+    padding: 11px 13px;
+    border-radius: var(--radio-chico);
+    background: var(--fondo-suave);
+    font-size: .84rem;
+    color: var(--texto-tenue);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    line-height: 1.35;
+}
+
+.pasos-pago li .num {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--borde-fuerte);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    font-size: .8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.pasos-pago li.hecho  { background: rgba(76, 175, 80, .1);  color: #1b5e20; }
+.pasos-pago li.hecho .num  { background: var(--verde); }
+.pasos-pago li.ahora  { background: rgba(41, 182, 246, .12); color: #01579b; font-weight: 600; }
+.pasos-pago li.ahora .num  { background: var(--azul); }
+
+/* La referencia y el monto, que es lo que la gente copia. */
+.recuadro-pago {
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-medio);
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.recuadro-pago .franja {
+    background: var(--oscuro);
+    color: #fff;
+    padding: 18px 22px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.recuadro-pago .franja .rotulo {
+    font-size: .74rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    opacity: .72;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.recuadro-pago .franja .valor {
+    font-size: 1.3rem;
+    font-weight: 700;
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+    letter-spacing: .02em;
+}
+
+.recuadro-pago .franja .monto { font-size: 1.7rem; font-weight: 700; }
+
+.recuadro-pago .cuerpo { padding: 20px 22px; }
+
+.linea-dato {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 16px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--borde-suave);
+    font-size: .94rem;
+}
+
+.linea-dato:last-child { border-bottom: none; }
+.linea-dato > span     { color: var(--texto-tenue); flex-shrink: 0; }
+.linea-dato > b        { color: var(--oscuro); text-align: right; word-break: break-word; }
+.linea-dato > b.mono   { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; }
+
+.nota-importante {
+    background: rgba(255, 152, 0, .1);
+    border-left: 4px solid var(--naranja);
+    border-radius: var(--radio-chico);
+    padding: 14px 17px;
+    font-size: .9rem;
+    line-height: 1.6;
+    color: #7a4a00;
+    margin: 18px 0;
+}
+
+.nota-importante b { color: #5c3800; }
+
+/* Estado de espera: se dice qué pasa ahora y en cuánto tiempo. Un
+   «gracias» sin plazo deja al cliente refrescando la página. */
+.espera {
+    text-align: center;
+    padding: 34px 22px;
+}
+
+.espera .icono { font-size: 3.4rem; display: block; margin-bottom: 14px; }
+.espera h2     { color: var(--oscuro); font-size: 1.35rem; margin-bottom: 9px; }
+.espera p      { color: var(--texto); line-height: 1.65; max-width: 460px; margin: 0 auto 8px; }
+
+
+/* ---------------------------------------------------------------
+   Historial de pagos del usuario
+   --------------------------------------------------------------- */
+
+.lista-pagos { display: grid; gap: 12px; }
+
+.fila-pago {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 18px;
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-medio);
+    background: var(--blanco);
+    flex-wrap: wrap;
+}
+
+.fila-pago .icono { font-size: 1.6rem; flex-shrink: 0; }
+.fila-pago .info  { flex: 1; min-width: 160px; }
+
+.fila-pago .info b {
+    display: block;
+    color: var(--oscuro);
+    font-size: .97rem;
+}
+
+.fila-pago .info small {
+    color: var(--texto-tenue);
+    font-size: .82rem;
+    font-family: ui-monospace, "Cascadia Code", Consolas, monospace;
+}
+
+.fila-pago .monto {
+    font-weight: 700;
+    color: var(--oscuro);
+    font-variant-numeric: tabular-nums;
+}
+
+.sello {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 11px;
+    border-radius: 50px;
+    font-size: .8rem;
+    font-weight: 700;
+}
+
+.sello.pendiente   { background: rgba(255, 152, 0, .16);  color: #e65100; }
+.sello.confirmado  { background: rgba(76, 175, 80, .15);  color: #2e7d32; }
+.sello.rechazado   { background: rgba(229, 57, 53, .12);  color: #c62828; }
+.sello.reembolsado { background: rgba(171, 71, 188, .14); color: #7b1fa2; }
+.sello.anulado     { background: #eef2f7;                 color: #576373; }
+
+@media (max-width: 560px) {
+    .recuadro-pago .franja { flex-direction: column; align-items: flex-start; gap: 10px; }
+    .linea-dato { flex-direction: column; gap: 3px; }
+    .linea-dato > b { text-align: left; }
+}
+
+
+/* ── Pagar con pasarela ───────────────────────────────────────────────
+   El bloque va destacado porque resuelve el pago en un minuto, pero sin
+   tapar la transferencia: las dos son formas legítimas de pagar y la
+   pantalla no debe empujar a ninguna.
+   ------------------------------------------------------------------- */
+
+.bloque-pasarela { border: 2px solid var(--azul); }
+
+.medios-pago {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 16px;
+    padding: 0;
+}
+
+.medios-pago li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--fondo-suave);
+    border-radius: var(--radio-pildora);
+    padding: 5px 14px;
+    font-size: .85rem;
+    color: var(--texto);
+}
+
+/* La raya con «o si prefieres» entre las dos formas de pago. */
+.separador-o {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin: 22px 0;
+    color: var(--texto-tenue);
+    font-size: .85rem;
+}
+
+.separador-o::before,
+.separador-o::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--borde);
+}
+
+/* Botonera al pie de un bloque, y la letra de matiz. */
+.acciones {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.fino {
+    color: var(--texto-tenue);
+    font-size: .87rem;
+    line-height: 1.6;
+}

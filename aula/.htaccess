@@ -1,0 +1,29 @@
+# =====================================================================
+#  aula/ — Entrar por código de clase
+# =====================================================================
+
+# Una lista con nombres de menores no se indexa nunca. La cabecera va
+# aquí además del <meta> de la página: si algún día se sirve otra cosa
+# desde esta carpeta, sigue protegida.
+<IfModule mod_headers.c>
+    Header set X-Robots-Tag "noindex, nofollow, noarchive"
+</IfModule>
+
+# ── Dirección corta ───────────────────────────────────────────────────
+#
+# /aula/Y66K7MR  →  /aula/index.php?c=Y66K7MR
+#
+# Es lo que el docente escribe en el tablero. Con la cadena de consulta
+# a la vista («?c=…») un niño se pierde al copiarla, y además un signo de
+# interrogación mal copiado no da error: da otra página.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /proyecto-final/aula/
+
+    # Lo que ya existe se sirve tal cual.
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+    # Solo letras y números: nada más puede ser un código.
+    RewriteRule ^([A-Za-z0-9]{4,16})/?$ index.php?c=$1 [L,QSA]
+</IfModule>

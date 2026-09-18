@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Flauta">
+  <!-- Flauta dulce. El emoji no la tiene: la palabra FLAUTA se
+       ilustraba con un violín 🎻. -->
+  <ellipse cx="64" cy="112" rx="40" ry="6" fill="#000" opacity=".08"/>
+
+  <!-- Cuerpo, en diagonal -->
+  <g transform="rotate(-38 64 64)">
+    <rect x="24" y="56" width="80" height="16" rx="8" fill="#c98a4b"/>
+    <rect x="24" y="56" width="80" height="7" rx="3.5" fill="#dda868"/>
+    <!-- Boquilla -->
+    <rect x="16" y="53" width="14" height="22" rx="6" fill="#8d6e63"/>
+    <!-- Campana -->
+    <path d="M104 54 l10 4 v12 l-10 4 z" fill="#8d6e63"/>
+    <!-- Agujeros -->
+    <circle cx="44" cy="64" r="3.4" fill="#5d4037"/>
+    <circle cx="56" cy="64" r="3.4" fill="#5d4037"/>
+    <circle cx="68" cy="64" r="3.4" fill="#5d4037"/>
+    <circle cx="80" cy="64" r="3.4" fill="#5d4037"/>
+    <circle cx="92" cy="64" r="3.4" fill="#5d4037"/>
+  </g>
+</svg>

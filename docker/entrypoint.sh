@@ -143,14 +143,32 @@ if [ "${SALTAR_MIGRACIONES:-0}" != "1" ]; then
         [ -f "$m" ] || continue
         nombre=$(basename "$m")
 
-        # `|| true`: una migración que falle no puede impedir que el sitio
-        # arranque. Queda escrito aquí y se mira; dejar el sitio caído por
-        # esto sería cambiar un problema parcial por uno total.
+        # Se intenta dos veces, y no por superstición.
+        #
+        # En el primer despliegue con migraciones, ésta murió a mitad —el
+        # log se cortó justo después de añadir una columna, sin error— y
+        # dejó `courses` con dos columnas de menos. Ejecutada a mano
+        # después funcionó a la primera. El corte en seco es la firma de
+        # un proceso que el kernel mata por memoria, y esta máquina es una
+        # t3.small donde el despliegue coincide con la imagen
+        # descargándose y el contenedor viejo todavía en pie.
+        #
+        # Lo caro no fue el fallo: fue que pasara desapercibido. La página
+        # de cursos daba 500 y el menú de Colegios no se dibujaba, que
+        # desde fuera parece una función sin hacer, no una migración a
+        # medias.
+        #
+        # Como son idempotentes, reintentar no tiene coste ni riesgo.
         if php "$m" --aplicar >/tmp/mig.log 2>&1; then
             printf '  ✓ %s\n' "$nombre"
+        elif php "$m" --aplicar >/tmp/mig.log 2>&1; then
+            printf '  ✓ %s (a la segunda)\n' "$nombre"
         else
-            printf '  ✗ %s\n' "$nombre"
-            sed 's/^/      /' /tmp/mig.log | tail -5
+            # `|| true` más abajo: una migración que falle no puede impedir
+            # que el sitio arranque. Dejarlo caído por esto sería cambiar
+            # un problema parcial por uno total.
+            printf '  ✗ %s — REVISAR\n' "$nombre"
+            sed 's/^/      /' /tmp/mig.log | tail -8
         fi
     done
 

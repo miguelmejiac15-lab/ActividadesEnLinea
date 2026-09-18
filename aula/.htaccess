@@ -16,9 +16,16 @@
 # Es lo que el docente escribe en el tablero. Con la cadena de consulta
 # a la vista («?c=…») un niño se pierde al copiarla, y además un signo de
 # interrogación mal copiado no da error: da otra página.
+#
+# Sin `RewriteBase`: decía `/proyecto-final/aula/`, la ruta de XAMPP, y en
+# producción el sitio vive en la raíz del dominio. El código de clase que
+# el docente escribe en el tablero daba 404 — el peor sitio para fallar,
+# porque el curso entero se queda fuera y nadie sabe por qué.
+#
+# Omitirlo hace que Apache deduzca la base del directorio, que es cierto
+# en los dos sitios. Ver el mismo comentario en `colegio/.htaccess`.
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /proyecto-final/aula/
 
     # Lo que ya existe se sirve tal cual.
     RewriteCond %{REQUEST_FILENAME} !-f

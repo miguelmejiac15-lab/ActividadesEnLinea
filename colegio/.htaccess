@@ -13,9 +13,20 @@
 #
 # Se reparte una vez y sirve todo el año, así que tiene que poder
 # escribirse en una circular sin signos raros.
+#
+# Sin `RewriteBase`, y es deliberado.
+#
+# Decía `RewriteBase /proyecto-final/colegio/`, que es la ruta de XAMPP.
+# En producción el sitio vive en la raíz del dominio, así que esa base no
+# existía y la reescritura no llegaba a aplicarse: «Ver su puerta» daba
+# 404 mientras `colegio/index.php?c=…` respondía perfectamente. Eso hace
+# pensar en un fallo de conexión o en datos que faltan, no en el enrutado.
+#
+# Omitirlo es más correcto que corregirlo: sin la directiva, Apache deduce
+# la base del directorio donde está este .htaccess, y eso es cierto en los
+# dos sitios a la vez. Una ruta escrita a mano sólo puede acertar en uno.
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    RewriteBase /proyecto-final/colegio/
 
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d

@@ -257,6 +257,130 @@ function guiasDisponibles(): array
             ],
         ],
 
+        /*
+         * ─────────────────────────────────────────────────────────────
+         *  POR QUÉ EL COORDINADOR TIENE TRES Y NO UNA
+         * ─────────────────────────────────────────────────────────────
+         *
+         * «Administrar su institución» enseña a crear un profesor y
+         * abrirle un curso, y ahí se acababa. Pero eso es el primer día:
+         * lo que un coordinador hace de verdad, y lo que más preguntas
+         * genera, es meter a los niños y entender por qué un día deja de
+         * funcionar.
+         *
+         * Se parten en tres y no en una larga a propósito: son tres
+         * momentos distintos del año —montar el colegio, matricular el
+         * curso, renovar— y nadie busca ayuda de los tres a la vez.
+         */
+
+        'matricular' => [
+            'titulo'   => 'Matricular a los estudiantes',
+            'resumen'  => 'Cree las cuentas del curso, reparta las claves y déles el código de clase.',
+            'icono'    => '🧒',
+            'duracion' => '1 min',
+            'para'     => 'coordinador',
+            'escenas'  => 'matricular',
+            'pasos'    => [
+                [
+                    'escena' => 'inicio',
+                    'texto'  => 'El curso ya existe, pero está vacío. Toca dar de alta a los '
+                              . 'estudiantes.',
+                    'a'      => '#g-ma-alta',
+                    'hacer'  => 'clic',
+                ],
+                [
+                    'escena' => 'lista',
+                    'texto'  => 'Puede pegar la lista del curso entera, un nombre por línea. '
+                              . 'No se pide correo: un niño de cinco años no tiene.',
+                    'a'      => '#g-ma-nombres',
+                    'hacer'  => 'escribir',
+                    'valor'  => "Ana Pérez\nLuis Acero\nSara Díaz",
+                ],
+                [
+                    'texto'  => 'La plataforma crea las cuentas y genera una clave para cada una.',
+                    'a'      => '#g-ma-crear',
+                    'hacer'  => 'clic',
+                    'pausa'  => 1100,
+                ],
+                [
+                    'escena' => 'claves',
+                    'texto'  => 'Anótelas ahora: no se vuelven a mostrar, solo se guarda su '
+                              . 'huella. Son legibles para poder dictarlas sin confundir '
+                              . 'un uno con una ele.',
+                    'a'      => '#g-ma-claves',
+                    'hacer'  => 'mirar',
+                    'pausa'  => 2400,
+                ],
+                [
+                    'escena' => 'codigo',
+                    'texto'  => 'Y esto es lo que se escribe en el tablero. El niño entra, '
+                              . 'toca su nombre en la lista y ya está dentro.',
+                    'a'      => '#g-ma-codigo',
+                    'hacer'  => 'mirar',
+                    'pausa'  => 2000,
+                ],
+                [
+                    'escena' => 'cierre',
+                    'texto'  => 'Desde aquí cada uno ve lo suyo: Marta su curso, los niños '
+                              . 'lo que Marta les puso, y usted el colegio entero.',
+                    'a'      => '#g-ma-cierre',
+                    'hacer'  => 'mirar',
+                    'pausa'  => 2200,
+                ],
+            ],
+        ],
+
+        'licencia' => [
+            'titulo'   => 'La licencia y los cupos',
+            'resumen'  => 'Cuántos estudiantes caben, qué pasa cuando se acaban y qué cambia al vencer.',
+            'icono'    => '🎟️',
+            'duracion' => '1 min',
+            'para'     => 'coordinador',
+            'escenas'  => 'licencia',
+            'pasos'    => [
+                [
+                    'escena' => 'inicio',
+                    'texto'  => 'Dos números gobiernan el colegio: hasta cuándo va la licencia '
+                              . 'y cuántos cupos quedan.',
+                    'a'      => '#g-li-licencia',
+                    'hacer'  => 'mirar',
+                    'pausa'  => 1800,
+                ],
+                [
+                    'escena' => 'cupos',
+                    'texto'  => 'Un cupo lo ocupa cada estudiante. Los profesores y usted no '
+                              . 'gastan licencia: solo gasta quien aprende.',
+                    'a'      => '#g-li-queocupa',
+                    'hacer'  => 'mirar',
+                    'pausa'  => 2200,
+                ],
+                [
+                    'escena' => 'lleno',
+                    'texto'  => 'Si no quedan, se avisa ANTES de crear las cuentas. Crear '
+                              . 'veinte y que entren doce sería peor que no crear ninguna.',
+                    'a'      => '#g-li-lleno',
+                    'hacer'  => 'mirar',
+                    'pausa'  => 2400,
+                ],
+                [
+                    'escena' => 'vencida',
+                    'texto'  => 'El día que la licencia vence nadie pierde nada: los niños '
+                              . 'siguen entrando a la parte gratuita y el avance espera.',
+                    'a'      => '#g-li-vencida',
+                    'hacer'  => 'mirar',
+                    'pausa'  => 2400,
+                ],
+                [
+                    'escena' => 'renovar',
+                    'texto'  => 'Al renovar, el tiempo nuevo se suma al que quede. Por eso '
+                              . 'adelantarse no cuesta nada, y esperar al último día sí.',
+                    'a'      => '#g-li-renovar',
+                    'hacer'  => 'mirar',
+                    'pausa'  => 2400,
+                ],
+            ],
+        ],
+
     ];
 }
 

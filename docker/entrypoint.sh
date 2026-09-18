@@ -112,6 +112,34 @@ else
     echo "✓ La base ya tiene $tablas tablas: no se toca nada"
 fi
 
+# ── 4. La primera cuenta de administrador ────────────────────────────
+#
+# Una instalación recién desplegada no tiene usuarios: el volcado de
+# producción los deja fuera a propósito. Sin esto no hay con qué entrar al
+# panel, y la única salida es abrir una terminal en el servidor — que es
+# justo lo que no siempre se puede.
+#
+# Se crea solo si están las dos variables Y no hay ya un administrador.
+# El guardián de verdad está dentro de `crear-admin.php`, que se niega y
+# lista los que hay: así reiniciar el contenedor veinte veces no deja
+# veinte cuentas. Es idempotente por construcción, no por cuidado.
+#
+# Cuando la cuenta ya existe, **quita las dos variables de Coolify**. No
+# hacen falta nunca más y una contraseña guardada en la configuración de
+# un panel es una contraseña de más.
+if [ -n "${ADMIN_EMAIL:-}" ] && [ -n "${ADMIN_PASSWORD:-}" ]; then
+    echo "· Comprobando la cuenta de administrador…"
+
+    # `|| true` a propósito: si falla —la contraseña no cumple el mínimo,
+    # el correo ya está usado— el contenedor tiene que arrancar igual. Un
+    # sitio entero caído porque una cuenta no se pudo crear es peor que el
+    # problema que intenta resolver, y el motivo queda escrito aquí arriba.
+    php /var/www/html/database/crear-admin.php \
+        --correo="$ADMIN_EMAIL" \
+        --nombre="${ADMIN_NOMBRE:-Administrador}" \
+        --clave="$ADMIN_PASSWORD" 2>&1 | sed 's/^/  /' || true
+fi
+
 echo "─────────────────────────────────────────────────────────"
 
 exec "$@"

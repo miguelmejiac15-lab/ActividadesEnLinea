@@ -112,7 +112,53 @@ else
     echo "✓ La base ya tiene $tablas tablas: no se toca nada"
 fi
 
-# ── 4. La primera cuenta de administrador ────────────────────────────
+# ── 4. Las migraciones ───────────────────────────────────────────────
+#
+# ─────────────────────────────────────────────────────────────────────
+#  POR QUÉ ESTO NO ES OPCIONAL
+# ─────────────────────────────────────────────────────────────────────
+#
+# `schema.sql` NO es el esquema completo: es la base sobre la que once
+# migraciones han ido añadiendo columnas. Un despliegue nuevo que solo
+# aplique `schema.sql` arranca con una base a medias —le faltan catorce
+# columnas repartidas en `schools`, `courses` y `users`— y el sitio
+# parece funcionar hasta que alguien entra a la parte que las usa.
+#
+# Y falla de la peor manera posible: no con un error de instalación, sino
+# con una consulta a una columna que no existe. La página devuelve 500 y
+# el menú de Colegios directamente NO SE DIBUJA, porque
+# `colegiosInstalados()` pregunta por `schools.plan_id`. Desde fuera no
+# parece una base incompleta: parece que la función no está hecha.
+#
+# Pasó exactamente así en el primer despliegue. Por eso corren solas: la
+# alternativa es acordarse a mano cada vez, y eso no es una alternativa.
+#
+# Son idempotentes por construcción —cada `ALTER` va detrás de un
+# `hayColumna()`, cada inserción detrás de su comprobación—, así que
+# repetirlas en cada arranque no cuesta nada ni cambia nada.
+if [ "${SALTAR_MIGRACIONES:-0}" != "1" ]; then
+    echo "· Aplicando migraciones…"
+
+    for m in /var/www/html/database/migracion-*.php; do
+        [ -f "$m" ] || continue
+        nombre=$(basename "$m")
+
+        # `|| true`: una migración que falle no puede impedir que el sitio
+        # arranque. Queda escrito aquí y se mira; dejar el sitio caído por
+        # esto sería cambiar un problema parcial por uno total.
+        if php "$m" --aplicar >/tmp/mig.log 2>&1; then
+            printf '  ✓ %s\n' "$nombre"
+        else
+            printf '  ✗ %s\n' "$nombre"
+            sed 's/^/      /' /tmp/mig.log | tail -5
+        fi
+    done
+
+    rm -f /tmp/mig.log
+    echo "✓ Migraciones al día"
+fi
+
+# ── 5. La primera cuenta de administrador ────────────────────────────
 #
 # Una instalación recién desplegada no tiene usuarios: el volcado de
 # producción los deja fuera a propósito. Sin esto no hay con qué entrar al

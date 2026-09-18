@@ -145,13 +145,44 @@ foreach ($todas as $tabla) {
     $sql .= "\n-- ─────────────────────────────────────────────────────\n";
     $sql .= "-- $tabla\n";
     $sql .= "-- ─────────────────────────────────────────────────────\n";
-    $sql .= "DROP TABLE IF EXISTS `$tabla`;\n";
-    $sql .= $crear . ";\n\n";
 
-    if (!in_array($tabla, CONTENIDO, true)) {
-        $sql .= "-- Sin datos a propósito: tabla de uso, no de catálogo.\n";
+    /*
+     * ─────────────────────────────────────────────────────────────────
+     *  DOS TRATOS DISTINTOS, Y LA DIFERENCIA IMPORTA
+     * ─────────────────────────────────────────────────────────────────
+     *
+     * Las tablas de CATÁLOGO se reemplazan: se borran y se vuelven a
+     * crear. Es lo que se quiere — el volcado trae la versión buena y
+     * debe pisar lo que hubiera.
+     *
+     * Las de USO, no. Y no es un matiz: la primera versión de esto hacía
+     * `DROP TABLE` en todas, así que importar el catálogo **borraba la
+     * cuenta de administrador** y cualquier usuario, progreso o cobro que
+     * hubiera en producción. El volcado se anunciaba como «traer el
+     * catálogo» y de paso vaciaba el sitio.
+     *
+     * Con `IF NOT EXISTS` y sin DROP, estas tablas se crean si faltan y
+     * se dejan intactas si ya están. Importar dos veces es inofensivo.
+     */
+    $esCatalogo = in_array($tabla, CONTENIDO, true);
+
+    if ($esCatalogo) {
+        $sql .= "DROP TABLE IF EXISTS `$tabla`;\n";
+        $sql .= $crear . ";\n\n";
+    } else {
+        // `CREATE TABLE` → `CREATE TABLE IF NOT EXISTS`, para no tocar
+        // una tabla que ya tenga datos en el destino.
+        $sql .= preg_replace(
+            '/^CREATE TABLE /',
+            'CREATE TABLE IF NOT EXISTS ',
+            $crear
+        ) . ";\n\n";
+
+        $sql .= "-- Sin datos y sin DROP: tabla de uso. Si ya existe en el\n";
+        $sql .= "-- destino, se queda como está (usuarios, progreso, cobros).\n";
+
         $soloEstructura++;
-        printf("  %-26s solo estructura\n", $tabla);
+        printf("  %-26s estructura, se respeta lo que haya\n", $tabla);
         continue;
     }
 

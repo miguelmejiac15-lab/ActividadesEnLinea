@@ -53,8 +53,14 @@ RUN a2enmod rewrite headers expires deflate remoteip
 # carpeta —config/, almacen/, includes/ y database/ tienen uno que dice
 # «Require all denied»—. Con el valor por defecto de esta imagen (None)
 # Apache los IGNORA y esas carpetas quedarían servidas por web.
-COPY docker/apache-ael.conf /etc/apache2/conf-available/ael.conf
-RUN a2enconf ael
+# El nombre empieza por `zzz-` a propósito, y no es manía de orden:
+# Apache carga `conf-enabled/*.conf` en orden alfabético y Debian trae un
+# `security.conf` que pone `ServerTokens OS`. Con el nombre `ael.conf`
+# —que va antes— el suyo gana y la cabecera sigue anunciando
+# «Apache/2.4.68 (Debian)», que es justo lo que esta configuración quería
+# evitar. Comprobado contra el sitio ya desplegado.
+COPY docker/apache-ael.conf /etc/apache2/conf-available/zzz-ael.conf
+RUN a2enconf zzz-ael
 
 # ── PHP ──────────────────────────────────────────────────────────────
 COPY docker/php-ael.ini /usr/local/etc/php/conf.d/zz-ael.ini

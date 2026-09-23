@@ -418,3 +418,56 @@
     font-size: .87rem;
     line-height: 1.6;
 }
+
+/* =====================================================================
+   FORMULARIO DE TARJETA (checkout propio)
+   =====================================================================
+
+   Los campos del número, el vencimiento y el código NO son inputs de
+   esta página: son iframes del SDK de la pasarela. Aquí se les da la
+   caja —borde, alto, fondo— para que encajen con el resto del
+   formulario; el texto de dentro se estiliza desde JavaScript, porque
+   una hoja de estilos no cruza a un documento de otro origen.
+
+   De ahí el alto fijo: un iframe no crece con su contenido como lo
+   haría un input, y sin altura declarada colapsa a cero. */
+
+.campo-seguro {
+    height: 48px;
+    padding: 0 14px;
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-chico);
+    background: var(--blanco);
+    display: flex;
+    align-items: center;
+    transition: border-color .15s;
+}
+
+/* El SDK marca el contenedor cuando el campo de dentro recibe el foco:
+   sin esto, al cliente le desaparece la pista de dónde está escribiendo. */
+.campo-seguro:focus-within { border-color: var(--azul); }
+
+.form-tarjeta .campo-simple { margin-bottom: 14px; }
+
+.fila-tarjeta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+}
+
+/* El selector de tipo de documento no necesita la mitad del ancho. */
+.fila-tarjeta .campo-doc { max-width: 130px; }
+
+.marca-tarjeta {
+    display: block;
+    font-size: .82rem;
+    color: var(--texto-tenue);
+    margin-top: 5px;
+    min-height: 1.1em;   /* reserva su sitio: sin esto el formulario
+                            salta hacia abajo al reconocer la tarjeta */
+}
+
+@media (max-width: 460px) {
+    .fila-tarjeta { grid-template-columns: 1fr; }
+    .fila-tarjeta .campo-doc { max-width: none; }
+}

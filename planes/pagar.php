@@ -54,57 +54,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     /*
-     * Ir a la pasarela. La preferencia se crea AQUÍ, en el servidor y en
-     * el momento de pulsar: si el monto viajara por el navegador —en un
-     * campo oculto, por ejemplo— el navegador podría cambiarlo.
+     * ─────────────────────────────────────────────────────────────────
+     *  AQUÍ YA NO SE VA A NINGUNA PARTE
+     * ─────────────────────────────────────────────────────────────────
      *
-     * Se crea una nueva cada vez que se pulsa, y no pasa nada: la clave
-     * de idempotencia va atada a la referencia, así que Mercado Pago
-     * devuelve la misma y no se cobra dos veces.
+     * Antes había un `accion=pasarela` que creaba una preferencia y
+     * mandaba al cliente al sitio de Mercado Pago. Se quitó entero, y no
+     * solo por estética: mientras ese camino existiera, bastaba un POST
+     * con ese campo para acabar en el checkout ajeno — un formulario
+     * viejo en caché, un enlace guardado, una prueba olvidada.
+     *
+     * La tarjeta se cobra ahora sin salir del dominio, contra
+     * `api/pagar-tarjeta.php`. `mpCrearPreferencia()` sigue en el
+     * adaptador por si algún día hiciera falta un enlace de pago para
+     * mandar por WhatsApp, pero nada de la web lo llama.
      */
-    if (post('accion') === 'pasarela') {
-
-        if (pasarelaActiva() !== 'mercadopago') {
-            mensaje('error', 'El pago con tarjeta no está disponible ahora mismo.');
-            redirigir('planes/pagar.php?ref=' . urlencode($pago['reference']));
-        }
-
-        $checkout = mpCrearPreferencia($pago);
-
-        if (!$checkout['ok']) {
-            // Al cliente no se le enseña el error de la API —puede citar
-            // credenciales o campos internos— pero queda entero en el log
-            // y en la historia del pago, que es donde sirve.
-            error_log('[pagar] preferencia fallida para ' . $pago['reference'] . ': ' . $checkout['error']);
-
-            registrarEventoPago(
-                (int) $pago['id'],
-                'nota',
-                'No se pudo crear el checkout de Mercado Pago: ' . $checkout['error'],
-                (int) $usuario['id']
-            );
-
-            mensaje('error', 'No pudimos abrir la pasarela de pago. Inténtalo en un momento '
-                           . 'o paga por transferencia.');
-            redirigir('planes/pagar.php?ref=' . urlencode($pago['reference']));
-        }
-
-        actualizarPago((int) $pago['id'], [
-            'method'   => 'pasarela',
-            'provider' => 'mercadopago',
-        ], (int) $usuario['id']);
-
-        registrarEventoPago(
-            (int) $pago['id'],
-            'nota',
-            'El cliente fue enviado al checkout de Mercado Pago'
-                . ($checkout['preferencia'] !== '' ? ' (preferencia ' . $checkout['preferencia'] . ')' : '') . '.',
-            (int) $usuario['id']
-        );
-
-        // A Mercado Pago. La URL viene de su API, no del cliente.
-        redirigir($checkout['url']);
-    }
 
     if (post('accion') === 'aviso') {
 
@@ -241,18 +205,39 @@ require RUTA_INCLUDES . '/cabecera.php';
             ?>
             <?php if (pasarelaActiva() === 'mercadopago'): ?>
 
-                <div class="bloque bloque-pasarela">
-                    <h2>Pagar ahora</h2>
-                    <p style="color:var(--texto);line-height:1.65;margin:9px 0 16px">
-                        Con tarjeta de crédito o débito, PSE, o el saldo de tu cuenta de
-                        Mercado Pago. El acceso se activa apenas se apruebe.
-                    </p>
+                <?php
+                /*
+                 * ─────────────────────────────────────────────────────
+                 *  EL FORMULARIO ES NUESTRO
+                 * ─────────────────────────────────────────────────────
+                 *
+                 * Antes este bloque era un botón que llevaba al sitio de
+                 * Mercado Pago. Ahora la tarjeta se escribe aquí, sin
+                 * salir del dominio y sin que aparezca la marca de la
+                 * pasarela en ninguna parte.
+                 *
+                 * Los tres campos sensibles no son `<input>` de esta
+                 * página: los dibuja el SDK dentro de iframes suyos, y
+                 * por eso el número no pasa por nuestro servidor ni
+                 * puede leerlo un script de esta página. Lo que se envía
+                 * es un token de un solo uso.
+                 */
+                ?>
+                <div class="bloque bloque-pasarela" id="pago-tarjeta"
+                     data-config='<?= e(jsonSeguro([
+                         "publicKey"  => mpPublicKey(),
+                         "monto"      => (int) $pago["amount_cop"],
+                         "ref"        => (string) $pago["reference"],
+                         "csrf"       => tokenCsrf(),
+                         "endpoint"   => url("api/pagar-tarjeta.php"),
+                         "retorno"    => url("planes/retorno.php?ref=" . urlencode((string) $pago["reference"])),
+                         "textoBoton" => "Pagar " . precioCop((int) $pago["amount_cop"]),
+                     ])) ?>'>
 
-                    <ul class="medios-pago">
-                        <li><span aria-hidden="true">💳</span> Tarjetas</li>
-                        <li><span aria-hidden="true">🏦</span> PSE</li>
-                        <li><span aria-hidden="true">📱</span> Mercado Pago</li>
-                    </ul>
+                    <h2>Pagar con tarjeta</h2>
+                    <p style="color:var(--texto);line-height:1.65;margin:9px 0 16px">
+                        Crédito o débito. El acceso se activa apenas el banco apruebe.
+                    </p>
 
                     <?php if (mpEsPruebas()): ?>
                         <div class="aviso info">
@@ -260,19 +245,80 @@ require RUTA_INCLUDES . '/cabecera.php';
                         </div>
                     <?php endif; ?>
 
-                    <form method="post">
-                        <?= campoCsrf() ?>
-                        <input type="hidden" name="accion" value="pasarela">
-                        <button class="btn btn-principal btn-bloque" type="submit">
-                            Pagar <?= e(precioCop((int) $pago['amount_cop'])) ?> con Mercado Pago
+                    <div class="aviso" id="pago-aviso" hidden></div>
+
+                    <form id="f-tarjeta" class="form-tarjeta" novalidate>
+
+                        <div class="campo-simple">
+                            <label for="c-numero">Número de la tarjeta</label>
+                            <div class="campo-seguro" id="c-numero"></div>
+                            <span class="marca-tarjeta" id="c-marca"></span>
+                        </div>
+
+                        <div class="fila-tarjeta">
+                            <div class="campo-simple">
+                                <label for="c-vence">Vence</label>
+                                <div class="campo-seguro" id="c-vence"></div>
+                            </div>
+                            <div class="campo-simple">
+                                <label for="c-codigo">Código de seguridad</label>
+                                <div class="campo-seguro" id="c-codigo"></div>
+                            </div>
+                        </div>
+
+                        <div class="campo-simple">
+                            <label for="c-titular">Nombre como aparece en la tarjeta</label>
+                            <input id="c-titular" name="titular" type="text" maxlength="60"
+                                   autocomplete="cc-name" required>
+                        </div>
+
+                        <div class="fila-tarjeta">
+                            <div class="campo-simple campo-doc">
+                                <label for="c-tipo-doc">Documento</label>
+                                <select id="c-tipo-doc" name="tipo_documento">
+                                    <option value="CC">CC</option>
+                                    <option value="CE">CE</option>
+                                    <option value="NIT">NIT</option>
+                                    <option value="PAS">Pasaporte</option>
+                                </select>
+                            </div>
+                            <div class="campo-simple">
+                                <label for="c-documento">Número de documento</label>
+                                <input id="c-documento" name="documento" type="text"
+                                       inputmode="numeric" maxlength="20" required>
+                            </div>
+                        </div>
+
+                        <div class="campo-simple">
+                            <label for="c-cuotas">Cuotas</label>
+                            <select id="c-cuotas" name="cuotas">
+                                <option value="1">1 cuota</option>
+                            </select>
+                        </div>
+
+                        <button class="btn btn-principal btn-bloque" type="submit" id="b-pagar">
+                            Pagar <?= e(precioCop((int) $pago['amount_cop'])) ?>
                         </button>
                     </form>
 
                     <p class="fino" style="margin-top:12px">
-                        Te llevamos al sitio de Mercado Pago. Los datos de tu tarjeta se
-                        escriben allí: nosotros no los recibimos ni los guardamos.
+                        🔒 Los datos de tu tarjeta viajan cifrados directamente al
+                        procesador. No pasan por nuestros servidores ni se guardan aquí.
                     </p>
                 </div>
+
+                <?php
+                /*
+                 * El script de seguridad va con `view="checkout"`: genera
+                 * la huella del dispositivo que usa el antifraude. Sin
+                 * ella suben los rechazos de tarjetas buenas, que es el
+                 * peor resultado posible — el cliente cree que el sitio
+                 * está roto.
+                 */
+                ?>
+                <script src="https://www.mercadopago.com/v2/security.js" view="checkout"></script>
+                <script src="https://sdk.mercadopago.com/js/v2"></script>
+                <script src="<?= e(urlRecurso('assets/js/pago-tarjeta.js')) ?>"></script>
 
                 <?php if (manualActivo() && recaudoConfigurado()): ?>
                     <div class="separador-o"><span>o si prefieres</span></div>

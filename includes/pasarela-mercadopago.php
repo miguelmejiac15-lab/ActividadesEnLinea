@@ -634,6 +634,222 @@ function mpCrearPreferencia(array $pago): array
     ];
 }
 
+// =====================================================================
+//  COBRO CON LA API — EL CHECKOUT ES NUESTRO
+// =====================================================================
+//
+// ─────────────────────────────────────────────────────────────────────
+//  QUÉ CAMBIA FRENTE A LA PREFERENCIA DE ARRIBA
+// ─────────────────────────────────────────────────────────────────────
+//
+// `mpCrearPreferencia()` manda al cliente al sitio de Mercado Pago. Todo
+// lo de aquí abajo hace lo contrario: el formulario es nuestro, está en
+// nuestro dominio, con nuestra tipografía, y el cliente no ve la marca
+// de la pasarela en ningún momento.
+//
+// ─────────────────────────────────────────────────────────────────────
+//  EL NÚMERO DE LA TARJETA NO PASA POR AQUÍ. NUNCA.
+// ─────────────────────────────────────────────────────────────────────
+//
+// Y es la decisión más importante de este archivo. Los campos de la
+// tarjeta los dibuja el SDK de Mercado Pago dentro de iframes suyos
+// (Secure Fields): se ven como nuestros —heredan nuestros colores y
+// nuestra fuente— pero el número, el código de seguridad y el
+// vencimiento viven en un documento que nuestro JavaScript no puede
+// leer. El navegador los cambia por un `token` de un solo uso, y ESO es
+// lo único que llega a este servidor.
+//
+// Hacerlo de otro modo —un `<input>` nuestro y el número viajando a
+// PHP— convertiría a esta plataforma en un sistema que almacena datos
+// de tarjeta, con todo lo que eso implica: la especificación del
+// proyecto lo prohíbe (§38) y el alcance de PCI DSS pasaría de un
+// cuestionario corto a una auditoría anual.
+//
+// Consecuencia práctica: si algún día alguien lee este archivo buscando
+// dónde se guarda una tarjeta, la respuesta es que no se guarda. Solo
+// queda `payment_reference`, que es el identificador del cobro.
+
+/**
+ * Cobra una tarjeta con un token de un solo uso.
+ *
+ * @param array $pago Fila de `payments` — de ahí sale el MONTO
+ * @param array $d    Lo que mandó el navegador: token, cuotas, método,
+ *                    emisor, correo, documento y el id de dispositivo
+ *
+ * @return array{ok:bool, error:?string, estado:?string, detalle:?string,
+ *               transaccion:?string, tresd:?array}
+ */
+function mpCobrarConTarjeta(array $pago, array $d): array
+{
+    $vacio = [
+        'ok' => false, 'estado' => null, 'detalle' => null,
+        'transaccion' => null, 'tresd' => null,
+    ];
+
+    if (!mpConfigurada()) {
+        return $vacio + ['error' => 'Mercado Pago no está configurado.'];
+    }
+
+    /*
+     * El monto sale de NUESTRA fila, jamás del navegador.
+     *
+     * Es la misma razón por la que `suscribir.php` no manda el precio en
+     * el formulario: si el importe viajara por el cliente, cualquiera
+     * pagaría el plan Escuela por mil pesos con el inspector abierto.
+     */
+    $monto = (int) $pago['amount_cop'];
+
+    if ($monto <= 0) {
+        return $vacio + ['error' => 'El monto del pago no es válido.'];
+    }
+
+    $token = trim((string) ($d['token'] ?? ''));
+
+    if ($token === '') {
+        return $vacio + ['error' => 'Falta el token de la tarjeta.'];
+    }
+
+    $plan = traerUno('SELECT name FROM plans WHERE id = ?', [(int) $pago['plan_id']]);
+
+    $cuerpo = [
+        'transaction_amount' => $monto,
+        'token'              => $token,
+        'description'        => 'Plan ' . ($plan['name'] ?? 'Actividades en Línea')
+                              . ' · ' . etiquetaCiclo((string) $pago['billing_cycle']),
+        // Mercado Pago exige al menos 1. Lo que el cliente eligió en
+        // nuestro desplegable, que salió de SU consulta de cuotas.
+        'installments'       => max(1, (int) ($d['cuotas'] ?? 1)),
+        'payment_method_id'  => (string) ($d['metodo'] ?? ''),
+        'external_reference' => (string) $pago['reference'],
+        'notification_url'   => url('api/webhook-pago.php'),
+        'statement_descriptor' => mpDescriptorExtracto(),
+
+        'payer' => [
+            'email' => (string) ($d['correo'] ?? ''),
+        ],
+
+        /*
+         * 3D Secure en modo «optional».
+         *
+         * Con `optional`, el banco pide la verificación solo cuando la
+         * considera necesaria y el pago sigue sin ella cuando no. Con
+         * `mandatory` se pediría siempre, y cada paso extra pierde
+         * clientes. Sin 3DS la responsabilidad por un contracargo
+         * fraudulento es del comercio; con esto, del emisor.
+         */
+        'three_d_secure_mode' => 'optional',
+    ];
+
+    // El emisor solo si el navegador lo resolvió: mandarlo vacío o
+    // inventado hace que Mercado Pago rechace la operación entera.
+    if (!empty($d['emisor'])) {
+        $cuerpo['issuer_id'] = (string) $d['emisor'];
+    }
+
+    // El documento es obligatorio en Colombia para muchos emisores.
+    if (!empty($d['documento'])) {
+        $cuerpo['payer']['identification'] = [
+            'type'   => (string) ($d['tipo_documento'] ?? 'CC'),
+            'number' => (string) $d['documento'],
+        ];
+    }
+
+    $cabeceras = [
+        /*
+         * La clave de idempotencia lleva la referencia Y el token.
+         *
+         * Solo con la referencia, un segundo intento después de un
+         * rechazo devolvería la respuesta del PRIMERO —Mercado Pago
+         * repite el resultado guardado— y el cliente vería su tarjeta
+         * corregida rechazada otra vez sin motivo. El token cambia en
+         * cada intento, así que cada intento es una operación nueva; y
+         * dos clics con el MISMO token siguen siendo un solo cobro, que
+         * es lo que la idempotencia viene a resolver.
+         */
+        'X-Idempotency-Key: ' . $pago['reference'] . '-' . substr(hash('sha256', $token), 0, 16),
+    ];
+
+    /*
+     * La huella del dispositivo, si el navegador la generó.
+     *
+     * Es lo que usa el antifraude para distinguir a un cliente de un
+     * robot probando tarjetas robadas. Sin ella suben los rechazos por
+     * «alto riesgo» — y los rechazos de una tarjeta buena son el peor
+     * resultado posible: el cliente cree que el sitio no funciona.
+     */
+    if (!empty($d['dispositivo'])) {
+        $cabeceras[] = 'X-meli-session-id: ' . $d['dispositivo'];
+    }
+
+    $r = mpApi('POST', '/v1/payments', $cuerpo, $cabeceras);
+
+    if (!$r['ok']) {
+        return $vacio + ['error' => $r['error']];
+    }
+
+    $p = $r['datos'];
+
+    /*
+     * Si el banco pide verificación, Mercado Pago devuelve a dónde
+     * mandar al cliente. Esa pantalla es del BANCO, no de la pasarela:
+     * es la misma que vería comprando en cualquier otro sitio, y no se
+     * puede evitar — la decide el emisor de la tarjeta.
+     */
+    $tresd = null;
+
+    if (!empty($p['three_ds_info']['external_resource_url'])) {
+        $tresd = [
+            'url'  => (string) $p['three_ds_info']['external_resource_url'],
+            'creq' => (string) ($p['three_ds_info']['creq'] ?? ''),
+        ];
+    }
+
+    return [
+        'ok'          => true,
+        'error'       => null,
+        'estado'      => (string) ($p['status'] ?? ''),
+        'detalle'     => (string) ($p['status_detail'] ?? ''),
+        'transaccion' => (string) ($p['id'] ?? ''),
+        'tresd'       => $tresd,
+    ];
+}
+
+/**
+ * Traduce el motivo del rechazo a algo que el cliente pueda resolver.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ *  POR QUÉ NO SE ENSEÑA EL CÓDIGO DE MERCADO PAGO
+ * ─────────────────────────────────────────────────────────────────────
+ *
+ * Porque `cc_rejected_bad_filled_security_code` no le dice nada a nadie,
+ * y porque el motivo importa menos que el SIGUIENTE PASO. Quien ve
+ * «revisa el código de seguridad» lo corrige y paga; quien ve un código
+ * de error cierra la pestaña.
+ *
+ * Hay un caso que merece cuidado aparte: cuando el rechazo es por
+ * sospecha de fraude o por fondos, NO se dice cuál de los dos. A quien
+ * está probando tarjetas robadas, esa diferencia le sirve de pista.
+ */
+function mpMotivoLegible(string $detalle): string
+{
+    return match ($detalle) {
+        'cc_rejected_bad_filled_card_number' => 'Revisa el número de la tarjeta.',
+        'cc_rejected_bad_filled_date'        => 'Revisa la fecha de vencimiento.',
+        'cc_rejected_bad_filled_security_code' => 'Revisa el código de seguridad.',
+        'cc_rejected_bad_filled_other'       => 'Revisa los datos de la tarjeta.',
+        'cc_rejected_insufficient_amount'    => 'La tarjeta no tiene fondos suficientes.',
+        'cc_rejected_card_disabled'          => 'La tarjeta está inactiva. Llama a tu banco para activarla.',
+        'cc_rejected_card_error'             => 'No pudimos procesar la tarjeta. Intenta de nuevo.',
+        'cc_rejected_duplicated_payment'     => 'Ya hiciste un pago igual. Si fue sin querer, revisa antes de repetirlo.',
+        'cc_rejected_max_attempts'           => 'Demasiados intentos con esta tarjeta. Prueba con otra.',
+        'cc_rejected_invalid_installments'   => 'Esa tarjeta no admite ese número de cuotas.',
+        'cc_rejected_call_for_authorize'     => 'Tu banco necesita autorizar este pago. Llámalos y vuelve a intentarlo.',
+        'cc_rejected_high_risk',
+        'cc_rejected_other_reason'           => 'El banco no autorizó el pago. Intenta con otra tarjeta.',
+        default                              => 'El pago no se pudo completar. Intenta con otra tarjeta.',
+    };
+}
+
 /**
  * ¿Esta dirección es de una máquina local?
  *

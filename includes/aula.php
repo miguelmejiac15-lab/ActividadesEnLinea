@@ -622,3 +622,103 @@ function urlDeAula(string $codigo): string
 {
     return url('aula/' . rawurlencode($codigo));
 }
+
+
+// =====================================================================
+//  LA ACTIVIDAD DE HOY
+// =====================================================================
+//
+// ─────────────────────────────────────────────────────────────────────
+//  POR QUÉ NO BASTA CON ABRIR LA CLASE
+// ─────────────────────────────────────────────────────────────────────
+//
+// Con el aula sola, el niño entra y llega a su espacio: ahí todavía
+// tiene que encontrar, entre lo que le asignaron, con qué toca empezar.
+// Con treinta niños de primero eso son treinta veces «profe, ¿cuál es?»
+// justo en el minuto en que el docente necesita que arranquen solos.
+//
+// Puesta la actividad de hoy, el enlace del tablero deja de llevar al
+// espacio del niño y lleva directo a jugarla: abre el enlace, toca su
+// nombre y ya está trabajando.
+//
+// Es opcional. Sin ella, todo se comporta como antes.
+
+/** ¿Está disponible esta función? La columna la añade su migración. */
+function actividadDeHoyInstalada(): bool
+{
+    static $listo = null;
+
+    if ($listo === null) {
+        $listo = (bool) traerValor(
+            'SELECT COUNT(*) FROM information_schema.COLUMNS
+              WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = "courses"
+                AND COLUMN_NAME = "actividad_hoy"'
+        );
+    }
+
+    return $listo;
+}
+
+/**
+ * La actividad con la que se empieza hoy en este curso, o null.
+ *
+ * El JOIN con `activities` hace tres cosas de una vez: trae el slug que
+ * hace falta para el enlace, descarta una actividad despublicada entre
+ * ayer y hoy, y descarta un id que apunte a algo borrado. Los tres casos
+ * acaban igual —no hay actividad de hoy— y esa es la respuesta correcta
+ * para los tres: el niño entra a su espacio, como antes de que esto
+ * existiera. Un dato de un día no puede dejar a la clase sin entrar.
+ */
+function actividadDeHoy(array $curso): ?array
+{
+    if (!actividadDeHoyInstalada() || empty($curso['actividad_hoy'])) {
+        return null;
+    }
+
+    return traerUno(
+        'SELECT a.id, a.slug, a.title, a.icon
+           FROM activities a
+          WHERE a.id = ? AND a.status = "published"',
+        [(int) $curso['actividad_hoy']]
+    );
+}
+
+/**
+ * Fija —o quita, con null— la actividad de hoy.
+ *
+ * Solo se acepta una actividad ASIGNADA al curso, y no es una
+ * formalidad: el reproductor comprueba después, por su cuenta, que la
+ * actividad esté en la ruta del estudiante (`motivoDeRuta()`). Si aquí
+ * se pudiera poner cualquiera, el docente elegiría uno de los 487
+ * títulos del catálogo, escribiría la dirección en el tablero, y los
+ * treinta niños rebotarían a su lista con un aviso —con la clase ya
+ * empezada y sin nada que tocar—. Vale más impedirlo aquí, donde hay
+ * una persona mirando y puede corregirlo en el momento.
+ *
+ * @return array{ok:bool, error:?string}
+ */
+function fijarActividadDeHoy(int $cursoId, ?int $actividadId): array
+{
+    if (!actividadDeHoyInstalada()) {
+        return ['ok' => false, 'error' => 'Falta aplicar la migración de la actividad de hoy.'];
+    }
+
+    if ($actividadId === null) {
+        ejecutar('UPDATE courses SET actividad_hoy = NULL WHERE id = ?', [$cursoId]);
+        return ['ok' => true, 'error' => null];
+    }
+
+    $asignada = traerValor(
+        'SELECT COUNT(*) FROM course_activities
+          WHERE course_id = ? AND activity_id = ?',
+        [$cursoId, $actividadId]
+    );
+
+    if (!$asignada) {
+        return ['ok' => false, 'error' => 'Esa actividad no está asignada a este curso.'];
+    }
+
+    ejecutar('UPDATE courses SET actividad_hoy = ? WHERE id = ?', [$actividadId, $cursoId]);
+
+    return ['ok' => true, 'error' => null];
+}

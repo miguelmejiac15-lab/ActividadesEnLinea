@@ -55,6 +55,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $curso) {
     $r = entrarPorAula($curso, $alumnoId, $pin);
 
     if ($r['ok']) {
+        /*
+         * Si el docente puso la actividad de hoy, se entra directo a
+         * ella. Es la diferencia entre un niño que ya está trabajando y
+         * uno que levanta la mano para preguntar cuál era.
+         *
+         * Si no la puso —o la actividad se despublicó desde ayer—,
+         * `actividadDeHoy()` devuelve null y se va al espacio de
+         * siempre: por esto nadie se queda sin entrar.
+         */
+        $hoy = function_exists('actividadDeHoy') ? actividadDeHoy($curso) : null;
+
+        if ($hoy) {
+            mensaje('ok', '¡Hola! A jugar con ' . $hoy['title'] . '.');
+            redirigir('actividades/jugar.php?a=' . urlencode((string) $hoy['slug']));
+        }
+
         mensaje('ok', '¡Hola! A jugar.');
         redirigir('usuario/');
     }

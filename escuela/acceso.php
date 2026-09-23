@@ -97,6 +97,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirigir('escuela/acceso.php?curso=' . $cursoId);
     }
 
+    // ── La actividad de hoy ──────────────────────────────────────────
+    if ($accion === 'hoy') {
+        $elegida = (int) post('actividad');
+
+        $r = fijarActividadDeHoy($cursoId, $elegida > 0 ? $elegida : null);
+
+        mensaje($r['ok'] ? 'ok' : 'error', $r['ok']
+            ? ($elegida > 0
+                ? 'Listo. El enlace del tablero abre esa actividad.'
+                : 'Quitada. El enlace lleva al espacio de cada niño.')
+            : (string) $r['error']);
+
+        redirigir('escuela/acceso.php?curso=' . $cursoId);
+    }
+
     // ── Código ───────────────────────────────────────────────────────
     if ($accion === 'nuevo_codigo') {
         $nuevo = cambiarCodigoDeCurso($cursoId);
@@ -289,6 +304,75 @@ require __DIR__ . '/includes/cabecera-escuela.php';
             </button>
         </form>
     </div>
+
+    <?php
+    /*
+     * La actividad de hoy, justo debajo de abrir la clase: es la misma
+     * gestión de cada mañana —abro y digo con qué se empieza— y
+     * separarla en otra pantalla obligaría a recordarla.
+     *
+     * Solo se listan las ASIGNADAS. Enseñar el catálogo entero aquí
+     * sería ofrecer elegir algo que después rebota a los treinta niños.
+     */
+    $asignadas = actividadDeHoyInstalada()
+        ? traerTodo(
+            'SELECT a.id, a.slug, a.title, a.icon
+               FROM course_activities ca
+               JOIN activities a ON a.id = ca.activity_id
+              WHERE ca.course_id = ? AND a.status = "published"
+              ORDER BY ca.sort_order, a.title',
+            [$cursoId]
+        )
+        : [];
+
+    $hoyId = (int) ($curso['actividad_hoy'] ?? 0);
+    ?>
+
+    <?php if (actividadDeHoyInstalada()): ?>
+        <div class="separador" style="margin:22px 0"></div>
+
+        <h2>Con qué empiezan hoy</h2>
+
+        <?php if (!$asignadas): ?>
+            <p class="nota-panel">
+                Todavía no le has asignado actividades a este curso. Cuando lo hagas,
+                aquí podrás elegir con cuál se empieza y el enlace del tablero abrirá
+                esa directamente.
+            </p>
+            <a class="btn btn-secundario btn-chico"
+               href="<?= e(url('escuela/actividades.php?curso=' . $cursoId)) ?>">
+                Asignar actividades →
+            </a>
+        <?php else: ?>
+            <p class="nota-panel">
+                Si eliges una, el niño abre el enlace, toca su nombre y
+                <b>entra directo a jugarla</b>. Si no, llega a su espacio y elige él.
+            </p>
+
+            <form method="post" class="form-linea" style="gap:8px;flex-wrap:wrap">
+                <?= campoCsrf() ?>
+                <input type="hidden" name="accion" value="hoy">
+
+                <label class="oculto-visual" for="a-hoy">Actividad de hoy</label>
+                <select id="a-hoy" name="actividad" style="flex:1;min-width:230px">
+                    <option value="0">— Ninguna: que elijan ellos —</option>
+                    <?php foreach ($asignadas as $a): ?>
+                        <option value="<?= (int) $a['id'] ?>" <?= $hoyId === (int) $a['id'] ? 'selected' : '' ?>>
+                            <?= e($a['icon'] . ' ' . $a['title']) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
+                <button class="btn btn-principal btn-chico" type="submit">Guardar</button>
+            </form>
+
+            <?php if ($hoyId > 0 && ($hoyActual = actividadDeHoy($curso))): ?>
+                <p class="nota-panel" style="margin-top:10px">
+                    Ahora mismo el enlace abre <b><?= e($hoyActual['title']) ?></b>.
+                </p>
+            <?php endif; ?>
+        <?php endif; ?>
+    <?php endif; ?>
 
     <p class="nota-panel" style="margin-top:14px">
         <b>Por qué hay que abrirla y cerrarla.</b>

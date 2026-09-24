@@ -103,6 +103,13 @@ function zonaEscuela(string $zona): string
                href="<?= e(url('escuela/progreso.php?curso=' . (int) $cursoActual['id'])) ?>">
                 <span class="ico" aria-hidden="true">📈</span> Progreso
             </a>
+            <?php /* «Progreso» dice cuánto avanzó; «Desempeño», cómo le
+                     fue. Van separados porque son preguntas distintas y
+                     mezclarlas en una tabla las vuelve ilegibles. */ ?>
+            <a class="<?= zonaEscuela('informe') ?>"
+               href="<?= e(url('escuela/informe.php?curso=' . (int) $cursoActual['id'])) ?>">
+                <span class="ico" aria-hidden="true">🎓</span> Desempeño
+            </a>
 
             <?php
             /*

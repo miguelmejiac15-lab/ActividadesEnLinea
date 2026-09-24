@@ -1129,3 +1129,188 @@ function resumenDelCurso(int $cursoId): array
 
     return $r ?: ['estudiantes' => 0, 'actividades' => 0, 'activos_semana' => 0, 'estaciones_hechas' => 0];
 }
+
+
+// =====================================================================
+//  DESEMPEÑO — CÓMO LE FUE, NO SOLO CUÁNTO AVANZÓ
+// =====================================================================
+//
+// ─────────────────────────────────────────────────────────────────────
+//  POR QUÉ EL AVANCE SOLO ENGAÑA
+// ─────────────────────────────────────────────────────────────────────
+//
+// La rejilla de progreso responde «cuántas estaciones hizo». Es la
+// pregunta de la administración, no la de la enseñanza: un niño que
+// terminó las diez acertando a la primera y otro que las terminó a base
+// de repetir hasta que salió se ven EXACTAMENTE IGUAL ahí, y son dos
+// situaciones opuestas. Al segundo hay que ayudarlo, y con el avance
+// solo nadie lo nota hasta la evaluación.
+//
+// Esto mira tres cosas que ya se guardaban y nadie estaba leyendo:
+//
+//   · `percent`  — qué porcentaje acertó en esa estación. La precisión.
+//   · `attempts` — cuántas veces la intentó. Repetir no es malo; repetir
+//                  mucho para llegar al mismo sitio sí dice algo.
+//   · `time_spent_seconds` — cuánto tardó.
+//
+// No hizo falta ninguna columna nueva: el motor llevaba meses
+// escribiendo estos datos.
+//
+// ─────────────────────────────────────────────────────────────────────
+//  QUÉ TRABAJO SE MIDE
+// ─────────────────────────────────────────────────────────────────────
+//
+// Aquí SÍ se cuenta lo que el niño hizo en casa, y es distinto del resto
+// del panel a propósito. La rejilla separa salón y casa porque responde
+// «¿cumplió con lo que mandé?». Esta pantalla responde «¿cómo le está
+// yendo con esto?», y para eso da igual dónde lo resolvió: si acierta el
+// 40% en la M, acierta el 40% en el salón y en su casa.
+
+/**
+ * Desempeño de cada estudiante en las actividades del curso.
+ *
+ * @return array<int, array> una fila por estudiante
+ */
+function informeDeCurso(int $cursoId): array
+{
+    $filas = traerTodo(
+        'SELECT u.id, u.name,
+                COUNT(DISTINCT CASE WHEN p.status = "completed" THEN p.station_id END) AS hechas,
+                /* La precisión se promedia SOLO sobre lo terminado: una
+                   estación a medias tiene `percent` bajo porque va por la
+                   mitad, no porque el niño falle. Mezclarlas haría
+                   parecer flojo a quien simplemente dejó algo abierto. */
+                ROUND(AVG(CASE WHEN p.status = "completed" THEN p.percent END)) AS precision_media,
+                ROUND(AVG(CASE WHEN p.status = "completed" THEN p.attempts END), 1) AS intentos_media,
+                COALESCE(SUM(p.time_spent_seconds), 0) AS segundos,
+                COALESCE(SUM(p.stars), 0) AS estrellas,
+                MAX(p.updated_at) AS ultima
+           FROM course_students cs
+           JOIN users u ON u.id = cs.user_id
+      LEFT JOIN course_activities ca ON ca.course_id = cs.course_id
+      LEFT JOIN activity_progress p  ON p.user_id = u.id AND p.activity_id = ca.activity_id
+          WHERE cs.course_id = ?
+       GROUP BY u.id, u.name
+       ORDER BY u.name',
+        [$cursoId]
+    );
+
+    // Cuántas estaciones suman las actividades asignadas: es el
+    // denominador honesto del avance.
+    $total = (int) traerValor(
+        'SELECT COUNT(*)
+           FROM course_activities ca
+           JOIN activity_stations s ON s.activity_id = ca.activity_id
+          WHERE ca.course_id = ?',
+        [$cursoId]
+    );
+
+    foreach ($filas as &$f) {
+        $f['hechas']          = (int) $f['hechas'];
+        $f['total']           = $total;
+        $f['precision_media'] = $f['precision_media'] === null ? null : (int) $f['precision_media'];
+        $f['intentos_media']  = $f['intentos_media']  === null ? null : (float) $f['intentos_media'];
+        $f['segundos']        = (int) $f['segundos'];
+        $f['estrellas']       = (int) $f['estrellas'];
+        $f['avance']          = $total > 0 ? (int) round(100 * $f['hechas'] / $total) : 0;
+        $f['senal']           = senalDeDesempeno($f);
+    }
+
+    unset($f);
+
+    return $filas;
+}
+
+/**
+ * La lectura pedagógica de una fila: qué mirar primero.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ *  ESTO NO ES UNA NOTA
+ * ─────────────────────────────────────────────────────────────────────
+ *
+ * Devuelve una señal para ordenar la atención del docente, no una
+ * calificación del niño. La diferencia importa: una nota se comunica y
+ * se defiende; esto solo dice «empieza por aquí».
+ *
+ * El caso que justifica la pantalla entera es `avanza_con_dificultad`:
+ * el niño que termina todo acertando poco. En la rejilla de avance se ve
+ * idéntico al que va perfecto, y es justo el que necesita ayuda antes de
+ * que el tema siguiente se apoye en este.
+ *
+ * El umbral es 70%, el corte habitual de suficiencia en Colombia. No es
+ * una verdad pedagógica: es un punto de partida visible y fácil de
+ * cambiar si el colegio usa otro.
+ */
+function senalDeDesempeno(array $f): string
+{
+    if ((int) $f['hechas'] === 0) {
+        return 'sin_empezar';
+    }
+
+    $precision = $f['precision_media'];
+
+    if ($precision === null) {
+        return 'en_marcha';
+    }
+
+    if ($precision < 70 && $f['avance'] >= 50) {
+        return 'avanza_con_dificultad';
+    }
+
+    if ($precision < 70) {
+        return 'le_cuesta';
+    }
+
+    if ($precision >= 90 && $f['avance'] >= 80) {
+        return 'va_muy_bien';
+    }
+
+    return 'en_marcha';
+}
+
+/** Cómo se nombra y se pinta cada señal. */
+function etiquetaDeSenal(string $senal): array
+{
+    return match ($senal) {
+        'sin_empezar'           => ['texto' => 'Sin empezar',         'clase' => 'tenue',  'icono' => '·'],
+        'avanza_con_dificultad' => ['texto' => 'Avanza con esfuerzo', 'clase' => 'alerta', 'icono' => '⚠️'],
+        'le_cuesta'             => ['texto' => 'Le está costando',    'clase' => 'alerta', 'icono' => '⚠️'],
+        'va_muy_bien'           => ['texto' => 'Va muy bien',         'clase' => 'bien',   'icono' => '⭐'],
+        default                 => ['texto' => 'En marcha',           'clase' => '',       'icono' => '→'],
+    };
+}
+
+/**
+ * Desempeño por actividad: cuál se les está atragantando.
+ *
+ * Es la otra mitad del informe, y la que corrige al docente además de al
+ * estudiante: si veinte de veintitrés niños tienen precisión baja en la
+ * misma actividad, el problema no está en los niños.
+ *
+ * Se ordenan de peor a mejor precisión, con las que nadie tocó al final:
+ * lo primero que se ve es lo que hay que revisar.
+ *
+ * @return array<int, array> una fila por actividad asignada
+ */
+function informePorActividad(int $cursoId): array
+{
+    return traerTodo(
+        'SELECT a.id, a.title, a.icon,
+                COUNT(DISTINCT p.user_id) AS estudiantes,
+                COUNT(DISTINCT CASE WHEN p.status = "completed" THEN p.station_id END) AS hechas,
+                ROUND(AVG(CASE WHEN p.status = "completed" THEN p.percent END)) AS precision_media,
+                ROUND(AVG(CASE WHEN p.status = "completed" THEN p.attempts END), 1) AS intentos_media,
+                (SELECT COUNT(*) FROM activity_stations s WHERE s.activity_id = a.id) AS estaciones
+           FROM course_activities ca
+           JOIN activities a ON a.id = ca.activity_id
+      LEFT JOIN course_students cs ON cs.course_id = ca.course_id
+      LEFT JOIN activity_progress p ON p.activity_id = a.id AND p.user_id = cs.user_id
+          WHERE ca.course_id = ?
+       GROUP BY a.id, a.title, a.icon
+       /* Se repite la expresion en vez de usar el alias: MariaDB no
+          admite ordenar por el alias de un agregado. */
+       ORDER BY AVG(CASE WHEN p.status = "completed" THEN p.percent END) IS NULL,
+                AVG(CASE WHEN p.status = "completed" THEN p.percent END) ASC',
+        [$cursoId]
+    );
+}

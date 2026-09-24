@@ -17,6 +17,45 @@ exigirEscuela();
 $cursoId = getEntero('id');
 $curso   = exigirCursoPropio($cursoId);
 
+// ── Renombrar ────────────────────────────────────────────────────────
+//
+// Un curso se crea en septiembre como «Transición A» y en enero es
+// «Primero A»: el nombre envejece antes que el curso. Sin esto, la única
+// salida era crear otro y volver a matricular a todos, perdiendo el
+// progreso de cada niño por un error de escritura.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('accion') === 'renombrar') {
+    exigirCsrf();
+
+    $nombre = trim((string) post('nombre'));
+    $grado  = trim((string) post('grado'));
+    $anio   = (int) post('anio');
+
+    if ($nombre === '') {
+        mensaje('error', 'El curso necesita un nombre.');
+        redirigir('escuela/curso.php?id=' . $cursoId);
+    }
+
+    /*
+     * El año se acota en vez de aceptar cualquier número: un dedazo como
+     * «20026» dejaría el curso fuera de cualquier lista ordenada por año
+     * y el docente no sabría por qué desapareció. Ante un valor absurdo
+     * se conserva el que tenía, que nunca es peor que el error.
+     */
+    $anioActual = (int) date('Y');
+
+    if ($anio < $anioActual - 5 || $anio > $anioActual + 2) {
+        $anio = (int) $curso['year'];
+    }
+
+    ejecutar(
+        'UPDATE courses SET name = ?, grade = ?, year = ? WHERE id = ?',
+        [mb_substr($nombre, 0, 120), mb_substr($grado, 0, 60), $anio, $cursoId]
+    );
+
+    mensaje('ok', 'Listo. El curso ahora se llama «' . $nombre . '».');
+    redirigir('escuela/curso.php?id=' . $cursoId);
+}
+
 // ── Archivar o reactivar ─────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('accion') === 'estado') {
     exigirCsrf();
@@ -59,6 +98,14 @@ require __DIR__ . '/includes/cabecera-escuela.php';
             <?php if ($curso['status'] === 'archived'): ?>
                 · <span class="etiqueta-archivado">Archivado</span>
             <?php endif; ?>
+            <?php /* Un `<details>` y no una pantalla aparte: renombrar se
+                     hace una o dos veces al año, y no merece ocupar sitio
+                     el resto del tiempo ni obligar a buscarlo en un menú. */ ?>
+            · <button class="enlace-sutil" type="button"
+                      onclick="document.getElementById('renombrar-curso').open = true;
+                               document.getElementById('r-nombre').focus()">
+                ✏️ Renombrar
+              </button>
         </p>
     </div>
 
@@ -94,6 +141,42 @@ require __DIR__ . '/includes/cabecera-escuela.php';
         </form>
     </div>
 </header>
+
+<details class="caja-renombrar" id="renombrar-curso">
+    <summary>✏️ Cambiar el nombre del curso</summary>
+
+    <p class="nota-panel">
+        Cambiar el nombre no toca nada más: los estudiantes, las actividades asignadas
+        y todo el progreso siguen igual. Es el mismo curso con otro nombre.
+    </p>
+
+    <form method="post" class="form-linea" style="gap:10px;flex-wrap:wrap;align-items:flex-end">
+        <?= campoCsrf() ?>
+        <input type="hidden" name="accion" value="renombrar">
+
+        <div class="campo-simple" style="flex:2;min-width:200px">
+            <label for="r-nombre">Nombre</label>
+            <input id="r-nombre" name="nombre" type="text" maxlength="120" required
+                   value="<?= e($curso['name']) ?>">
+        </div>
+
+        <div class="campo-simple" style="flex:1;min-width:130px">
+            <label for="r-grado">Grado <span class="tenue">(opcional)</span></label>
+            <input id="r-grado" name="grado" type="text" maxlength="60"
+                   value="<?= e((string) ($curso['grade'] ?? '')) ?>"
+                   placeholder="Transición, 1.º…">
+        </div>
+
+        <div class="campo-simple" style="max-width:110px">
+            <label for="r-anio">Año</label>
+            <input id="r-anio" name="anio" type="number" inputmode="numeric"
+                   min="<?= (int) date('Y') - 5 ?>" max="<?= (int) date('Y') + 2 ?>"
+                   value="<?= (int) $curso['year'] ?>">
+        </div>
+
+        <button class="btn btn-principal btn-chico" type="submit">Guardar</button>
+    </form>
+</details>
 
 <div class="tira-cifras">
     <div class="cifra">

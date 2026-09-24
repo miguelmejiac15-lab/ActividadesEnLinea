@@ -204,6 +204,27 @@ require __DIR__ . '/includes/cabecera-escuela.php';
 </header>
 
 
+<?php
+/*
+ * ─────────────────────────────────────────────────────────────────────
+ *  LAS DOS FORMAS, DICHAS ANTES DE EMPEZAR
+ * ─────────────────────────────────────────────────────────────────────
+ *
+ * Asignar de una en una se podía desde siempre —el buscador de más
+ * abajo—, pero la página empezaba con los paquetes y quien llegaba aquí
+ * se llevaba la impresión de que era lo único posible: «solo me deja
+ * añadir las vocales enteras». La función estaba; lo que faltaba era
+ * decirlo antes de que la primera pantalla contestara otra cosa.
+ */
+?>
+<div class="aviso info" style="margin-bottom:18px">
+    <b>También puedes asignar una sola actividad.</b>
+    Si estás armando tu planeación —hoy la A, mañana la M, el jueves contar hasta 10—
+    baja a <a href="#una-a-una">buscar y marcar</a>: eliges exactamente cuáles, de
+    cualquier materia, y luego ordenas. Los paquetes de aquí abajo son el atajo para
+    cuando quieres la materia entera.
+</div>
+
 <!-- ── 1. Paquetes ──────────────────────────────────────────────────── -->
 
 <section class="bloque-panel">
@@ -336,8 +357,13 @@ require __DIR__ . '/includes/cabecera-escuela.php';
 
 <!-- ── 2. Buscar sueltas ────────────────────────────────────────────── -->
 
-<section class="bloque-panel">
-    <h2>Buscar actividades sueltas</h2>
+<section class="bloque-panel" id="una-a-una">
+    <h2>Buscar y marcar · una a una</h2>
+    <p class="nota-panel">
+        Busca por materia, por nivel o por título, marca las que quieras y añádelas.
+        Puedes mezclar materias: hoy la A de Letras, mañana «contar hasta 10» de
+        Matemática. El orden en que se juegan se decide más abajo.
+    </p>
 
     <form method="get" class="form-linea">
         <input type="hidden" name="curso" value="<?= $cursoId ?>">

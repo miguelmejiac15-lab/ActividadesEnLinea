@@ -1129,3 +1129,38 @@
     .barra-avance span { transition: none; }
     .tarjeta-curso:hover { transform: none; }
 }
+
+/* =====================================================================
+   INFORME DE DESEMPEÑO
+   ===================================================================== */
+
+/* Ocho columnas no caben en un teléfono, y una tabla de desempeño no se
+   puede partir en tarjetas sin perder justo lo que la hace útil: la
+   comparación entre filas. Se desplaza en horizontal. */
+.tabla-envoltura {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tabla-informe { min-width: 620px; }
+
+.tabla-informe .senal {
+    white-space: nowrap;
+    font-size: .88rem;
+}
+
+/* El color va en la celda de la precisión y en la señal, no en la fila
+   entera: una fila roja de lado a lado se lee como «este niño está mal»,
+   y lo que se quiere decir es «mira este dato». */
+.tabla-informe .alerta { color: var(--rojo); }
+.tabla-informe .bien   { color: var(--verde); }
+
+.fila-alerta { background: color-mix(in srgb, var(--rojo) 5%, transparent); }
+.fila-bien   { background: color-mix(in srgb, var(--verde) 5%, transparent); }
+.fila-tenue  { opacity: .62; }
+
+.tabla-informe .num small {
+    display: block;
+    font-size: .74rem;
+    font-weight: 400;
+}

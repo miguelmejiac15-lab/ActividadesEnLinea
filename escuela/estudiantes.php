@@ -239,6 +239,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mensaje('ok', 'Estudiante retirado del curso. Su cuenta y su progreso no se borran.');
         redirigir('escuela/estudiantes.php?curso=' . $cursoId);
     }
+
+    /*
+     * ─────────────────────────────────────────────────────────────────
+     *  VARIOS A LA VEZ
+     * ─────────────────────────────────────────────────────────────────
+     *
+     * De uno en uno es una confirmación por niño: con un curso mal
+     * importado de treinta son treinta clics y treinta cuadros de
+     * diálogo. La operación es la misma, solo cambia cuántas veces se
+     * repite.
+     *
+     * `retirarEstudiante()` y `restablecerClaveDeEstudiante()` ya
+     * comprueban por su cuenta que el estudiante pertenezca a ESTE
+     * curso, así que un id colado en el formulario no alcanza a nadie de
+     * otro curso. Aquí solo se recorre la lista.
+     */
+    if ($accion === 'retirar_varios' || $accion === 'clave_varios') {
+
+        $ids = array_values(array_unique(array_filter(
+            array_map('intval', (array) ($_POST['usuarios'] ?? [])),
+            static fn(int $id): bool => $id > 0
+        )));
+
+        if (!$ids) {
+            mensaje('info', 'No marcaste a nadie.');
+            redirigir('escuela/estudiantes.php?curso=' . $cursoId);
+        }
+
+        if ($accion === 'retirar_varios') {
+            foreach ($ids as $id) {
+                retirarEstudiante($cursoId, $id);
+            }
+
+            mensaje('ok', count($ids) . ' estudiante(s) retirados del curso. '
+                        . 'Sus cuentas y su progreso no se borran.');
+            redirigir('escuela/estudiantes.php?curso=' . $cursoId);
+        }
+
+        /*
+         * Claves nuevas para los marcados. Se guardan en la sesión para
+         * enseñarlas UNA vez, igual que al crear cuentas: después solo
+         * queda su hash y no hay forma de volver a verlas.
+         */
+        $hechas = [];
+
+        foreach ($ids as $id) {
+            $r = restablecerClaveDeEstudiante($cursoId, $id);
+
+            if (!$r['ok']) {
+                continue;
+            }
+
+            $alumno = traerUno('SELECT name, email FROM users WHERE id = ?', [$id]);
+
+            $hechas[] = [
+                'nombre' => $alumno['name'] ?? '',
+                'correo' => $alumno['email'] ?? '',
+                'clave'  => $r['clave'],
+            ];
+        }
+
+        if ($hechas) {
+            $_SESSION['cuentas_creadas'] = $hechas;
+        }
+
+        mensaje($hechas ? 'ok' : 'error', $hechas
+            ? count($hechas) . ' contraseña(s) nuevas. Anótalas ahora: no se vuelven a mostrar.'
+            : 'No se pudo cambiar ninguna contraseña.');
+
+        redirigir('escuela/estudiantes.php?curso=' . $cursoId);
+    }
 }
 
 // Credenciales recién generadas, para enseñarlas una sola vez.
@@ -498,9 +569,26 @@ require __DIR__ . '/includes/cabecera-escuela.php';
             ?: strcmp((string) $a['name'], (string) $b['name']));
         ?>
 
+        <?php
+        /*
+         * El formulario de las acciones en lote va FUERA de la tabla y
+         * las casillas lo señalan con `form="lote-alumnos"`.
+         *
+         * Hace falta porque cada fila ya tiene sus propios formularios
+         * —retirar uno, clave de uno— y el HTML no permite anidarlos. El
+         * atributo `form` es lo que deja que una casilla de dentro de la
+         * tabla pertenezca a un formulario de fuera.
+         */
+        ?>
+        <form method="post" id="lote-alumnos"><?= campoCsrf() ?></form>
+
         <table class="tabla-panel">
             <thead>
                 <tr>
+                    <th style="width:34px">
+                        <input type="checkbox" aria-label="Marcar todos"
+                               onchange="document.querySelectorAll('.marca-alumno').forEach(c => c.checked = this.checked)">
+                    </th>
                     <th>Estudiante</th>
                     <th>Usuario</th>
                     <th style="min-width:190px">Avance del curso</th>
@@ -510,6 +598,7 @@ require __DIR__ . '/includes/cabecera-escuela.php';
             </thead>
             <tbody>
             <?php foreach ($porAvance as $al): ?>
+                <?php /* La casilla, atada al formulario de arriba. */ ?>
                 <?php
                 $pc     = (int) $al['porcentaje'];
                 $hechas = (int) $al['estaciones_hechas'];
@@ -520,6 +609,11 @@ require __DIR__ . '/includes/cabecera-escuela.php';
                 $tono = $pc >= 80 ? 'completa' : ($pc >= 40 ? 'media' : ($pc > 0 ? 'poca' : 'nada'));
                 ?>
                 <tr>
+                    <td>
+                        <input type="checkbox" class="marca-alumno" form="lote-alumnos"
+                               name="usuarios[]" value="<?= (int) $al['id'] ?>"
+                               aria-label="Marcar a <?= e($al['name']) ?>">
+                    </td>
                     <td>
                         <a href="<?= e(url('escuela/estudiante.php?curso=' . $cursoId . '&id=' . (int) $al['id'])) ?>">
                             <strong><?= e($al['name']) ?></strong>
@@ -569,6 +663,47 @@ require __DIR__ . '/includes/cabecera-escuela.php';
             <?php endforeach; ?>
             </tbody>
         </table>
+
+        <div class="pie-bloque acciones-lote">
+            <span class="tenue">Con los marcados:</span>
+
+            <button class="btn btn-secundario btn-chico" type="submit"
+                    form="lote-alumnos" formmethod="post"
+                    name="accion" value="clave_varios"
+                    onclick="return confirmarLote(this, 'generar contraseñas nuevas para')">
+                🔑 Contraseñas nuevas
+            </button>
+
+            <button class="btn btn-secundario btn-chico" type="submit"
+                    form="lote-alumnos" formmethod="post"
+                    name="accion" value="retirar_varios"
+                    onclick="return confirmarLote(this, 'retirar del curso a')">
+                Retirar del curso
+            </button>
+        </div>
+
+        <script>
+            /*
+             * Confirmar diciendo A CUÁNTOS afecta.
+             *
+             * «¿Estás seguro?» no da ninguna información: el docente que
+             * marcó treinta sin querer contesta que sí igual. Decir el
+             * número es lo único que hace útil la confirmación, y avisar
+             * cuando no hay nadie marcado evita el viaje al servidor.
+             */
+            function confirmarLote(boton, queHace) {
+                const n = document.querySelectorAll('.marca-alumno:checked').length;
+
+                if (n === 0) {
+                    alert('Primero marca a quién.');
+                    return false;
+                }
+
+                return confirm('Vas a ' + queHace + ' ' + n +
+                    (n === 1 ? ' estudiante.' : ' estudiantes.') +
+                    '\n\nSus cuentas y su progreso no se borran.');
+            }
+        </script>
     <?php endif; ?>
 </section>
 

@@ -129,6 +129,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         olvidarRuta();
     }
 
+    /*
+     * El orden entero, como quedó tras arrastrar.
+     *
+     * Las flechas mueven de a una posición: llevar la última de veinte
+     * al principio son diecinueve clics con su recarga cada uno.
+     * Arrastrando se hace en un gesto, y lo que llega aquí es la lista
+     * completa ya ordenada.
+     *
+     * Las flechas se quedan. No son un resto del pasado: son lo único
+     * que funciona con el teclado, y quitarlas dejaría fuera a quien no
+     * puede arrastrar.
+     */
+    if ($accion === 'orden') {
+        $n = guardarOrdenDeRuta($cursoId, (array) ($_POST['orden'] ?? []));
+        olvidarRuta();
+
+        mensaje($n > 0 ? 'ok' : 'info',
+            $n > 0 ? 'Orden guardado.' : 'No se pudo cambiar el orden.');
+    }
+
     // ── Cómo avanza el estudiante ────────────────────────────────────
     if ($accion === 'modo') {
         guardarModoDeRuta($cursoId, (string) post('ruta_modo'));
@@ -531,10 +551,29 @@ require __DIR__ . '/includes/cabecera-escuela.php';
             <input type="hidden" name="accion" value="quitar_marcadas">
         </form>
 
-        <table class="tabla-panel">
+        <?php
+        /*
+         * El formulario que recibe el orden nuevo tras arrastrar. Lleva
+         * los ids en campos ocultos que el JavaScript reescribe antes de
+         * enviar.
+         */
+        ?>
+        <form method="post" id="orden-ruta">
+            <?= campoCsrf() ?>
+            <input type="hidden" name="accion" value="orden">
+        </form>
+
+        <div class="aviso info" id="pista-arrastre" hidden style="margin-bottom:12px">
+            <b>Arrastra las filas para reordenarlas.</b>
+            Toma una por el ⠿ de la izquierda y suéltala donde quieras. Al soltar se
+            guarda solo. Las flechas siguen ahí si prefieres ir de una en una.
+        </div>
+
+        <table class="tabla-panel tabla-ruta" id="tabla-ruta">
             <thead>
                 <tr>
                     <th style="width:34px"></th>
+                    <th style="width:30px"></th>
                     <th style="width:44px" class="num">#</th>
                     <th>Actividad</th>
                     <th>Materia</th>
@@ -545,12 +584,16 @@ require __DIR__ . '/includes/cabecera-escuela.php';
             </thead>
             <tbody>
             <?php foreach ($asignadas as $i => $a): ?>
-                <tr>
+                <tr data-id="<?= (int) $a['id'] ?>">
                     <td>
                         <input type="checkbox" form="quitar-marcadas"
                                name="asignadas[]" value="<?= (int) $a['id'] ?>">
                     </td>
-                    <td class="num"><b><?= $i + 1 ?></b></td>
+                    <?php /* El asa. Solo por aquí se arrastra: si la fila
+                             entera fuera arrastrable, no se podría
+                             seleccionar el título ni abrir su enlace. */ ?>
+                    <td class="asa" aria-hidden="true" hidden>⠿</td>
+                    <td class="num orden-num"><b><?= $i + 1 ?></b></td>
                     <td>
                         <?= e($a['icon'] ?? '') ?>
                         <a href="<?= e(url('actividades/ver.php?a=' . urlencode($a['slug']))) ?>"
@@ -595,6 +638,8 @@ require __DIR__ . '/includes/cabecera-escuela.php';
                 Quitar las marcadas
             </button>
         </div>
+
+        <script src="<?= e(urlRecurso('assets/js/orden-ruta.js')) ?>"></script>
     <?php endif; ?>
 </section>
 

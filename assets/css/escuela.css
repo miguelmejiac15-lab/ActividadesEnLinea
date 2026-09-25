@@ -1164,3 +1164,43 @@
     font-size: .74rem;
     font-weight: 400;
 }
+
+/* =====================================================================
+   ARRASTRAR PARA ORDENAR LA RUTA
+   ===================================================================== */
+
+/* El asa: lo único por donde se agarra la fila. Se deja ancha y con el
+   cursor de mover para que se vea que es agarrable sin tener que
+   explicarlo. */
+.tabla-ruta td.asa {
+    cursor: grab;
+    color: var(--texto-tenue);
+    font-size: 1.05rem;
+    text-align: center;
+    user-select: none;
+    /* `touch-action: none` es lo que impide que el dedo desplace la
+       página en vez de mover la fila. Sin esta línea el arrastre
+       simplemente no funciona en tableta. */
+    touch-action: none;
+}
+
+.tabla-ruta td.asa:hover { color: var(--oscuro); }
+
+.tabla-ruta tr.arrastrando {
+    background: var(--fondo-suave);
+    box-shadow: var(--sombra);
+    cursor: grabbing;
+}
+
+.tabla-ruta tr.arrastrando td.asa { cursor: grabbing; }
+
+/* Mientras se arrastra, que no se seleccione texto por el camino: el
+   subrayado azul de media tabla hace parecer que algo se rompió. */
+body.arrastrando-fila {
+    user-select: none;
+    cursor: grabbing;
+}
+
+/* El número de orden cambia en cuanto se suelta; un parpadeo suave
+   confirma que se actualizó sin necesidad de leerlo. */
+.tabla-ruta .orden-num b { transition: color .2s; }

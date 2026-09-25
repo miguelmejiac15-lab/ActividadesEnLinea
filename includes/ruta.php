@@ -464,6 +464,108 @@ function moverEnRuta(int $cursoId, int $actividadId, int $delta): bool
     return true;
 }
 
+/**
+ * Guarda el orden completo de la ruta, de una sola vez.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ *  POR QUÉ NO BASTA CON `moverEnRuta()`
+ * ─────────────────────────────────────────────────────────────────────
+ *
+ * Esa intercambia una actividad con su vecina: mover la última de
+ * veinte al principio son diecinueve clics y diecinueve recargas de
+ * página. Arrastrar produce un orden NUEVO entero, y lo que llega aquí
+ * es la lista completa tal y como quedó.
+ *
+ * ─────────────────────────────────────────────────────────────────────
+ *  LA LISTA QUE LLEGA ES UNA PROPUESTA, NO UNA ORDEN
+ * ─────────────────────────────────────────────────────────────────────
+ *
+ * Viene del navegador, así que se cruza con lo que el curso tiene de
+ * verdad y se ignora todo lo demás. Sin ese cruce, un id de otro curso
+ * en el formulario reordenaría —o dejaría huérfana— la ruta ajena.
+ *
+ * Y las que el navegador no mencione no se pierden: van al final, en el
+ * orden que tenían. Eso cubre el caso real de dos pestañas abiertas —el
+ * docente asigna una actividad en una y arrastra en la otra— sin que la
+ * recién asignada desaparezca de la lista.
+ *
+ * @param int[] $actividadIds En el orden deseado.
+ * @return int Cuántas se colocaron según lo pedido.
+ */
+function guardarOrdenDeRuta(int $cursoId, array $actividadIds): int
+{
+    if (!rutaInstalada()) {
+        return 0;
+    }
+
+    // Lo que el curso tiene, en su orden actual. Es la verdad contra la
+    // que se compara lo que mandó el navegador.
+    $reales = traerTodo(
+        'SELECT id, activity_id FROM course_activities
+          WHERE course_id = ? ORDER BY sort_order, assigned_at, id',
+        [$cursoId]
+    );
+
+    if (!$reales) {
+        return 0;
+    }
+
+    $porActividad = [];
+    foreach ($reales as $f) {
+        $porActividad[(int) $f['activity_id']] = (int) $f['id'];
+    }
+
+    // Los pedidos que existen de verdad, sin repetir.
+    $orden = [];
+    foreach ($actividadIds as $id) {
+        $id = (int) $id;
+
+        if (isset($porActividad[$id]) && !in_array($id, $orden, true)) {
+            $orden[] = $id;
+        }
+    }
+
+    $colocadas = count($orden);
+
+    // Y detrás, lo que no venía en la lista.
+    foreach ($porActividad as $actividadId => $filaId) {
+        if (!in_array($actividadId, $orden, true)) {
+            $orden[] = $actividadId;
+        }
+    }
+
+    /*
+     * Todo dentro de una transacción.
+     *
+     * A mitad de la renumeración hay posiciones repetidas, y si el
+     * proceso muriera ahí la ruta quedaría con dos actividades en el
+     * puesto 3 — que en modo secuencial significa que el niño no sabe
+     * cuál le toca. Con la transacción, o se guarda el orden entero o no
+     * se guarda nada.
+     */
+    $pdo = db();
+    $pdo->beginTransaction();
+
+    try {
+        $n = 0;
+
+        foreach ($orden as $actividadId) {
+            $n++;
+            ejecutar('UPDATE course_activities SET sort_order = ? WHERE id = ?',
+                     [$n, $porActividad[$actividadId]]);
+        }
+
+        $pdo->commit();
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        error_log('[ruta] no se pudo guardar el orden del curso ' . $cursoId . ': ' . $e->getMessage());
+
+        return 0;
+    }
+
+    return $colocadas;
+}
+
 /** Cambia el modo de la ruta de un curso. */
 function guardarModoDeRuta(int $cursoId, string $modo): void
 {

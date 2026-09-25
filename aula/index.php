@@ -94,6 +94,14 @@ $titulo = $curso ? $curso['name'] : 'Entrar a mi clase';
 <meta name="robots" content="noindex, nofollow">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="<?= e(urlRecurso('assets/css/aula.css')) ?>">
+
+<?php /* El favicon y la verificacion tambien aqui: estas dos paginas
+         tienen <head> propio, y son las que mas ven los ninos. La
+         verificacion no envia nada a Google; solo acredita el dominio. */ ?>
+<link rel="icon" type="image/svg+xml" href="<?= e(urlRecurso('assets/marca/lapiz.svg')) ?>">
+<?php if (function_exists('gscVerificacion') && gscVerificacion() !== ''): ?>
+<meta name="google-site-verification" content="<?= e(gscVerificacion()) ?>">
+<?php endif; ?>
 </head>
 <body>
 

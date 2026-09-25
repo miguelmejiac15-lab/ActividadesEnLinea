@@ -69,6 +69,9 @@ $titulo = $titulo ?? 'Actividades en Línea';
     .pasos-compra li.ahora span{background:var(--azul)}
 </style>
 <?= etiquetaAnalitica() ?>
+
+<link rel="icon" type="image/svg+xml" href="<?= e(urlRecurso('assets/marca/lapiz.svg')) ?>">
+<link rel="apple-touch-icon" href="<?= e(urlRecurso('assets/marca/lapiz.svg')) ?>">
 </head>
 <body>
 <div class="caja">

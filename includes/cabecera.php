@@ -39,6 +39,21 @@ $usuario = usuarioActual();
 <link rel="stylesheet" href="<?= e(urlRecurso($hoja)) ?>">
 <?php endforeach; ?>
 <?= etiquetaAnalitica() ?>
+
+<?php /*
+ * El favicon, con el lapiz de la marca.
+ *
+ * Es el SVG y no un .ico a proposito: el manual de marca dice que fuera
+ * de la web el simbolo es `lapiz.svg` y no el emoji, porque un emoji lo
+ * dibuja el sistema de quien mira y sale distinto en cada equipo. Un
+ * .ico rasterizado se veria borroso en las pantallas de hoy; el SVG se
+ * adapta a cualquier tamano.
+ *
+ * `urlRecurso()` le pone la marca de tiempo del archivo: sin eso, el
+ * navegador se queda anos con el favicon viejo.
+ */ ?>
+<link rel="icon" type="image/svg+xml" href="<?= e(urlRecurso("assets/marca/lapiz.svg")) ?>">
+<link rel="apple-touch-icon" href="<?= e(urlRecurso("assets/marca/lapiz.svg")) ?>">
 </head>
 <body>
 

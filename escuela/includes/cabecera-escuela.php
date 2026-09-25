@@ -49,6 +49,9 @@ function zonaEscuela(string $zona): string
  */
 ?>
 <link rel="stylesheet" href="<?= e(urlRecurso('assets/css/guia.css')) ?>">
+
+<link rel="icon" type="image/svg+xml" href="<?= e(urlRecurso('assets/marca/lapiz.svg')) ?>">
+<link rel="apple-touch-icon" href="<?= e(urlRecurso('assets/marca/lapiz.svg')) ?>">
 </head>
 <body class="panel">
 

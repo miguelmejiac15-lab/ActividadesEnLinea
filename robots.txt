@@ -1,0 +1,48 @@
+# =====================================================================
+#  Actividades en Línea — qué puede rastrear un buscador
+# =====================================================================
+#
+# Lo que se quiere encontrar en Google es la parte pública: la portada,
+# los planes y las fichas del catálogo. Eso es lo que trae familias y
+# docentes.
+#
+# Todo lo demás queda fuera, y en un caso no es preferencia sino
+# obligación: detrás de /aula/ y /colegio/ hay listas con nombres de
+# menores. Esas carpetas además mandan `X-Robots-Tag: noindex` por su
+# propio .htaccess, que es lo que de verdad lo impide — este archivo es
+# una cortesía que un rastreador puede ignorar; la cabecera, no.
+
+User-agent: *
+
+# ── Zonas privadas ───────────────────────────────────────────────────
+Disallow: /admin/
+Disallow: /escuela/
+Disallow: /colegio/
+Disallow: /aula/
+Disallow: /usuario/
+Disallow: /api/
+Disallow: /config/
+Disallow: /almacen/
+Disallow: /database/
+Disallow: /includes/
+Disallow: /legacy/
+
+# ── Páginas de sesión y de cobro ─────────────────────────────────────
+# No aportan nada en un buscador y salen mal en un resultado.
+Disallow: /login.php
+Disallow: /logout.php
+Disallow: /registro.php
+Disallow: /olvide.php
+Disallow: /restablecer.php
+Disallow: /estado.php
+Disallow: /planes/pagar.php
+Disallow: /planes/retorno.php
+Disallow: /planes/suscribir.php
+
+# ── El reproductor ───────────────────────────────────────────────────
+# Es donde se juega, hace falta cuenta y no tiene sentido indexarlo.
+# Las fichas (`/actividades/ver.php`) sí: son la puerta pública de cada
+# actividad y lo que puede aparecer en una búsqueda.
+Disallow: /actividades/jugar.php
+
+Sitemap: https://actividadesenlinea.com/sitemap.xml

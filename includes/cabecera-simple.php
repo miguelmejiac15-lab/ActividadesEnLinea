@@ -68,6 +68,7 @@ $titulo = $titulo ?? 'Actividades en Línea';
     .pasos-compra li.ahora{color:var(--oscuro);font-weight:600;border-top-color:var(--azul)}
     .pasos-compra li.ahora span{background:var(--azul)}
 </style>
+<?= etiquetaAnalitica() ?>
 </head>
 <body>
 <div class="caja">

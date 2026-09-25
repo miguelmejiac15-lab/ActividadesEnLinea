@@ -192,6 +192,7 @@ require_once RUTA_INCLUDES . '/acceso.php';
 require_once RUTA_INCLUDES . '/catalogo.php';
 require_once RUTA_INCLUDES . '/gamificacion.php';
 require_once RUTA_INCLUDES . '/correo.php';
+require_once RUTA_INCLUDES . '/analitica.php';
 require_once RUTA_INCLUDES . '/recuperacion.php';
 
 // El adaptador va ANTES que `pagos.php`: `pasarelaActiva()` pregunta si

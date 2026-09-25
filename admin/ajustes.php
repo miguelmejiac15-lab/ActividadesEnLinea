@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'sitio_nombre', 'sitio_testigo', 'catalogo_modo_global',
         'estaciones_libres_def', 'nuevas_actividades_dias', 'plan_recomendado',
         'exigir_cuenta_para_jugar',
+        'ga_medicion_id', 'gsc_verificacion',
     ];
 
     foreach ($permitidas as $clave) {
@@ -46,6 +47,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $valor = (string) max(0, min(3650, (int) $valor));
         }
         if ($clave === 'plan_recomendado' && !planPorSlug($valor)) {
+            continue;
+        }
+
+        /*
+         * El identificador de GA4 tiene una forma fija: G- y de
+         * ocho a doce caracteres. Aceptar cualquier cosa dejaria
+         * una etiqueta rota en todas las paginas publicas, y el
+         * sitio seguiria pareciendo medido sin estarlo.
+         */
+        if ($clave === 'ga_medicion_id' && $valor !== ''
+            && !preg_match('/^G-[A-Z0-9]{8,12}$/i', $valor)) {
+            mensaje('error', 'El identificador de Analytics debe tener la forma G-XXXXXXXXXX.');
             continue;
         }
 
@@ -183,6 +196,65 @@ require __DIR__ . '/includes/cabecera-admin.php';
                 </div>
             </div>
 
+        </div>
+    </div>
+
+    <div class="caja">
+        <div class="cabeza"><h2>Medición con Google</h2></div>
+        <div class="cuerpo formulario">
+
+            <div class="aviso info" style="margin-bottom:14px">
+                <b>Solo se mide la parte pública.</b>
+                La etiqueta no se carga en el reproductor, ni en el aula, ni en el
+                espacio del estudiante, ni en el panel del colegio: son páginas con
+                menores, y sus datos no salen de aquí. Lo que se mide es de dónde
+                llegan las familias y los docentes.
+            </div>
+
+            <div class="campo">
+                <label for="ga_medicion_id">Identificador de Google Analytics</label>
+                <input id="ga_medicion_id" name="ga_medicion_id" type="text" maxlength="20"
+                       placeholder="G-XXXXXXXXXX"
+                       value="<?= e(ajuste('ga_medicion_id', '')) ?>">
+                <p class="ayuda">
+                    Se copia de Analytics → Administrar → Flujos de datos.
+                    Déjalo vacío para no medir nada.
+                </p>
+            </div>
+
+            <div class="campo">
+                <label for="gsc_verificacion">Verificación de Search Console</label>
+                <input id="gsc_verificacion" name="gsc_verificacion" type="text" maxlength="120"
+                       value="<?= e(ajuste('gsc_verificacion', '')) ?>">
+                <p class="ayuda">
+                    Solo el contenido de la etiqueta <code>google-site-verification</code>,
+                    sin el HTML alrededor. No envía nada a Google: únicamente demuestra
+                    que el dominio es tuyo.
+                </p>
+            </div>
+
+            <?php
+            /*
+             * El estado REAL, calculado, y no lo que diga un ajuste.
+             *
+             * En desarrollo la medición está apagada a propósito, y sin
+             * decirlo aquí alguien pegaría el identificador, no vería
+             * datos y pensaría que está roto.
+             */
+            ?>
+            <p class="ayuda">
+                <b>Estado ahora mismo:</b>
+                <?php if (gaMedicionId() === ''): ?>
+                    sin identificador, no se mide nada.
+                <?php elseif (ES_DESARROLLO): ?>
+                    configurado, pero <b>apagado</b> porque este entorno es de desarrollo.
+                    En producción medirá.
+                <?php else: ?>
+                    midiendo las páginas públicas.
+                <?php endif; ?>
+                El mapa del sitio se publica en
+                <a href="<?= e(url('sitemap.xml')) ?>" target="_blank" rel="noopener">/sitemap.xml</a>.
+            </p>
         </div>
     </div>
 

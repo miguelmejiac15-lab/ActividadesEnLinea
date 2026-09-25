@@ -38,6 +38,7 @@ $usuario = usuarioActual();
 <?php foreach ($hojasExtra as $hoja): ?>
 <link rel="stylesheet" href="<?= e(urlRecurso($hoja)) ?>">
 <?php endforeach; ?>
+<?= etiquetaAnalitica() ?>
 </head>
 <body>
 

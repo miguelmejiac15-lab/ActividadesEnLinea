@@ -49,3 +49,17 @@ AddDefaultCharset UTF-8
     ExpiresByType image/svg+xml           "access plus 30 days"
     ExpiresByType image/webp              "access plus 30 days"
 </IfModule>
+
+# ── El mapa del sitio ────────────────────────────────────────────────
+#
+# Se sirve `/sitemap.xml` desde `sitemap.php`, que lo genera leyendo la
+# base. El nombre con `.xml` importa: es el que esperan los buscadores y
+# el que se declara en robots.txt.
+#
+# Sin `RewriteBase`, a propósito: en XAMPP el sitio cuelga de una
+# subcarpeta y en producción de la raíz del dominio. Sin la directiva,
+# Apache deduce la base del directorio y acierta en los dos.
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^sitemap\.xml$ sitemap.php [L]
+</IfModule>

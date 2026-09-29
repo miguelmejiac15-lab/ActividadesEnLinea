@@ -201,6 +201,55 @@
         return t.replace(/\s+/g, ' ').trim();
     }
 
+    /*
+     * ─────────────────────────────────────────────────────────────────
+     *  LO QUE EN PANTALLA VA EN MAYÚSCULAS NO SE LEE LETRA A LETRA
+     * ─────────────────────────────────────────────────────────────────
+     *
+     * «¿Lleva la GUE-GUI?» se escribe así para que el dígrafo destaque,
+     * pero el sintetizador toma «GUE» y «GUI» por siglas y las deletrea:
+     * «ge, u, e, guion, ge, u, i». El niño oye una ristra de letras justo
+     * donde tenía que oír el sonido que está aprendiendo.
+     *
+     * Solo se tocan los dígrafos y sílabas que se enseñan, escritos en
+     * mayúsculas y sueltos. «que» o «guiso» dentro de una frase no cambian.
+     */
+    const COMO_SE_DICE = {
+        GUE: 'gue', GUI: 'gui', 'GÜE': 'güe', 'GÜI': 'güi',
+        QUE: 'que', QUI: 'qui', QU: 'cu',
+        CH: 'che', LL: 'elle', RR: 'erre',
+    };
+
+    /*
+     * Con `new RegExp` y no con un literal: un Safari anterior a 16.4 no
+     * conoce `(?<!…)`, y un literal que no entiende rompe el archivo
+     * ENTERO al cargarlo. Así solo falla esto, dentro del try.
+     */
+    let reDigrafoPar = null;
+    let reDigrafo = null;
+
+    try {
+        const silaba = '(GÜE|GÜI|GUE|GUI|QUE|QUI)';
+        reDigrafoPar = new RegExp('(?<!\\p{L})' + silaba + '\\s*[-·–—]\\s*' + silaba + '(?!\\p{L})', 'gu');
+        reDigrafo = new RegExp('(?<!\\p{L})(GÜE|GÜI|GUE|GUI|QUE|QUI|QU|CH|LL|RR)(?!\\p{L})', 'gu');
+    } catch (e) {
+        /* se lee como antes */
+    }
+
+    const enEspanol = (lang) => String(lang || '').toLowerCase().slice(0, 2) === 'es';
+
+    function paraVoz(texto) {
+        const t = String(texto);
+        if (!reDigrafo) return t;
+
+        const di = (m) => COMO_SE_DICE[m] || m;
+
+        return t
+            // «GUE-GUI», «GUE·GUI»: el guion se oye como pausa, no «guion».
+            .replace(reDigrafoPar, (m, a, b) => di(a) + ', ' + di(b))
+            .replace(reDigrafo, di);
+    }
+
     /** La mejor voz disponible para un idioma, o null si no hay ninguna. */
     function vozPara(idioma) {
         if (!vocesListas.length) return null;
@@ -280,8 +329,8 @@
                 window.speechSynthesis.cancel();
             }
 
-            const v = new SpeechSynthesisUtterance(limpio);
             const lang = op.idioma || idiomaVoz;
+            const v = new SpeechSynthesisUtterance(enEspanol(lang) ? paraVoz(limpio) : limpio);
             const voz = vozPara(lang);
 
             v.lang = lang;
@@ -357,7 +406,7 @@
                 const limpio = soloPalabras(t);
                 if (!limpio) return;
 
-                const v = new SpeechSynthesisUtterance(limpio);
+                const v = new SpeechSynthesisUtterance(enEspanol(idiomaVoz) ? paraVoz(limpio) : limpio);
                 const voz = vozPara(idiomaVoz);
 
                 v.lang = idiomaVoz;
@@ -993,6 +1042,39 @@
         return Array.isArray(lista) && lista.length > 0 && lista.every(esSoloDibujo);
     }
 
+    /*
+     * ─────────────────────────────────────────────────────────────────
+     *  EL SONIDO DE LA LETRA, DICHO COMO LO DIRÍA UN DOCENTE
+     * ─────────────────────────────────────────────────────────────────
+     *
+     * El contenido trae el sonido escrito para la pantalla: «Mmmmm»,
+     * «Gggg», «Ch ch ch», «Ks». Leído por el sintetizador eso no es un
+     * sonido sino una sigla, y lo deletrea —«ge, ge, ge, ge»— o lo
+     * distorsiona. Una consonante sola no se puede pronunciar bien con
+     * voz sintética; con sus vocales, sí. Es además como se enseña en el
+     * aula: «ma, me, mi, mo, mu».
+     *
+     * Las letras que ya traen sílabas («Ca, co, cu», «Gue, gui») o una
+     * frase («H (silenciosa)») se leen tal como vienen.
+     */
+    const SILABAS_DE = {
+        B: 'ba, be, bi, bo, bu',   D: 'da, de, di, do, du',
+        F: 'fa, fe, fi, fo, fu',   G: 'ga, go, gu',
+        J: 'ja, je, ji, jo, ju',   K: 'ka, ke, ki, ko, ku',
+        L: 'la, le, li, lo, lu',   M: 'ma, me, mi, mo, mu',
+        N: 'na, ne, ni, no, nu',   'Ñ': 'ña, ñe, ñi, ño, ñu',
+        P: 'pa, pe, pi, po, pu',   R: 'ra, re, ri, ro, ru',
+        S: 'sa, se, si, so, su',   T: 'ta, te, ti, to, tu',
+        V: 'va, ve, vi, vo, vu',   W: 'wa, we, wi',
+        X: 'equis. Suena ks, como en taxi',
+        CH: 'cha, che, chi, cho, chu',
+    };
+
+    function sonidoDeLetra(letra, sonido) {
+        const clave = String(letra || '').toUpperCase().replace(/[^A-ZÑ]/g, '');
+        return SILABAS_DE[clave] || sonido || '';
+    }
+
     // ── Registro de minijuegos ───────────────────────────────────────
     // Cada función recibe el contenido de la estación y una función
     // `fin(aciertos, total)` que llama al terminar.
@@ -1057,10 +1139,19 @@
                 });
                 p.appendChild(ops);
 
-                hablar(it.n);
+                /*
+                 * La primera palabra va DETRÁS del sonido de la letra, no
+                 * encima. Antes se pedía sin encolar, y `hablar()` sin
+                 * encolar cancela lo que suena: el sonido de la letra se
+                 * cortaba a la primera sílaba y se oía como un chasquido.
+                 */
+                hablar(it.n, i === 0 && presentado ? { encolar: true } : undefined);
             }
 
-            if (extra && extra.sonido) hablar(extra.sonido);
+            const sonido = sonidoDeLetra(extra && extra.letra, extra && extra.sonido);
+            const presentado = !!sonido;
+            if (sonido) hablar(sonido, { proteger: true });
+
             marcarProgreso(0, items.length);
             pinta();
         },
@@ -3128,6 +3219,174 @@
         c.appendChild(b);
     }
 
+    // ── Antes de empezar ─────────────────────────────────────────────
+    /*
+     * Lo primero que ve un niño de primaria al abrir una actividad nueva
+     * no debería ser una pregunta sobre algo que nadie le ha contado.
+     * Aquí se le cuenta: qué es, las ideas que va a practicar y un
+     * ejemplo. Luego dos preguntas cortas para comprobar que lo entendió.
+     *
+     * No puntúa ni guarda nada, y equivocarse no cuesta: la opción mala
+     * se apaga y se vuelve a intentar, con la idea a la vista. Es lectura
+     * con un repaso, no un examen. Por eso tampoco pasa por `avisar()`,
+     * que cuenta fallos para ofrecer la ayuda de pago.
+     */
+
+    /** Escapa y convierte `**término**` en negrita. */
+    function conNegritas(texto) {
+        return esc(texto).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    }
+
+    function marcarIntro(activa) {
+        const b = $('#abrir-intro');
+        if (b) b.classList.toggle('activa', activa);
+    }
+
+    function mostrarIntroduccion() {
+        const intro = estado.intro;
+        if (!intro) return;
+
+        estado.actual = null;
+        idiomaVoz = 'es-ES';
+        marcarActivo(null);
+
+        const cab = $('#titulo-estacion');
+        if (cab) cab.textContent = '📖 Antes de empezar';
+        marcarIntro(true);
+
+        const preguntas = intro.preguntas || [];
+        const total = 1 + preguntas.length;
+
+        leer();
+
+        function leer() {
+            limpiar();
+            marcarProgreso(0, total);
+            titular(intro.titulo, 'Lee con calma: es lo que vas a practicar');
+
+            const c = panel('juego-centro');
+            const hoja = el('div', 'intro-hoja');
+
+            const idea = el('p', 'intro-idea');
+            idea.innerHTML = conNegritas(intro.idea);
+            hoja.appendChild(idea);
+
+            if ((intro.claves || []).length) {
+                hoja.appendChild(el('h3', 'intro-subtitulo', 'Lo que vas a practicar'));
+                const ul = el('ul', 'intro-claves');
+                intro.claves.forEach((k) => {
+                    const li = el('li');
+                    li.innerHTML = conNegritas(k);
+                    ul.appendChild(li);
+                });
+                hoja.appendChild(ul);
+            }
+
+            if (intro.ejemplo) {
+                const ej = el('div', 'intro-ejemplo');
+                ej.innerHTML = '<b>Por ejemplo</b> ' + conNegritas(intro.ejemplo);
+                hoja.appendChild(ej);
+            }
+
+            c.appendChild(hoja);
+
+            const sinMarcas = (t) => String(t || '').replace(/\*\*/g, '');
+            const todo = [intro.idea].concat(intro.claves || [], intro.ejemplo ? ['Por ejemplo: ' + intro.ejemplo] : [])
+                                     .map(sinMarcas);
+
+            const acciones = el('div', 'juego-opciones');
+
+            const oir = el('button', 'btn btn-secundario', '🔊 Escuchar');
+            oir.onclick = () => { callar(); hablarSeguido(todo); };
+            acciones.appendChild(oir);
+
+            const sig = el('button', 'btn btn-principal',
+                preguntas.length ? 'Comprobar lo que entendí →' : 'Empezar →');
+            sig.onclick = () => (preguntas.length ? preguntar(0) : empezar());
+            acciones.appendChild(sig);
+
+            c.appendChild(acciones);
+        }
+
+        function preguntar(n) {
+            limpiar();
+
+            if (n >= preguntas.length) return listo();
+
+            const q = preguntas[n];
+            marcarProgreso(1 + n, total);
+
+            const completar = q.tipo === 'completar';
+            titular(completar ? 'Completa la frase' : q.enunciado,
+                    'Comprueba lo que entendiste · ' + (n + 1) + ' de ' + preguntas.length);
+
+            const c = panel('juego-centro');
+
+            let hueco = null;
+            if (completar) {
+                const frase = el('p', 'intro-frase');
+                const partes = String(q.enunciado).split('___');
+                frase.appendChild(document.createTextNode(partes[0] || ''));
+                hueco = el('span', 'intro-hueco', '      ');
+                frase.appendChild(hueco);
+                frase.appendChild(document.createTextNode(partes.slice(1).join('___')));
+                c.appendChild(frase);
+            }
+
+            const nota = el('p', 'intro-nota');
+            const largas = q.opciones.some((o) => String(o).length > 18);
+            const ops = el('div', 'juego-opciones' + (largas ? ' vertical' : ''));
+
+            q.opciones.forEach((o, k) => {
+                const b = el('button', 'btn btn-secundario juego-boton', String(o));
+                b.onclick = () => {
+                    if (k === q.correcta) {
+                        b.classList.add('acierto');
+                        ops.querySelectorAll('button').forEach((x) => { x.disabled = true; });
+                        if (hueco) { hueco.textContent = String(o); hueco.classList.add('lleno'); }
+                        nota.textContent = '¡Eso es! ✅';
+                        nota.className = 'intro-nota bien';
+                        setTimeout(() => preguntar(n + 1), 1300);
+                    } else {
+                        b.classList.add('error');
+                        b.disabled = true;
+                        nota.textContent = 'Todavía no. Piensa en lo que acabas de leer y prueba otra.';
+                        nota.className = 'intro-nota mal';
+                    }
+                };
+                ops.appendChild(b);
+            });
+
+            c.appendChild(ops);
+            c.appendChild(nota);
+
+            const volver = el('button', 'btn-enlace', '← Volver a leer');
+            volver.type = 'button';
+            volver.onclick = leer;
+            c.appendChild(volver);
+        }
+
+        function listo() {
+            marcarProgreso(total, total);
+            const c = panel('juego-centro');
+            c.appendChild(el('div', 'juego-emoji grande', '🚀'));
+            c.appendChild(el('h2', null, '¡Listo! Ya sabes lo que necesitas'));
+            c.appendChild(el('p', 'juego-texto', 'Ahora a practicarlo en las estaciones.'));
+
+            const b = el('button', 'btn btn-principal', 'Empezar la primera estación →');
+            b.onclick = empezar;
+            c.appendChild(b);
+        }
+
+        function empezar() {
+            marcarIntro(false);
+            const primera = estado.estaciones.find((e) => e.desbloqueada && !e.hecha)
+                         || estado.estaciones.find((e) => e.desbloqueada);
+            if (primera) abrirEstacion(primera.id);
+            else mostrarInvitacion();
+        }
+    }
+
     // ── Arranque ─────────────────────────────────────────────────────
 
     function iniciar(config) {
@@ -3136,15 +3395,29 @@
         estado.csrf = config.csrf || '';
         estado.slug = config.slug || '';
         estado.personaje = config.personaje || null;
+        estado.intro = config.intro || null;
 
-        document.querySelectorAll('.mapa-estacion').forEach((n) => {
+        document.querySelectorAll('.mapa-estacion[data-id]').forEach((n) => {
             n.addEventListener('click', () => {
+                marcarIntro(false);
                 const id = Number(n.dataset.id);
                 const ficha = estado.estaciones.find((e) => e.id === id);
                 if (ficha && ficha.desbloqueada) abrirEstacion(id);
                 else mostrarInvitacion();
             });
         });
+
+        const botonIntro = $('#abrir-intro');
+        if (botonIntro) botonIntro.addEventListener('click', mostrarIntroduccion);
+
+        /*
+         * La introducción se abre sola la primera vez, cuando todavía no
+         * hay ninguna estación hecha. Quien vuelve a la actividad entra
+         * directo a jugar; la tiene en el mapa si quiere repasarla.
+         */
+        if (estado.intro && !estado.estaciones.some((e) => e.hecha)) {
+            return mostrarIntroduccion();
+        }
 
         const primera = estado.estaciones.find((e) => e.desbloqueada);
         if (primera) abrirEstacion(primera.id);

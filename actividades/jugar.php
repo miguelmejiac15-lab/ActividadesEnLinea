@@ -14,6 +14,7 @@
  */
 
 require_once dirname(__DIR__) . '/config/config.php';
+require_once RUTA_INCLUDES . '/introducciones.php';
 
 $slug = get('a');
 $actividad = $slug !== '' ? actividadPorSlug($slug) : null;
@@ -119,6 +120,13 @@ $paraElMotor = array_map(static function (array $e) use ($hechas): array {
     ];
 }, $preparadas);
 
+/*
+ * «Antes de empezar»: la definición y dos preguntas de comprensión. Va
+ * aparte de las estaciones porque no es contenido premium sino el
+ * contexto para poder jugar; ver includes/introducciones.php.
+ */
+$intro = introduccionDe($actividad);
+
 $titulo        = $actividad['title'] . ' · Jugar';
 $descripcion   = $actividad['description'] ?? '';
 $seccionActiva = 'actividades';
@@ -136,6 +144,14 @@ require RUTA_INCLUDES . '/cabecera.php';
             <p class="resumen">
                 <?= (int) $resumen['disponibles'] ?> de <?= (int) $resumen['total'] ?> estaciones disponibles
             </p>
+
+            <?php if ($intro): ?>
+                <button class="mapa-estacion mapa-intro" id="abrir-intro" type="button">
+                    <span class="num">📖</span>
+                    <span class="etiqueta">Antes de empezar</span>
+                    <span class="marca" aria-hidden="true">▶️</span>
+                </button>
+            <?php endif; ?>
 
             <?php
             $corteDibujado = false;
@@ -212,6 +228,7 @@ require RUTA_INCLUDES . '/cabecera.php';
         slug: <?= jsonSeguro($actividad['slug']) ?>,
         csrf: <?= jsonSeguro(tokenCsrf()) ?>,
         estaciones: <?= jsonSeguro($paraElMotor) ?>,
+        intro: <?= jsonSeguro($intro) ?>,
 
         /*
          * El personaje que el niño eligió y se compró con sus monedas.

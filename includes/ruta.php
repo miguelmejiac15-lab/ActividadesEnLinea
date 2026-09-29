@@ -190,8 +190,11 @@ function rutaDelEstudiante(int $usuarioId, array $curso): array
 {
     $cursoId = (int) $curso['id'];
 
+    // Sin la migración de tareas para casa, todo es trabajo de clase.
+    $casa = function_exists('casaInstalada') && casaInstalada() ? 'ca.para_casa' : '0';
+
     $pasos = traerTodo(
-        'SELECT ca.sort_order, ca.due_date,
+        'SELECT ca.sort_order, ca.due_date, ' . $casa . ' AS para_casa,
                 a.id, a.slug, a.title, a.icon, a.duration_minutes,
                 cat.name AS categoria, cat.icon AS categoria_icon,
                 (SELECT COUNT(*) FROM activity_stations s
@@ -228,20 +231,50 @@ function rutaDelEstudiante(int $usuarioId, array $curso): array
          * un descuido del catálogo dejando a la clase entera parada, sin
          * que el docente pueda ni enterarse de por qué.
          */
-        $p['abierta'] = !$secuencial || $anteriorOk;
+        $p['para_casa'] = (int) $p['para_casa'] === 1;
 
-        if ($secuencial) {
-            $anteriorOk = $p['completa'] || $total === 0;
+        /*
+         * Una tarea para casa está SIEMPRE abierta y no frena la cadena.
+         *
+         * La docente la mandó a la casa para hacerla allí; si quedara
+         * detrás del candado de la ruta de clase, la familia se sentaría
+         * con el niño y encontraría la tarea cerrada. Y tampoco bloquea lo
+         * de clase: no hacer la tarea de casa no debe dejar al niño sin
+         * poder seguir mañana en el salón.
+         *
+         * Esto no concede nada que el plan no conceda: la ruta solo decide
+         * qué de lo asignado se puede abrir, `acceso.php` sigue mandando.
+         */
+        if ($p['para_casa']) {
+            $p['abierta'] = true;
+        } else {
+            $p['abierta'] = !$secuencial || $anteriorOk;
+
+            if ($secuencial) {
+                $anteriorOk = $p['completa'] || $total === 0;
+            }
         }
 
         $p['es_siguiente'] = false;
 
-        if (!$yaHayUna && $p['abierta'] && !$p['completa'] && $total > 0) {
+        if (!$yaHayUna && $p['abierta'] && !$p['completa'] && $total > 0 && !$p['para_casa']) {
             $p['es_siguiente'] = true;
             $yaHayUna = true;
         }
     }
     unset($p);
+
+    // Lo que toca es lo de clase; si de clase no queda nada, la primera
+    // tarea de casa pendiente.
+    if (!$yaHayUna) {
+        foreach ($pasos as &$p) {
+            if ($p['para_casa'] && !$p['completa'] && $p['total'] > 0) {
+                $p['es_siguiente'] = true;
+                break;
+            }
+        }
+        unset($p);
+    }
 
     return $pasos;
 }

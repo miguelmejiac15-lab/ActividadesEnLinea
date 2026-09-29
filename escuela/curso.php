@@ -69,6 +69,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('accion') === 'estado') {
     redirigir('escuela/curso.php?id=' . $cursoId);
 }
 
+// ── Resumen a todas las familias ─────────────────────────────────────
+//
+// Uno por niño con correo de acudiente, saltando a las familias a las que
+// ya se les escribió hoy. El mensaje cuenta los cuatro casos: si solo
+// dijera «enviado», la docente no sabría a quién le falta el correo.
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && post('accion') === 'resumenes') {
+    exigirCsrf();
+
+    $r = enviarResumenesDelCurso($curso);
+
+    $partes = [];
+    if ($r['enviados'] > 0)   { $partes[] = $r['enviados'] . ' enviado(s)'; }
+    if ($r['recientes'] > 0)  { $partes[] = $r['recientes'] . ' ya recibieron uno hoy'; }
+    if ($r['sin_correo'] > 0) { $partes[] = $r['sin_correo'] . ' sin correo de acudiente'; }
+    if ($r['fallidos'] > 0)   { $partes[] = $r['fallidos'] . ' no se pudieron enviar'; }
+
+    mensaje($r['enviados'] > 0 ? 'ok' : ($r['error'] ? 'error' : 'info'),
+        'Resumen a las familias: ' . ($partes ? implode(' · ', $partes) : 'no hay estudiantes')
+        . ($r['error'] && $r['enviados'] === 0 ? '. ' . $r['error'] : '.'));
+
+    redirigir('escuela/curso.php?id=' . $cursoId . '#familias');
+}
+
 $resumen     = resumenDelCurso($cursoId);
 $estudiantes = estudiantesDelCurso($cursoId);
 $actividades = actividadesDelCurso($cursoId);
@@ -319,6 +342,43 @@ require __DIR__ . '/includes/cabecera-escuela.php';
                 </li>
             <?php endforeach; ?>
         </ul>
+    </section>
+<?php endif; ?>
+
+<?php if ($estudiantes && casaInstalada()): ?>
+    <?php
+    $familias   = familiasConCorreo($cursoId);
+    $paraCasa   = count(array_filter($actividades, static fn($a) => (int) $a['para_casa'] === 1));
+    ?>
+    <section class="bloque-panel" id="familias">
+        <h2>🏠 Tareas para casa y familias</h2>
+
+        <p class="nota-panel">
+            <?php if ($paraCasa > 0): ?>
+                Hay <b><?= $paraCasa ?></b> tarea(s) para casa en este curso.
+            <?php else: ?>
+                Todavía no hay tareas para casa. Se marcan en
+                <a href="<?= e(url('escuela/actividades.php?curso=' . $cursoId)) ?>">Actividades</a>
+                con el botón 🏫 / 🏠 de cada una.
+            <?php endif; ?>
+            <b><?= $familias['con_correo'] ?></b> de <?= $familias['total'] ?> estudiantes tienen
+            correo de acudiente. Se añade en la ficha de cada uno (<em>Ver progreso</em>).
+        </p>
+
+        <?php if ($familias['con_correo'] > 0): ?>
+            <form method="post" class="form-linea"
+                  onsubmit="return confirm('¿Enviar el resumen a las <?= $familias['con_correo'] ?> familias con correo?\n\nA las que ya recibieron uno hoy no se les vuelve a enviar.')">
+                <?= campoCsrf() ?>
+                <input type="hidden" name="accion" value="resumenes">
+                <button class="btn btn-principal btn-chico" type="submit">
+                    ✉️ Enviar resumen a las familias
+                </button>
+            </form>
+            <p class="nota-panel">
+                Cada familia recibe solo lo de su hijo: sus tareas para casa, lo que jugó esta
+                semana y cómo entrar desde casa con su usuario. La contraseña nunca va en el correo.
+            </p>
+        <?php endif; ?>
     </section>
 <?php endif; ?>
 

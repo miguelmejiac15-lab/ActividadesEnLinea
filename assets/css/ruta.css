@@ -249,3 +249,73 @@
         padding: 20px;
     }
 }
+
+
+/* ── Para hacer en casa ───────────────────────────────────────────────
+   Arriba y aparte de la ruta de clase: en casa es lo que se busca.
+   Naranja de la marca para distinguirlo del azul de clase sin gritar. */
+
+.ruta-casa {
+    background: var(--blanco);
+    border: 2px solid var(--naranja);
+    border-radius: var(--radio-medio);
+    padding: 18px 20px;
+    margin-bottom: 24px;
+}
+
+.ruta-casa h2 {
+    margin: 0 0 12px;
+    font-size: 1.2rem;
+    color: var(--oscuro);
+}
+
+.ruta-casa ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 10px;
+}
+
+.ruta-casa li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 10px 12px;
+    border-radius: var(--radio-chico);
+    background: var(--fondo-suave);
+}
+
+.ruta-casa-nombre {
+    font-weight: 600;
+    color: var(--oscuro);
+    min-width: 0;
+}
+
+.ruta-casa-nombre small {
+    display: block;
+    font-weight: 400;
+    color: var(--texto-tenue);
+    margin-top: 2px;
+}
+
+.ruta-casa-listo {
+    margin: 0;
+    font-weight: 600;
+    color: var(--verde);
+}
+
+.ruta-etiqueta-casa {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 9px;
+    border-radius: var(--radio-pildora);
+    background: rgba(255, 152, 0, .14);
+    color: #b26a00;
+    font-size: .72rem;
+    font-weight: 700;
+    vertical-align: middle;
+    white-space: nowrap;
+}

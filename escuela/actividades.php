@@ -77,8 +77,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // ── Las marcadas en el buscador ──────────────────────────────────
+    //
+    // Con «son para casa» marcado, quedan como tarea para casa en el
+    // mismo gesto: asignar y luego buscarlas en la tabla para marcarlas
+    // sería hacer dos veces lo mismo.
     if ($accion === 'marcadas') {
-        $contar(asignarVarias($cursoId, (array) ($_POST['actividades'] ?? []), $fecha));
+        $elegidas = (array) ($_POST['actividades'] ?? []);
+        $contar(asignarVarias($cursoId, $elegidas, $fecha));
+
+        if (post('para_casa') === '1' && marcarParaCasa($cursoId, $elegidas, true, $fecha) > 0) {
+            olvidarRuta();
+            mensaje('ok', 'Quedaron como tarea para casa.');
+        }
+    }
+
+    // ── Para casa o para clase ───────────────────────────────────────
+    //
+    // Una tarea para casa aparece arriba en la pantalla del niño, está
+    // abierta aunque la ruta vaya en orden y entra en el resumen que se
+    // le envía a la familia.
+    if ($accion === 'casa' || $accion === 'clase') {
+        marcarParaCasa($cursoId, [(int) post('actividad')], $accion === 'casa');
+        olvidarRuta();
+        mensaje('ok', $accion === 'casa'
+            ? 'Ahora es tarea para casa.'
+            : 'Ahora es trabajo de clase.');
+    }
+
+    if ($accion === 'casa_marcadas' || $accion === 'clase_marcadas') {
+        $n = marcarParaCasa(
+            $cursoId,
+            (array) ($_POST['asignadas'] ?? []),
+            $accion === 'casa_marcadas',
+            post('fecha_casa') ?: null
+        );
+        olvidarRuta();
+
+        mensaje($n > 0 ? 'ok' : 'info', $n > 0
+            ? "$n actividad(es) " . ($accion === 'casa_marcadas' ? 'ahora son tarea para casa.' : 'vuelven a ser de clase.')
+            : 'No marcaste ninguna, o ya estaban así.');
     }
 
     // ── Una sola ─────────────────────────────────────────────────────
@@ -471,6 +508,12 @@ require __DIR__ . '/includes/cabecera-escuela.php';
                     Para cuándo (opcional)
                     <input type="date" name="fecha">
                 </label>
+                <?php if (casaInstalada()): ?>
+                    <label class="fecha-opcional">
+                        <input type="checkbox" name="para_casa" value="1">
+                        🏠 Son tarea para casa
+                    </label>
+                <?php endif; ?>
             </div>
         </form>
 
@@ -546,9 +589,15 @@ require __DIR__ . '/includes/cabecera-escuela.php';
          * filas— y el resultado depende del navegador.
          */
         ?>
+        <?php
+        /*
+         * Las acciones sobre las marcadas —quitar, mandar a casa, devolver
+         * a clase— comparten este formulario. Cada botón lleva su propia
+         * `accion` como valor: es lo que envía el que se pulsa.
+         */
+        ?>
         <form method="post" id="quitar-marcadas">
             <?= campoCsrf() ?>
-            <input type="hidden" name="accion" value="quitar_marcadas">
         </form>
 
         <?php
@@ -579,6 +628,7 @@ require __DIR__ . '/includes/cabecera-escuela.php';
                     <th>Materia</th>
                     <th class="num">La terminaron</th>
                     <th>Para cuándo</th>
+                    <?php if (casaInstalada()): ?><th>Dónde</th><?php endif; ?>
                     <th style="width:96px">Orden</th>
                 </tr>
             </thead>
@@ -606,6 +656,21 @@ require __DIR__ . '/includes/cabecera-escuela.php';
                     <td class="<?= $a['due_date'] ? '' : 'tenue' ?>">
                         <?= $a['due_date'] ? e(fechaLarga($a['due_date'])) : 'Sin fecha' ?>
                     </td>
+                    <?php if (casaInstalada()): ?>
+                        <?php $esCasa = (int) $a['para_casa'] === 1; ?>
+                        <td>
+                            <form method="post" style="display:inline">
+                                <?= campoCsrf() ?>
+                                <input type="hidden" name="accion" value="<?= $esCasa ? 'clase' : 'casa' ?>">
+                                <input type="hidden" name="actividad" value="<?= (int) $a['id'] ?>">
+                                <button class="btn btn-chico <?= $esCasa ? 'btn-principal' : 'btn-secundario' ?>"
+                                        type="submit"
+                                        title="<?= $esCasa ? 'Pasar a trabajo de clase' : 'Dejar como tarea para casa' ?>">
+                                    <?= $esCasa ? '🏠 Casa' : '🏫 Clase' ?>
+                                </button>
+                            </form>
+                        </td>
+                    <?php endif; ?>
                     <td class="acciones-fila">
                         <?php if ($i > 0): ?>
                             <form method="post" style="display:inline">
@@ -634,10 +699,35 @@ require __DIR__ . '/includes/cabecera-escuela.php';
 
         <div class="pie-bloque">
             <button class="btn btn-secundario" type="submit" form="quitar-marcadas"
+                    name="accion" value="quitar_marcadas"
                     onclick="return confirm('¿Quitar las actividades marcadas?\n\nEl progreso ya hecho se conserva.')">
                 Quitar las marcadas
             </button>
+
+            <?php if (casaInstalada()): ?>
+                <button class="btn btn-principal btn-chico" type="submit" form="quitar-marcadas"
+                        name="accion" value="casa_marcadas">
+                    🏠 Marcadas → para casa
+                </button>
+                <label class="fecha-opcional">
+                    Para cuándo (opcional)
+                    <input type="date" name="fecha_casa" form="quitar-marcadas">
+                </label>
+                <button class="btn btn-secundario btn-chico" type="submit" form="quitar-marcadas"
+                        name="accion" value="clase_marcadas">
+                    🏫 Marcadas → de clase
+                </button>
+            <?php endif; ?>
         </div>
+
+        <?php if (casaInstalada()): ?>
+            <p class="nota-panel">
+                <b>🏠 Tareas para casa.</b> Aparecen arriba en la pantalla del niño, se pueden
+                hacer aunque la ruta vaya en orden y lo que hagan cuenta para este curso. Para
+                que la familia se entere, envíale el resumen desde
+                <a href="<?= e(url('escuela/curso.php?id=' . $cursoId)) ?>#familias">el curso</a>.
+            </p>
+        <?php endif; ?>
 
         <script src="<?= e(urlRecurso('assets/js/orden-ruta.js')) ?>"></script>
     <?php endif; ?>

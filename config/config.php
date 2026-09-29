@@ -209,6 +209,9 @@ require_once RUTA_INCLUDES . '/aula.php';
  */
 require_once RUTA_INCLUDES . '/ruta.php';
 
+// Tareas para casa y resumen a la familia. Usa la ruta y el correo.
+require_once RUTA_INCLUDES . '/casa.php';
+
 /*
  * Y `modo-nino.php` junto a ella, por lo mismo: también cierra sobre lo
  * que decide `acceso.php`, que lo llama con `function_exists()`.

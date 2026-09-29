@@ -32,6 +32,38 @@ $curso   = exigirCursoPropio($cursoId);
 $alumnoId = getEntero('id');
 $alumno   = exigirEstudianteDelCurso($cursoId, $alumnoId);
 
+// ── La familia: su correo y el resumen ───────────────────────────────
+//
+// Las dos comprobaciones de arriba ya cerraron el curso y el niño: aquí
+// solo se llega con un curso propio y un estudiante matriculado en él.
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    exigirCsrf();
+
+    $volver = 'escuela/estudiante.php?curso=' . $cursoId . '&id=' . $alumnoId . '#familia';
+
+    if (post('accion') === 'acudiente') {
+        $r = guardarCorreoAcudiente($alumnoId, (string) post('correo_acudiente'));
+
+        mensaje($r['ok'] ? 'ok' : 'error', $r['ok']
+            ? (trim((string) post('correo_acudiente')) === ''
+                ? 'Se borró el correo del acudiente.'
+                : 'Correo del acudiente guardado.')
+            : $r['error']);
+    }
+
+    if (post('accion') === 'resumen') {
+        $r = enviarResumenFamilia($curso, $alumnoId);
+
+        mensaje($r['ok'] ? 'ok' : ($r['motivo'] === 'reciente' ? 'info' : 'error'),
+            $r['ok'] ? 'Resumen enviado a la familia.' : (string) $r['error']);
+    }
+
+    redirigir($volver);
+}
+
+$acudiente = (string) traerValor('SELECT guardian_email FROM users WHERE id = ?', [$alumnoId]);
+$esCuentaDeFamilia = traerValor('SELECT role FROM users WHERE id = ?', [$alumnoId]) !== 'student';
+
 /*
  * `detalleDeEstudiante()` devuelve una fila por estación. Se agrupa aquí
  * en memoria en vez de con una consulta por actividad: los datos ya
@@ -161,6 +193,68 @@ require __DIR__ . '/includes/cabecera-escuela.php';
         <span class="cifra-eti">Tiempo jugado</span>
     </div>
 </div>
+
+<?php if (casaInstalada()): ?>
+    <?php
+    $tareasCasa = tareasDeCasa($alumnoId, $cursoId);
+    $ultimo     = ultimoResumen($alumnoId, $cursoId);
+    ?>
+    <section class="bloque-panel" id="familia">
+        <h2>🏠 Tareas para casa y familia</h2>
+
+        <?php if ($tareasCasa): ?>
+            <p class="nota-panel">
+                <?php $faltan = count(array_filter($tareasCasa, static fn($t) => !$t['completa'])); ?>
+                Tiene <?= count($tareasCasa) ?> tarea(s) para casa:
+                <?= $faltan === 0 ? '<b>todas hechas ✅</b>' : '<b>le faltan ' . $faltan . '</b>' ?>.
+            </p>
+        <?php else: ?>
+            <p class="nota-panel">
+                Este curso no tiene tareas para casa. Se marcan en
+                <a href="<?= e(url('escuela/actividades.php?curso=' . $cursoId)) ?>">Actividades</a>.
+            </p>
+        <?php endif; ?>
+
+        <?php if ($esCuentaDeFamilia): ?>
+            <p class="nota-panel">
+                Esta es una cuenta de familia: la gestionan sus padres, así que el correo del
+                acudiente no se cambia desde aquí.
+            </p>
+        <?php else: ?>
+            <form method="post" class="form-linea">
+                <?= campoCsrf() ?>
+                <input type="hidden" name="accion" value="acudiente">
+                <label>
+                    Correo del acudiente
+                    <input type="email" name="correo_acudiente" maxlength="190"
+                           value="<?= e($acudiente) ?>" placeholder="familia@correo.com">
+                </label>
+                <button class="btn btn-secundario btn-chico" type="submit">Guardar</button>
+            </form>
+            <p class="nota-panel">
+                Escribe solo un correo que la familia te haya dado para esto. Es un dato
+                personal de un menor: se usa únicamente para enviarle este resumen.
+            </p>
+        <?php endif; ?>
+
+        <?php if ($acudiente !== '' && !$esCuentaDeFamilia): ?>
+            <form method="post" class="form-linea">
+                <?= campoCsrf() ?>
+                <input type="hidden" name="accion" value="resumen">
+                <button class="btn btn-principal btn-chico" type="submit">
+                    ✉️ Enviar resumen a la familia
+                </button>
+                <span class="tenue">
+                    <?= $ultimo ? 'Último envío: ' . e(fechaLarga($ultimo)) : 'Todavía no se le ha enviado ninguno.' ?>
+                </span>
+            </form>
+            <p class="nota-panel">
+                Lleva las tareas para casa pendientes y hechas, lo que jugó esta semana y cómo
+                entrar desde casa con su usuario. La contraseña nunca va en el correo.
+            </p>
+        <?php endif; ?>
+    </section>
+<?php endif; ?>
 
 <?php if (!$porAct): ?>
 

@@ -117,6 +117,50 @@ require RUTA_INCLUDES . '/cabecera.php';
         <?php endif; ?>
 
 
+        <?php
+        /*
+         * Lo de casa, ARRIBA y aparte.
+         *
+         * Quien abre esto en casa suele ser el niño con su familia al
+         * lado, y lo que buscan es «qué dejó la profe para hoy». Enterrado
+         * en la lista de clase, la familia tendría que saber cuál de las
+         * veinte es la tarea.
+         */
+        $deCasa     = array_values(array_filter($pasos, static fn($p) => !empty($p['para_casa'])));
+        $casaFalta  = array_values(array_filter($deCasa, static fn($p) => empty($p['completa'])));
+        ?>
+        <?php if ($deCasa): ?>
+            <section class="ruta-casa" aria-labelledby="titulo-casa">
+                <h2 id="titulo-casa">🏠 Para hacer en casa</h2>
+
+                <?php if (!$casaFalta): ?>
+                    <p class="ruta-casa-listo">¡Hiciste todas las tareas de casa! ⭐</p>
+                <?php else: ?>
+                    <ul>
+                        <?php foreach ($casaFalta as $p): ?>
+                            <li>
+                                <span class="ruta-casa-nombre">
+                                    <?= e($p['icon'] ?? '') ?> <?= e($p['title']) ?>
+                                    <small>
+                                        <?= (int) $p['hechas'] ?> de <?= (int) $p['total'] ?> partes
+                                        <?php if (!empty($p['due_date'])): ?>
+                                            · para el <?= e(fechaLarga($p['due_date'])) ?>
+                                        <?php endif; ?>
+                                    </small>
+                                </span>
+                                <?php if ((int) $p['total'] > 0): ?>
+                                    <a class="btn btn-principal btn-chico"
+                                       href="<?= e(url('actividades/jugar.php?a=' . urlencode($p['slug']))) ?>">
+                                        ▶ Jugar
+                                    </a>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </section>
+        <?php endif; ?>
+
         <?php if (!$pasos): ?>
 
             <div class="ruta-final">
@@ -145,6 +189,9 @@ require RUTA_INCLUDES . '/cabecera.php';
                         <div>
                             <h2>
                                 <?= e($p['icon'] ?? '') ?> <?= e($p['title']) ?>
+                                <?php if (!empty($p['para_casa'])): ?>
+                                    <span class="ruta-etiqueta-casa">🏠 Para casa</span>
+                                <?php endif; ?>
                             </h2>
 
                             <p class="ruta-meta">

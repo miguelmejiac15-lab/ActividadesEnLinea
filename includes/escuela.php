@@ -726,8 +726,12 @@ function retirarEstudiante(int $cursoId, int $usuarioId): void
 /** Actividades asignadas a un curso, con cuántos las terminaron. */
 function actividadesDelCurso(int $cursoId): array
 {
+    // Sin la migración de tareas para casa, todo es de clase.
+    $casa = function_exists('casaInstalada') && casaInstalada() ? 'ca.para_casa' : '0';
+
     return traerTodo(
         'SELECT ca.id AS asignacion_id, ca.due_date, ca.sort_order, ca.assigned_at,
+                ' . $casa . ' AS para_casa,
                 a.id, a.slug, a.title, a.icon, a.duration_minutes,
                 c.name AS categoria, c.icon AS categoria_icon,
                 (SELECT COUNT(*) FROM activity_stations s WHERE s.activity_id = a.id) AS estaciones,

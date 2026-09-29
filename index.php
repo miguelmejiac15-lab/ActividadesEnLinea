@@ -32,10 +32,25 @@ $totalEstaciones = (int) traerValor(
       WHERE a.status = "published"'
 );
 
-$titulo      = 'Actividades en Línea · Aprender también puede ser una aventura';
-$descripcion = 'Explora actividades interactivas, retos y experiencias diseñadas para aprender haciendo. '
-             . $total . ' actividades listas para usar, y creciendo.';
+/*
+ * El título y la descripción dicen lo que alguien escribe en Google:
+ * «actividades para niños de primaria», «juegos educativos». La marca va
+ * al final, que es donde el buscador la espera y la corta si no cabe.
+ */
+$titulo      = 'Actividades educativas para niños de primaria | Actividades en Línea';
+$descripcion = 'Más de ' . (int) (floor($total / 100) * 100) . ' actividades interactivas y juegos educativos '
+             . 'para niños de 3 a 12 años: lectura, matemática, ciencias, inglés y más. '
+             . 'Pruébalo gratis.';
 $seccionActiva = 'inicio';
+
+$faq      = preguntasFrecuentes($total);
+$canonica = url('');
+$jsonLd   = [
+    esquemaOrganizacion(),
+    esquemaSitio(),
+    esquemaPlataforma($total),
+    esquemaFaq($faq),
+];
 
 require RUTA_INCLUDES . '/cabecera.php';
 ?>
@@ -298,6 +313,38 @@ $materiasEnPalabras = $nombresNumero[$cuantasMaterias] ?? (string) $cuantasMater
         <p style="text-align:center;margin-top:24px;font-size:.92rem;color:var(--texto-tenue)">
             ¿Dudas? <a href="<?= e(url('planes/')) ?>" style="color:var(--azul);font-weight:600">Mira el detalle de cada plan</a>
         </p>
+
+    </div>
+</section>
+
+
+<?php
+/*
+ * ═══ 6. PREGUNTAS FRECUENTES ═══════════════════════════════════════
+ *
+ * Plegadas con `<details>`: no alargan la portada para quien no las
+ * necesita, funcionan sin JavaScript y con teclado. Son las mismas que
+ * van en el JSON-LD `FAQPage` de arriba (salen de la misma función), y
+ * tienen que verse en la página: marcar preguntas que el visitante no ve
+ * es lo que los buscadores castigan.
+ */
+?>
+<section class="seccion" id="preguntas">
+    <div class="contenedor">
+
+        <div class="titulo-seccion">
+            <small>Preguntas frecuentes</small>
+            <h2>Lo que más nos preguntan</h2>
+        </div>
+
+        <div class="faq">
+            <?php foreach ($faq as $f): ?>
+                <details class="faq-item">
+                    <summary><?= e($f['p']) ?></summary>
+                    <p><?= e($f['r']) ?></p>
+                </details>
+            <?php endforeach; ?>
+        </div>
 
     </div>
 </section>

@@ -2018,3 +2018,37 @@ a.etiqueta:hover { color: var(--azul); border-color: var(--azul); }
         scroll-behavior: auto !important;
     }
 }
+
+
+/* ── Preguntas frecuentes de la portada ───────────────────────────────
+   `<details>` nativo: se abre con clic o teclado y no necesita script. */
+.faq {
+    max-width: 760px;
+    margin: 0 auto;
+    display: grid;
+    gap: 10px;
+}
+.faq-item {
+    background: var(--blanco);
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-medio);
+    padding: 0 20px;
+}
+.faq-item summary {
+    cursor: pointer;
+    padding: 16px 0;
+    font-weight: 600;
+    color: var(--oscuro);
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: '+'; color: var(--azul); font-weight: 700; }
+.faq-item[open] summary::after { content: '−'; }
+.faq-item p {
+    margin: 0 0 16px;
+    color: var(--texto);
+    line-height: 1.6;
+}

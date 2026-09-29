@@ -190,6 +190,7 @@ require_once RUTA_INCLUDES . '/funciones.php';
 require_once RUTA_INCLUDES . '/auth.php';
 require_once RUTA_INCLUDES . '/acceso.php';
 require_once RUTA_INCLUDES . '/catalogo.php';
+require_once RUTA_INCLUDES . '/seo.php';
 require_once RUTA_INCLUDES . '/gamificacion.php';
 require_once RUTA_INCLUDES . '/correo.php';
 require_once RUTA_INCLUDES . '/analitica.php';

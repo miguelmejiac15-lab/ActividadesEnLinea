@@ -83,8 +83,41 @@ $relacionadas = actividadesRelacionadas($actividad, 4);
 $completo   = tieneCatalogoCompleto();
 $usuario    = usuarioActual();
 
-$titulo      = $actividad['title'] . ' · Actividades en Línea';
-$descripcion = $actividad['description'] ?? '';
+/*
+ * Título y descripción con lo que se busca: la materia y la edad. «Letra M
+ * · Actividades en Línea» no le dice a Google para quién es; «para
+ * Preescolar (3-5 años)» sí.
+ */
+$paraQuien = !empty($actividad['nivel'])
+    ? $actividad['nivel'] . (isset($actividad['min_age'], $actividad['max_age'])
+        ? ' (' . (int) $actividad['min_age'] . '-' . (int) $actividad['max_age'] . ' años)' : '')
+    : '';
+
+$titulo = $actividad['title']
+        . (!empty($actividad['categoria']) ? ' · ' . $actividad['categoria'] : '')
+        . ' | Actividades en Línea';
+
+$descripcion = trim(
+    rtrim((string) ($actividad['description'] ?? ''), '. ') . '. '
+    . 'Actividad interactiva' . ($paraQuien !== '' ? ' para ' . $paraQuien : '')
+    . ' con ' . count($estaciones) . ' estaciones de ejercicios y audio. Pruébala gratis.'
+);
+
+$canonica = url('actividades/ver.php?a=' . urlencode((string) $actividad['slug']));
+
+$migas = [['nombre' => 'Inicio', 'url' => url('')],
+          ['nombre' => 'Actividades', 'url' => url('actividades/')]];
+if (!empty($actividad['categoria_slug'])) {
+    $migas[] = ['nombre' => $actividad['categoria'],
+                'url'    => url('actividades/?categoria=' . urlencode((string) $actividad['categoria_slug']))];
+}
+$migas[] = ['nombre' => $actividad['title'], 'url' => $canonica];
+
+$jsonLd = [
+    esquemaRecursoAprendizaje($actividad, count($estaciones)),
+    esquemaMigas($migas),
+];
+
 $seccionActiva = 'actividades';
 
 require RUTA_INCLUDES . '/cabecera.php';

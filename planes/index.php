@@ -15,9 +15,10 @@ $usuario  = usuarioActual();
 $completo = tieneCatalogoCompleto();
 $actual   = planActual();
 
-$titulo      = 'Planes y precios · Actividades en Línea';
-$descripcion = 'Empieza gratis o desbloquea toda la biblioteca. Si eres una institución, lleva las actividades a otro nivel.';
+$titulo      = 'Planes: gratis, Biblioteca Completa y Licencia Escuela | Actividades en Línea';
+$descripcion = 'Empieza gratis con todas las actividades, desbloquea la Biblioteca Completa para tu familia o lleva la plataforma a tu colegio con la Licencia Escuela. Sin permanencia.';
 $seccionActiva = 'planes';
+$canonica    = url('planes/');
 
 require RUTA_INCLUDES . '/cabecera.php';
 ?>

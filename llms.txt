@@ -1,0 +1,39 @@
+# Actividades en Línea
+
+> Plataforma colombiana de actividades educativas interactivas para niños de 3 a 12 años (preescolar y primaria). Cada actividad combina una explicación, audio y ejercicios por estaciones, de lo más sencillo a lo más difícil. La usan familias, docentes y colegios. Más de 400 actividades y miles de ejercicios, en una biblioteca que sigue creciendo. Lema: «Pedagogía de avanzada, potenciada por tecnología».
+
+Datos clave:
+
+- Edades: preescolar (3-5 años), primero y segundo (6-7), tercero y cuarto (8-10), quinto y sexto (11-12).
+- Materias: lectoescritura (Aventura de las Letras), matemática, ciencias, ciencias sociales, inglés, artística, tecnología, pensamiento y lógica, valores y convivencia, vida y bienestar, juegos y retos, y Aprender sin Barreras (actividades con apoyos, desde el Diseño Universal para el Aprendizaje).
+- Tipos de ejercicio: explicación y comprensión, escuchar y decidir, selección, identificar imágenes, relacionar, completar, ordenar, armar palabras con sílabas, escribir con el teclado, ortografía, cálculo, memoria, sopa de letras, crucigramas, laberintos de programación y cuentos con preguntas.
+- Accesibilidad: todo texto se puede escuchar; en preescolar la voz lee sola las instrucciones y opciones.
+- Funciona en computador, tableta o celular con navegador; no hay que instalar nada.
+- Planes: Gratis (todas las actividades, la primera parte de cada una), Biblioteca Completa (todo el catálogo para una cuenta) y Licencia Escuela (colegios: cursos, estudiantes, asignación de actividades en orden, tareas para la casa, progreso y resumen a las familias).
+- Privacidad: las cuentas de menores de 14 años requieren el correo de un adulto responsable; no hay publicidad; no se guardan datos de tarjetas.
+
+## Páginas principales
+
+- [Inicio y preguntas frecuentes](https://actividadesenlinea.com/): qué es, para quién, cómo funciona y cuánto cuesta.
+- [Catálogo de actividades](https://actividadesenlinea.com/actividades/): todas las actividades por materia, bloque, edad y habilidad.
+- [Apoyos para aprender](https://actividadesenlinea.com/actividades/apoyos.php): guía para familias y docentes sobre actividades con apoyos (TDAH, autismo y otras formas de aprender).
+- [Planes y precios](https://actividadesenlinea.com/planes/): plan gratis, Biblioteca Completa y Licencia Escuela.
+
+## Materias
+
+- [Aventura de las Letras](https://actividadesenlinea.com/actividades/?categoria=letras): lectoescritura, vocales, consonantes, sílabas, ortografía y comprensión lectora.
+- [Matemática](https://actividadesenlinea.com/actividades/?categoria=matematica)
+- [Ciencias](https://actividadesenlinea.com/actividades/?categoria=ciencias)
+- [Ciencias Sociales](https://actividadesenlinea.com/actividades/?categoria=sociales)
+- [Idiomas (inglés)](https://actividadesenlinea.com/actividades/?categoria=idiomas)
+- [Artística](https://actividadesenlinea.com/actividades/?categoria=artistica)
+- [Tecnología](https://actividadesenlinea.com/actividades/?categoria=tecnologia)
+- [Pensamiento y Lógica](https://actividadesenlinea.com/actividades/?categoria=pensamiento)
+- [Valores y Convivencia](https://actividadesenlinea.com/actividades/?categoria=valores)
+- [Vida y Bienestar](https://actividadesenlinea.com/actividades/?categoria=bienestar)
+- [Juegos y Retos](https://actividadesenlinea.com/actividades/?categoria=juegos)
+- [Aprender sin Barreras](https://actividadesenlinea.com/actividades/?categoria=dua)
+
+## Opcional
+
+- [Mapa del sitio](https://actividadesenlinea.com/sitemap.xml): la ficha pública de cada actividad publicada.

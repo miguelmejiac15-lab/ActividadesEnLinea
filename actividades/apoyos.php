@@ -160,7 +160,9 @@ foreach ($conteos as $t) {
     $totalApoyos += (int) $t['total'];
 }
 
-$titulo        = 'Apoyos para aprender';
+$titulo        = 'Apoyos para aprender: actividades inclusivas (DUA) | Actividades en Línea';
+$descripcion   = 'Guía para familias y docentes: actividades con apoyos visuales, audio y pasos cortos para niños con TDAH, autismo y otras formas de aprender, desde el Diseño Universal para el Aprendizaje (DUA).';
+$canonica      = url('actividades/apoyos.php');
 $seccionActiva = 'actividades';
 require RUTA_INCLUDES . '/cabecera.php';
 ?>

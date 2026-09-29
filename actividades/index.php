@@ -165,10 +165,32 @@ function urlFiltro(array $cambios): string
     return url('actividades/') . ($nuevos ? '?' . http_build_query($nuevos) : '');
 }
 
-$titulo = $categoriaActual
-    ? $categoriaActual['name'] . ' · Actividades en Línea'
-    : 'Explorar actividades · Actividades en Línea';
-$descripcion   = 'Busca y filtra entre ' . totalActividades() . ' actividades interactivas por categoría, edad y tipo de acceso.';
+/*
+ * Una materia es una página que se busca por sí sola («actividades de
+ * matemática para niños»), así que lleva su propio título y descripción.
+ */
+if ($categoriaActual) {
+    $titulo      = $categoriaActual['name'] . ': actividades para niños de primaria | Actividades en Línea';
+    $descripcion = 'Actividades interactivas de ' . $categoriaActual['name']
+                 . (!empty($categoriaActual['tagline']) ? ' · ' . rtrim((string) $categoriaActual['tagline'], '.') : '')
+                 . '. De 3 a 12 años, con audio y ejercicios. Pruébalas gratis.';
+} else {
+    $titulo      = 'Juegos y actividades educativas para niños de 3 a 12 años | Actividades en Línea';
+    $descripcion = 'Explora más de ' . (int) (floor(totalActividades() / 100) * 100) . ' actividades interactivas '
+                 . 'por materia, edad y habilidad: lectura, matemática, ciencias, inglés y más. Pruébalas gratis.';
+}
+
+/*
+ * La canónica: el catálogo o la materia, nunca una combinación de
+ * filtros. Solo la categoría sola cuenta como página propia; con
+ * cualquier otro filtro, búsqueda u orden la canónica es la de la
+ * materia (o la del catálogo), para no repartir el valor entre cientos
+ * de variantes casi iguales.
+ */
+$canonica = url('actividades/') . ($categoriaActual
+    ? '?categoria=' . urlencode((string) $categoriaActual['slug'])
+    : '');
+
 $seccionActiva = 'actividades';
 
 require RUTA_INCLUDES . '/cabecera.php';

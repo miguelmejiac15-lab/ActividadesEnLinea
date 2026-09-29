@@ -66,6 +66,7 @@ echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">', "\n";
 echo urlDelMapa('', null, 'weekly', '1.0');
 echo urlDelMapa('actividades/', null, 'daily', '0.9');
 echo urlDelMapa('planes/', null, 'monthly', '0.8');
+echo urlDelMapa('actividades/apoyos.php', null, 'monthly', '0.7');
 
 // ── Las categorías ───────────────────────────────────────────────────
 foreach (traerTodo('SELECT slug FROM categories WHERE is_active = 1 ORDER BY sort_order') as $c) {

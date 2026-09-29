@@ -8,6 +8,8 @@
  *   $seccionActiva · 'inicio' | 'actividades' | 'planes' | 'cuenta'
  *   $hojasExtra    · hojas de estilo solo para esta página
  *                    (ej. ['assets/css/pago.css'])
+ *   $canonica      · la URL canónica, si la página es pública e indexable
+ *   $jsonLd        · lista de esquemas schema.org (ver includes/seo.php)
  *
  * El menú móvil funciona con una casilla oculta y CSS, sin JavaScript:
  * así la navegación nunca depende de que un script cargue bien.
@@ -21,6 +23,8 @@ $titulo        = $titulo        ?? ajuste('sitio_nombre', 'Actividades en Línea
 $descripcion   = $descripcion   ?? 'Una biblioteca creciente de experiencias de aprendizaje interactivo listas para usar.';
 $seccionActiva = $seccionActiva ?? '';
 $hojasExtra    = $hojasExtra    ?? [];
+$canonica      = $canonica      ?? null;
+$jsonLd        = $jsonLd        ?? [];
 
 $usuario = usuarioActual();
 ?>
@@ -31,6 +35,23 @@ $usuario = usuarioActual();
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?= e($titulo) ?></title>
 <meta name="description" content="<?= e($descripcion) ?>">
+<?php /*
+ * Canónica, Open Graph y datos estructurados: solo en las páginas que
+ * los piden (las públicas). Ver includes/seo.php.
+ */ ?>
+<?php if ($canonica): ?>
+<link rel="canonical" href="<?= e($canonica) ?>">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="<?= e(seoSitio()) ?>">
+<meta property="og:locale" content="es_CO">
+<meta property="og:title" content="<?= e($titulo) ?>">
+<meta property="og:description" content="<?= e($descripcion) ?>">
+<meta property="og:url" content="<?= e($canonica) ?>">
+<meta name="twitter:card" content="summary">
+<?php endif; ?>
+<?php foreach ($jsonLd as $esquema): ?>
+<?= jsonLd($esquema) ?>
+<?php endforeach; ?>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">

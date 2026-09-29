@@ -185,11 +185,17 @@ jobs:
           # `-w` para capturar el código HTTP: curl devuelve 0 aunque el
           # servidor conteste 401, así que sin esto un token caducado
           # daría un despliegue «correcto» que nunca ocurrió.
+          #
+          # El uuid va en el CUERPO JSON, no en la URL: Coolify 4.3.23 pasó
+          # este endpoint de GET a POST y es la forma que acepta
+          # (comprobado a mano el 2026-09-29).
           codigo=$(curl -sS -o /tmp/respuesta -w '%{http_code}' \
             --max-time 60 \
             -X POST \
             -H "Authorization: Bearer ${COOLIFY_TOKEN}" \
-            "${COOLIFY_URL}/api/v1/deploy?uuid=${APP_UUID}&force=false")
+            -H "Content-Type: application/json" \
+            -d "{\"uuid\":\"${APP_UUID}\",\"force\":false}" \
+            "${COOLIFY_URL%/}/api/v1/deploy")
 
           echo "Coolify respondió $codigo"
           cat /tmp/respuesta || true

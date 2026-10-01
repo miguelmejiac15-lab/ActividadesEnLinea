@@ -197,6 +197,10 @@ require_once RUTA_INCLUDES . '/correo.php';
 require_once RUTA_INCLUDES . '/analitica.php';
 require_once RUTA_INCLUDES . '/recuperacion.php';
 
+// Registro a prueba de robots, correo verificado y entrar con Google.
+require_once RUTA_INCLUDES . '/acceso-seguro.php';
+require_once RUTA_INCLUDES . '/google.php';
+
 // El adaptador va ANTES que `pagos.php`: `pasarelaActiva()` pregunta si
 // Mercado Pago está configurado, así que sus funciones tienen que existir.
 require_once RUTA_INCLUDES . '/pasarela-mercadopago.php';

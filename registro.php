@@ -51,7 +51,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $v['birth_year']     = post('birth_year');
     $v['guardian_email'] = post('guardian_email');
 
-    $r = registrarUsuario(
+    /*
+     * Primero, que sea una persona (ver includes/acceso-seguro.php).
+     * Un robot detectado recibe un mensaje genérico: decirle por qué lo
+     * pillamos le enseñaría a esquivarlo.
+     */
+    $robot     = motivoRobot();
+    $frenado   = registroFrenado();
+    $respondio = respuestaCorrecta((string) post('comprobacion'));
+
+    anotarIntento('registro', ipCliente(), false);
+
+    if ($frenado) {
+        $errores['general'] = 'Se han creado demasiadas cuentas desde esta conexión. Inténtalo más tarde.';
+    } elseif ($robot !== null) {
+        error_log('[registro] envío bloqueado: ' . $robot);
+        $errores['general'] = 'No pudimos procesar el formulario. Recarga la página e inténtalo otra vez.';
+    } elseif (!$respondio) {
+        $errores['comprobacion'] = 'La respuesta a la pregunta de comprobación no es correcta. Responde la nueva.';
+    }
+
+    $r = $errores ? ['ok' => false, 'errores' => $errores] : registrarUsuario(
         $v['name'],
         $v['email'],
         (string) ($_POST['password'] ?? ''),
@@ -60,6 +80,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
 
     if ($r['ok']) {
+        anotarIntento('registro', ipCliente(), true);
+
+        /*
+         * El enlace de confirmación sale si hay correo saliente. Si además
+         * se exige, la cuenta no entra hasta confirmarlo; si no, entra ya
+         * y el enlace queda para confirmar cuando quiera.
+         */
+        $enviado = enviarVerificacion((int) $r['usuario_id']);
+
+        if (exigeCorreoVerificado()) {
+            mensaje('ok', $enviado
+                ? 'Tu cuenta está creada. Te enviamos un enlace a ' . correoValido($v['email'])
+                  . ': ábrelo para confirmar tu correo y entrar.'
+                : 'Tu cuenta está creada, pero no pudimos enviarte el enlace. Pide uno nuevo aquí.');
+            redirigir('verificar.php');
+        }
+
         // Se inicia sesión de una vez: una cuenta nueva no debería
         // obligar a escribir la contraseña dos veces seguidas.
         iniciarSesion($v['email'], (string) ($_POST['password'] ?? ''));
@@ -123,8 +160,18 @@ require RUTA_INCLUDES . '/cabecera-simple.php';
     </div>
 <?php endif; ?>
 
+<?php if (googleConfigurado()): ?>
+    <?php /* La vía preferida: Google ya verificó el correo y no hay robot
+             que pase por ahí. Va primero y es el botón más grande. */ ?>
+    <a class="btn-google" href="<?= e(url('entrar-google.php' . ($planCompra ? '?comprar=' . urlencode((string) $planCompra['slug']) : ''))) ?>">
+        <span class="btn-google-g" aria-hidden="true">G</span> Crear cuenta con Google
+    </a>
+    <p class="separador-o"><span>o con tu correo</span></p>
+<?php endif; ?>
+
 <form method="post" autocomplete="on">
     <?= campoCsrf() ?>
+    <?= camposAntiRobot() ?>
 
     <label for="name">Nombre</label>
     <input id="name" name="name" class="<?= isset($errores['name']) ? 'campo-error' : '' ?>"
@@ -158,6 +205,13 @@ require RUTA_INCLUDES . '/cabecera-simple.php';
         Solo pedimos el año, no la fecha completa. Si la cuenta es de un menor de 14 años,
         necesitamos el correo de un adulto responsable.
     </p>
+
+    <?php /* Una pregunta nueva en cada carga: cada una vale un intento. */ ?>
+    <label for="comprobacion">Comprobación: <?= e(nuevaPregunta()) ?></label>
+    <input id="comprobacion" name="comprobacion" inputmode="numeric" autocomplete="off" required
+           maxlength="12" class="<?= isset($errores['comprobacion']) ? 'campo-error' : '' ?>"
+           placeholder="Escribe el resultado en número">
+    <p class="pista">Es para comprobar que eres una persona y no un programa.</p>
 
     <button type="submit"><?= $planCompra ? 'Crear cuenta y seguir al pago' : 'Crear mi cuenta' ?></button>
 </form>

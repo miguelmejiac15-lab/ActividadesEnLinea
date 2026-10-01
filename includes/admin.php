@@ -631,7 +631,8 @@ function crearUsuarioComoAdmin(array $d): array
         (string) ($d['email'] ?? ''),
         (string) ($d['password'] ?? ''),
         ($d['guardian_email'] ?? '') !== '' ? (string) $d['guardian_email'] : null,
-        ($d['birth_year'] ?? '') !== '' ? (int) $d['birth_year'] : null
+        ($d['birth_year'] ?? '') !== '' ? (int) $d['birth_year'] : null,
+        false
     );
 
     if (!$r['ok']) {
@@ -639,6 +640,11 @@ function crearUsuarioComoAdmin(array $d): array
     }
 
     $id = (int) $r['usuario_id'];
+
+    // La crea un administrador que sabe de quién es: no hace falta confirmar.
+    if (function_exists('marcarCorreoVerificado')) {
+        marcarCorreoVerificado($id);
+    }
 
     $rol = (string) ($d['role'] ?? 'user');
     if ($rol !== 'user') {

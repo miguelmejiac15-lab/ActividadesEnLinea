@@ -34,6 +34,9 @@ Disallow: /logout.php
 Disallow: /registro.php
 Disallow: /olvide.php
 Disallow: /restablecer.php
+Disallow: /verificar.php
+Disallow: /entrar-google.php
+Disallow: /google-volver.php
 Disallow: /estado.php
 Disallow: /planes/pagar.php
 Disallow: /planes/retorno.php

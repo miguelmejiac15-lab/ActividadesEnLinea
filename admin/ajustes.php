@@ -20,14 +20,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $permitidas = [
         'sitio_nombre', 'sitio_testigo', 'catalogo_modo_global',
         'estaciones_libres_def', 'nuevas_actividades_dias', 'plan_recomendado',
-        'exigir_cuenta_para_jugar',
+        'exigir_cuenta_para_jugar', 'exigir_correo_verificado',
         'ga_medicion_id', 'gsc_verificacion',
     ];
 
     foreach ($permitidas as $clave) {
         // Las casillas de verificación no se envían cuando están
         // desmarcadas: si no llega, es que se apagó.
-        if ($clave === 'exigir_cuenta_para_jugar') {
+        if (in_array($clave, ['exigir_cuenta_para_jugar', 'exigir_correo_verificado'], true)) {
             guardarAjuste($clave, empty($_POST[$clave]) ? '0' : '1');
             continue;
         }
@@ -173,6 +173,26 @@ require __DIR__ . '/includes/cabecera-admin.php';
                             Sin cuenta no hay dónde guardar el progreso, así que el niño
                             repetiría estaciones y perdería sus estrellas al cerrar el navegador.
                             Desactívalo solo para una demostración.
+                        </span>
+                    </span>
+                </label>
+            </div>
+
+            <div class="campo">
+                <label class="opcion-acceso">
+                    <input type="checkbox" name="exigir_correo_verificado" value="1"
+                           <?= ajuste('exigir_correo_verificado', '0') === '1' ? 'checked' : '' ?>>
+                    <span>
+                        <b>✉️ Exigir que las cuentas nuevas confirmen su correo</b>
+                        <span>
+                            Al crear una cuenta llega un enlace al correo, y no se puede entrar hasta
+                            abrirlo. Solo afecta a cuentas de familia nuevas: las de colegio, las
+                            creadas desde el panel y las que entran con Google ya están verificadas.
+                            <?php if (!correoConfigurado()): ?>
+                                <br><b style="color:var(--rojo)">Ahora mismo no tiene efecto: el sitio no tiene
+                                correo saliente configurado</b> (Panel → Correo). Encenderlo sin poder enviar
+                                el enlace dejaría a cada cuenta nueva fuera.
+                            <?php endif; ?>
                         </span>
                     </span>
                 </label>

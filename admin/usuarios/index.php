@@ -128,8 +128,25 @@ if (in_array($fEstado, ['active', 'inactive', 'pending'], true)) {
     $params[] = $fEstado;
 }
 
+/*
+ * Revisar cuentas dudosas. «Sin verificar» son las de familia creadas
+ * después de la verificación de correo que todavía no lo confirmaron.
+ * «Nunca entró» es la otra pista: una cuenta creada por un robot no
+ * vuelve. Las dos juntas casi siempre señalan una cuenta falsa.
+ */
+$conVerificacion = function_exists('accesoSeguroInstalado') && accesoSeguroInstalado();
+$fRevision = get('revision');
+
+if ($fRevision === 'sin_verificar' && $conVerificacion) {
+    $where[] = 'u.email_verified_at IS NULL AND u.role = "user"';
+}
+if ($fRevision === 'nunca_entro') {
+    $where[] = 'u.last_login_at IS NULL';
+}
+
 $usuarios = traerTodo(
     'SELECT u.id, u.name, u.email, u.role, u.status, u.created_at, u.last_login_at,
+            ' . ($conVerificacion ? 'u.email_verified_at, u.google_sub,' : 'u.created_at AS email_verified_at, NULL AS google_sub,') . '
             p.name AS plan, p.slug AS plan_slug, s.expires_at, s.billing_cycle
        FROM users u
   LEFT JOIN subscriptions s
@@ -354,6 +371,14 @@ $pestanas = [
             <option value="pending"  <?= $fEstado === 'pending'  ? 'selected' : '' ?>>Pendientes</option>
         </select>
 
+        <select name="revision" aria-label="Revisar cuentas dudosas">
+            <option value="">Sin filtro de revisión</option>
+            <?php if ($conVerificacion): ?>
+                <option value="sin_verificar" <?= $fRevision === 'sin_verificar' ? 'selected' : '' ?>>Correo sin verificar</option>
+            <?php endif; ?>
+            <option value="nunca_entro" <?= $fRevision === 'nunca_entro' ? 'selected' : '' ?>>Nunca volvió a entrar</option>
+        </select>
+
         <button class="btn-mini solido" type="submit">Filtrar</button>
         <a class="btn-mini" href="<?= e(url('admin/usuarios/')) ?>">Limpiar</a>
     </form>
@@ -378,6 +403,11 @@ $pestanas = [
                                     <span class="distintivo azul" style="margin-left:5px">tú</span>
                                 <?php endif; ?>
                                 <br><small style="color:var(--texto-tenue)"><?= e($u['email']) ?></small>
+                                <?php if (!empty($u['google_sub'])): ?>
+                                    <span class="distintivo azul" title="Entra con Google: el correo lo verificó Google">Google</span>
+                                <?php elseif ($u['email_verified_at'] === null && $u['role'] === 'user'): ?>
+                                    <span class="distintivo gris" title="No ha confirmado su correo">sin verificar</span>
+                                <?php endif; ?>
                             </td>
 
                             <td class="compacta">

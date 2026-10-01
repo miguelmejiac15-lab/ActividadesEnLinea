@@ -198,7 +198,8 @@ function exigirRol(string ...$roles): void
  *
  * @return array{ok:bool, errores:array, usuario_id:?int}
  */
-function registrarUsuario(string $nombre, string $correo, string $password, ?string $correoAcudiente = null, ?int $anioNacimiento = null): array
+function registrarUsuario(string $nombre, string $correo, string $password, ?string $correoAcudiente = null,
+                          ?int $anioNacimiento = null, bool $revisarCorreo = true): array
 {
     $errores = [];
 
@@ -208,8 +209,19 @@ function registrarUsuario(string $nombre, string $correo, string $password, ?str
     }
 
     $correoNormalizado = correoValido($correo);
+    /*
+     * `$revisarCorreo` en false solo desde el panel: un administrador puede
+     * dar de alta a una familia sin correo propio con una dirección interna.
+     */
+    $creible = $revisarCorreo && function_exists('correoCreible')
+        ? correoCreible($correo)
+        : ['ok' => true, 'error' => null];
+
     if ($correoNormalizado === null) {
         $errores['email'] = 'El correo no tiene un formato válido.';
+    } elseif (!$creible['ok']) {
+        // Erratas («gmail.con»), correos desechables y dominios que no existen.
+        $errores['email'] = (string) $creible['error'];
     } elseif (traerValor('SELECT 1 FROM users WHERE email = ?', [$correoNormalizado])) {
         $errores['email'] = 'Ya existe una cuenta con este correo.';
     }
@@ -229,6 +241,14 @@ function registrarUsuario(string $nombre, string $correo, string $password, ?str
             if ($acudiente === null) {
                 $errores['guardian_email'] = 'Para cuentas de menores de 14 años se necesita el correo de un adulto responsable.';
             }
+        }
+    }
+
+    // El del adulto también tiene que ser creíble: es el que responde por el menor.
+    if ($revisarCorreo && !isset($errores['guardian_email']) && $correoAcudiente && function_exists('correoCreible')) {
+        $c = correoCreible($correoAcudiente);
+        if (!$c['ok']) {
+            $errores['guardian_email'] = (string) $c['error'];
         }
     }
 
@@ -310,17 +330,44 @@ function iniciarSesion(string $correo, string $password): array
         return ['ok' => false, 'error' => $generico];
     }
 
+    /*
+     * Freno a quien prueba contraseñas: cinco fallos con el mismo correo
+     * en quince minutos, o treinta desde la misma conexión. Se comprueba
+     * ANTES de mirar la contraseña, para que seguir probando no sirva de
+     * nada mientras dura el freno.
+     */
+    if (function_exists('ingresoFrenado') && ingresoFrenado($correoNormalizado)) {
+        return ['ok' => false, 'error' => 'Demasiados intentos. Espera unos 15 minutos y vuelve a probar, '
+                                        . 'o recupera tu contraseña.'];
+    }
+
     $usuario = traerUno(
-        'SELECT id, password, status FROM users WHERE email = ?',
+        'SELECT id, password, status, role FROM users WHERE email = ?',
         [$correoNormalizado]
     );
 
     if (!$usuario || !password_verify($password, $usuario['password'])) {
+        if (function_exists('anotarIntento')) {
+            anotarIntento('ingreso', $correoNormalizado, false);
+            anotarIntento('ingreso', ipCliente(), false);
+        }
         return ['ok' => false, 'error' => $generico];
     }
 
     if ($usuario['status'] !== 'active') {
         return ['ok' => false, 'error' => 'Esta cuenta está desactivada. Escríbenos para reactivarla.'];
+    }
+
+    /*
+     * Correo sin confirmar. Solo cuentas de familia: las de colegio las
+     * crea un docente con correos internos que nadie puede abrir. Y solo
+     * si el sitio puede enviar el enlace (ver exigeCorreoVerificado()).
+     */
+    if (function_exists('exigeCorreoVerificado') && exigeCorreoVerificado()
+        && $usuario['role'] === 'user' && !correoVerificado((int) $usuario['id'])) {
+        return ['ok' => false, 'error' => 'Confirma tu correo para entrar: te enviamos un enlace. '
+                                        . 'Si no te llegó, pide otro en «Confirma tu correo».',
+                'sin_verificar' => true];
     }
 
     // Si el algoritmo por defecto de PHP cambió (o subió el coste),

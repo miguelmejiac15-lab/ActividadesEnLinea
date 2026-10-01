@@ -87,7 +87,19 @@ require RUTA_INCLUDES . '/cabecera-simple.php';
 <?php endif; ?>
 
 <?php if ($error): ?>
-    <div class="aviso mal"><?= e($error) ?></div>
+    <div class="aviso mal">
+        <?= e($error) ?>
+        <?php if (!empty($r['sin_verificar'])): ?>
+            <br><a href="<?= e(url('verificar.php')) ?>">Pedir un enlace nuevo</a>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
+
+<?php if (googleConfigurado()): ?>
+    <a class="btn-google" href="<?= e(url('entrar-google.php' . ($planCompra ? '?comprar=' . urlencode((string) $planCompra['slug']) : ''))) ?>">
+        <span class="btn-google-g" aria-hidden="true">G</span> Entrar con Google
+    </a>
+    <p class="separador-o"><span>o con tu correo</span></p>
 <?php endif; ?>
 
 <form method="post" autocomplete="on">

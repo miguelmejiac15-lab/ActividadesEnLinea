@@ -67,6 +67,20 @@ $titulo = $titulo ?? 'Actividades en Línea';
                           font-size:.7rem;font-weight:700;flex:none}
     .pasos-compra li.ahora{color:var(--oscuro);font-weight:600;border-top-color:var(--azul)}
     .pasos-compra li.ahora span{background:var(--azul)}
+
+    /* Entrar con Google: el botón con su «G», en blanco como pide Google. */
+    .btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+                padding:13px;border:2px solid var(--borde);border-radius:50px;background:#fff;
+                color:var(--oscuro);font-weight:600;text-decoration:none;font-size:.98rem}
+    .btn-google:hover{border-color:var(--azul)}
+    .btn-google-g{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;
+                  background:conic-gradient(#ea4335 0 25%,#fbbc05 0 50%,#34a853 0 75%,#4285f4 0);
+                  color:#fff;font-weight:700;font-size:.85rem}
+    .separador-o{display:flex;align-items:center;gap:10px;margin:18px 0;color:#8b95a5;font-size:.8rem}
+    .separador-o::before,.separador-o::after{content:'';flex:1;height:2px;background:var(--borde)}
+
+    /* La casilla trampa: fuera de la vista, pero existe para un robot. */
+    .campo-trampa{position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
 </style>
 <?= etiquetaAnalitica() ?>
 

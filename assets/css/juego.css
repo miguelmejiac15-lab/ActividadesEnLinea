@@ -615,6 +615,49 @@ body.sin-lectura .juego-boton {
 .intro-nota { min-height: 1.4em; font-weight: 600; text-align: center; }
 .intro-nota.bien { color: var(--verde); }
 .intro-nota.mal  { color: var(--naranja); }
+/* La introducción de los pequeños: letra grande, poco texto y lo que va
+   a hacer con un ícono por cosa, para quien todavía no lee. */
+.intro-breve-idea {
+    font-size: clamp(1.15rem, 2.6vw, 1.45rem);
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--oscuro);
+    text-align: center;
+    max-width: 560px;
+    margin: 0;
+}
+.intro-breve-idea strong { color: var(--azul); }
+.intro-breve-vas {
+    margin: 4px 0 0;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--texto-tenue);
+}
+.intro-breve-lista {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    max-width: 620px;
+}
+.intro-breve-lista li {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 14px;
+    border-radius: var(--radio-pildora);
+    background: var(--fondo-suave);
+    border: 2px solid var(--borde);
+    font-weight: 600;
+    color: var(--oscuro);
+}
+.intro-breve-ico { font-size: 1.25rem; line-height: 1; }
+
 .btn-enlace {
     background: none; border: 0; padding: 4px;
     color: var(--texto-tenue); font: inherit; font-size: .88rem; cursor: pointer;

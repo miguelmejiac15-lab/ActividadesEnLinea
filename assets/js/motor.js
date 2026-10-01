@@ -3257,7 +3257,75 @@
         const preguntas = intro.preguntas || [];
         const total = 1 + preguntas.length;
 
+        /*
+         * Los pequeños leen poco o nada: su introducción se lee en voz
+         * alta sola y con la voz lenta de preescolar. `sinLectura` se
+         * vuelve a fijar desde el servidor al abrir la primera estación,
+         * así que esto no se arrastra a nada más.
+         */
+        const breve = intro.modo === 'breve';
+        sinLectura = breve;
+        document.body.classList.toggle('sin-lectura', breve);
+
+        if (breve) return mostrarBreve();
+
         leer();
+
+        /*
+         * La introducción de los pequeños: el dibujo grande, una o dos
+         * frases y lo que va a hacer, con un ícono por cosa para quien
+         * todavía no lee. Sin preguntas: a esta edad lo que importa es
+         * entender qué toca, no demostrar que se entendió.
+         */
+        function mostrarBreve() {
+            limpiar();
+            marcarProgreso(0, 1);
+            titular(intro.titulo);
+
+            const c = panel('juego-centro');
+            if (intro.icono) c.appendChild(dibujo(intro.icono, 'juego-emoji grande'));
+
+            const idea = el('p', 'intro-breve-idea');
+            idea.innerHTML = conNegritas(intro.idea);
+            c.appendChild(idea);
+
+            const haras = intro.haras || [];
+            if (haras.length) {
+                c.appendChild(el('p', 'intro-breve-vas', 'Vas a:'));
+                const ul = el('ul', 'intro-breve-lista');
+                haras.forEach((h) => {
+                    const li = el('li');
+                    li.appendChild(el('span', 'intro-breve-ico', h.icono));
+                    li.appendChild(el('span', null, h.texto));
+                    ul.appendChild(li);
+                });
+                c.appendChild(ul);
+            }
+
+            const dicho = [String(intro.idea || '').replace(/\*\*/g, '')];
+            if (haras.length) {
+                dicho.push('Vas a: ' + haras.map((h) => h.texto).join(', ') + '.');
+            }
+
+            const acciones = el('div', 'juego-opciones');
+            const oir = el('button', 'btn btn-secundario juego-boton', '🔊 Escuchar');
+            oir.onclick = () => { callar(); hablarSeguido(dicho); };
+            acciones.appendChild(oir);
+
+            const ir = el('button', 'btn btn-principal juego-boton', '¡A jugar! →');
+            ir.onclick = () => { callar(); empezar(); };
+            acciones.appendChild(ir);
+            c.appendChild(acciones);
+
+            /*
+             * Se lee sola. Algunos navegadores no dejan hablar hasta que
+             * la persona toca algo en la página; entonces no suena, y
+             * para eso está el botón grande de escuchar.
+             */
+            // A la cola de la pantalla, detrás del título que ya apuntó
+            // `titular()`: así se oyen seguidos y no uno encima del otro.
+            dicho.forEach(decir);
+        }
 
         function leer() {
             limpiar();

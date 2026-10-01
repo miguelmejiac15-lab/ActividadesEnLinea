@@ -48,6 +48,98 @@ function intro(string $idea, array $claves, array $preguntas, ?string $ejemplo =
 }
 
 /**
+ * Una introducción BREVE, para los más pequeños (preescolar, primero y
+ * segundo).
+ *
+ * A los cuatro o seis años no hace falta una definición ni una prueba de
+ * comprensión: hace falta saber **de qué va esto y qué voy a hacer**.
+ * Una o dos frases muy cortas —«La vocal A es la primera letra. Su
+ * sonido es a»— y la lista de lo que hará, que se lee en voz alta sola.
+ *
+ * La lista «Vas a…» NO se escribe a mano: sale de las estaciones de la
+ * actividad (`queSeHaceEn()`). Así nunca promete un juego que no está, y
+ * si mañana se añade una estación aparece sola.
+ *
+ * @param string      $idea   Una o dos frases cortas. `**así**` resalta.
+ * @param string|null $dibujo Emoji grande; sin él, el ícono de la actividad.
+ */
+function breve(string $idea, ?string $dibujo = null): array
+{
+    return [
+        'modo'      => 'breve',
+        'idea'      => $idea,
+        'dibujo'    => $dibujo,
+        'claves'    => [],
+        'ejemplo'   => null,
+        'preguntas' => [],
+    ];
+}
+
+/**
+ * Lo que se hace en una actividad, dicho para un niño, a partir de sus
+ * estaciones. Sin repetir, en el orden en que aparecen, y el reto final
+ * siempre al final. Como mucho cinco: más no se recuerda.
+ *
+ * @param string[] $tipos game_type de cada estación, en orden
+ * @return array<int, array{icono:string, texto:string}>
+ */
+function queSeHaceEn(array $tipos): array
+{
+    static $como = [
+        'sonido_letra'       => ['👂', 'escuchar palabras'],
+        'pronunciacion'      => ['🗣️', 'repetir en voz alta'],
+        'seleccion_imagenes' => ['👆', 'tocar los dibujos correctos'],
+        'opcion_multiple'    => ['✅', 'elegir la respuesta'],
+        'juego_rapido'       => ['⚡', 'decir sí o no'],
+        'emparejar'          => ['🔗', 'unir parejas'],
+        'completar_palabra'  => ['✏️', 'completar palabras'],
+        'completar_texto'    => ['📝', 'completar frases'],
+        'puzle_silabas'      => ['🧩', 'armar palabras con sílabas'],
+        'armar_palabras'     => ['🔤', 'armar palabras letra por letra'],
+        'teclado'            => ['⌨️', 'escribir con el teclado'],
+        'ortografia'         => ['🔍', 'elegir cómo se escribe'],
+        'ordenar_secuencia'  => ['🔢', 'poner las cosas en orden'],
+        'operacion'          => ['🧮', 'contar y hacer cuentas'],
+        'secuencia_numerica' => ['➡️', 'completar series de números'],
+        'memoria'            => ['🃏', 'encontrar parejas escondidas'],
+        'sopa_letras'        => ['🔎', 'buscar palabras escondidas'],
+        'crucigrama'         => ['🧩', 'llenar un crucigrama'],
+        'cuento'             => ['📖', 'escuchar un cuento'],
+        'laberinto'          => ['🤖', 'guiar a un robot'],
+    ];
+
+    $vistos = [];
+    $lista  = [];
+    $reto   = false;
+
+    foreach ($tipos as $t) {
+        if ($t === 'desafio_final') {
+            $reto = true;
+            continue;
+        }
+        if (!isset($como[$t])) {
+            continue;
+        }
+
+        [$icono, $texto] = $como[$t];
+
+        if (isset($vistos[$texto])) {
+            continue;
+        }
+        $vistos[$texto] = true;
+        $lista[] = ['icono' => $icono, 'texto' => $texto];
+    }
+
+    $lista = array_slice($lista, 0, $reto ? 4 : 5);
+
+    if ($reto) {
+        $lista[] = ['icono' => '🏆', 'texto' => 'superar un reto final'];
+    }
+
+    return $lista;
+}
+
+/**
  * Completar: una frase con un hueco (`___`) y opciones para llenarlo.
  * La primera respuesta es la correcta; el motor las baraja.
  */
@@ -114,12 +206,30 @@ function introduccionDe(array $actividad): ?array
         ];
     }
 
+    $breve = ($i['modo'] ?? '') === 'breve';
+
     return [
+        'modo'      => $breve ? 'breve' : 'completa',
         'titulo'    => $actividad['title'] ?? '',
-        'icono'     => $actividad['icon'] ?? '',
+        'icono'     => ($breve ? ($i['dibujo'] ?? null) : null) ?: ($actividad['icon'] ?? ''),
         'idea'      => $i['idea'],
         'claves'    => $i['claves'],
         'ejemplo'   => $i['ejemplo'],
         'preguntas' => $preguntas,
+        // Lo que va a hacer, sacado de sus estaciones reales.
+        'haras'     => $breve ? queSeHaceEn(tiposDeEstaciones((int) ($actividad['id'] ?? 0))) : [],
     ];
+}
+
+/** Los tipos de minijuego de una actividad, en el orden de sus estaciones. */
+function tiposDeEstaciones(int $actividadId): array
+{
+    if ($actividadId <= 0 || !function_exists('traerTodo')) {
+        return [];
+    }
+
+    return array_column(traerTodo(
+        'SELECT game_type FROM activity_stations WHERE activity_id = ? ORDER BY position',
+        [$actividadId]
+    ), 'game_type');
 }

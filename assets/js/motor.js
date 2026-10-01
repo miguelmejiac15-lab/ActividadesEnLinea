@@ -1003,6 +1003,31 @@
         return el('span', c, v);
     }
 
+    /**
+     * Botón de opción con un dibujo pequeño delante del texto.
+     *
+     * Para el niño que no lee: «El elefante» y «El ratón» son dos botones
+     * iguales hasta que llevan 🐘 y 🐭. El dibujo lo decide el servidor
+     * (includes/dibujos-opciones.php), que sabe cuándo ayudaría y cuándo
+     * delataría la respuesta; aquí solo se pinta si viene.
+     *
+     * El dibujo es decorativo para el lector de pantalla: la palabra ya
+     * está escrita al lado.
+     */
+    function botonConDibujo(texto, dib) {
+        const b = el('button', 'btn btn-secundario juego-boton');
+
+        if (dib) {
+            const d = dibujo(dib, 'juego-boton-dibujo');
+            d.setAttribute('aria-hidden', 'true');
+            b.appendChild(d);
+            b.classList.add('con-dibujo');
+        }
+
+        b.appendChild(document.createTextNode(texto));
+        return b;
+    }
+
     /** Igual, pero devuelve el HTML para los sitios que usan innerHTML. */
     function dibujoHtml(valor, clase) {
         const v = String(valor == null ? '' : valor);
@@ -1928,7 +1953,7 @@
                     + (dibujos ? ' dibujos' : ''));
 
                 (it.opciones || []).forEach((o, k) => {
-                    const b = el('button', 'btn btn-secundario juego-boton', String(o));
+                    const b = botonConDibujo(String(o), (it.dibujos || [])[k]);
                     b.onclick = () => {
                         // Si el niño ya decidió, la voz sobra: dejarla
                         // hablando encima del acierto tapa el «¡Muy bien!».
@@ -2290,7 +2315,7 @@
                 estado.pista = () => descartarUnaMala(ops, q.a);
 
                 q.opts.forEach((o, k) => {
-                    const b = el('button', 'btn btn-secundario juego-boton', o);
+                    const b = botonConDibujo(String(o), (q.dibujos || [])[k]);
                     b.onclick = () => {
                         olvidarLoDicho();
 

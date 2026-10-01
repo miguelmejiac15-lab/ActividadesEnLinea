@@ -676,6 +676,20 @@ body.sin-lectura .juego-boton {
 .juego-opciones.vertical { flex-direction: column; width: 100%; max-width: 440px; }
 
 .juego-boton { min-width: 118px; }
+
+/* Opción con su dibujo pequeño delante: se reconoce sin leer. */
+.juego-boton.con-dibujo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.juego-boton-dibujo {
+    font-size: 1.6em;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.juego-boton-dibujo.juego-icono { width: 1.6em; height: 1.6em; }
 .juego-boton.acierto { background: var(--verde) !important; color: #fff !important; border-color: var(--verde) !important; }
 .juego-boton.error   { background: var(--rojo)  !important; color: #fff !important; border-color: var(--rojo)  !important; }
 

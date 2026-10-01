@@ -61,9 +61,10 @@ if (!$estacion) {
  */
 $actividad = traerUno(
     'SELECT a.id, a.slug, a.title, a.status, a.access_type, a.free_stations,
-            a.content, l.slug AS nivel
+            a.content, l.slug AS nivel, c.slug AS categoria
        FROM activities a
   LEFT JOIN levels l ON l.id = a.level_id
+  LEFT JOIN categories c ON c.id = a.category_id
       WHERE a.id = ?',
     [$estacion['activity_id']]
 );
@@ -94,6 +95,18 @@ if ($motivo !== null) {
 // A partir de aquí el acceso está confirmado.
 $config = json_decode($estacion['config'] ?? 'null', true);
 $comun  = json_decode($actividad['content'] ?? 'null', true);
+
+/*
+ * Un dibujo pequeño en cada opción, para los que todavía no leen. Ver
+ * includes/dibujos-opciones.php: solo donde ayuda a reconocer la opción
+ * sin delatar la respuesta. En inglés nunca: ahí la palabra extranjera ES
+ * lo que se practica, y el dibujo la traduciría.
+ */
+if (in_array($actividad['nivel'] ?? '', NIVELES_CON_DIBUJOS, true)
+    && ($actividad['categoria'] ?? '') !== 'idiomas'
+    && is_array($config) && array_key_exists('datos', $config)) {
+    $config['datos'] = ilustrarOpciones((string) $estacion['game_type'], $config['datos']);
+}
 
 // Progreso previo, si hay sesión.
 $progreso = null;

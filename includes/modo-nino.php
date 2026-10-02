@@ -262,17 +262,19 @@ function seleccionDeModoNino(?int $usuarioId = null): array
 
     return traerTodo(
         'SELECT a.id, a.slug, a.title, a.icon, a.access_type, a.free_stations,
-                c.name AS categoria, c.slug AS categoria_slug,
+                c.name AS categoria, c.slug AS categoria_slug, c.icon AS categoria_icono,
+                b.name AS bloque, b.slug AS bloque_slug, b.icon AS bloque_icono,
                 l.name AS nivel,
                 m.sort_order,
                 (SELECT COUNT(*) FROM activity_stations s
                   WHERE s.activity_id = a.id) AS estaciones
            FROM child_mode_activities m
            JOIN activities a ON a.id = m.activity_id AND a.status = "published"
-      LEFT JOIN categories c ON c.id = a.category_id
-      LEFT JOIN levels     l ON l.id = a.level_id
+      LEFT JOIN categories  c ON c.id = a.category_id
+      LEFT JOIN collections b ON b.id = a.collection_id
+      LEFT JOIN levels      l ON l.id = a.level_id
           WHERE m.user_id = ?
-       ORDER BY m.sort_order ASC, a.title ASC',
+       ORDER BY c.sort_order, b.sort_order, l.sort_order, a.title',
         [$usuarioId]
     );
 }
@@ -385,6 +387,43 @@ function agregarGrupoAlModoNino(int $usuarioId, string $tipo, string $slug): int
     }
 
     return $puestas;
+}
+
+
+/**
+ * Quita de golpe todo un bloque o una categoría de la selección.
+ *
+ * Es el reverso de `agregarGrupoAlModoNino()`: quien asignó «Bosque de
+ * Vocales» entero y se arrepiente no debería quitar catorce a mano.
+ */
+function quitarGrupoDelModoNino(int $usuarioId, string $tipo, string $slug): int
+{
+    if (!modoNinoInstalado() || $usuarioId <= 0) {
+        return 0;
+    }
+
+    $columna = match ($tipo) {
+        'bloque'    => 'b.slug',
+        'categoria' => 'c.slug',
+        default     => null,
+    };
+
+    if ($columna === null) {
+        return 0;
+    }
+
+    $quitadas = ejecutar(
+        "DELETE m FROM child_mode_activities m
+           JOIN activities a       ON a.id = m.activity_id
+      LEFT JOIN categories  c ON c.id = a.category_id
+      LEFT JOIN collections b ON b.id = a.collection_id
+          WHERE m.user_id = ? AND $columna = ?",
+        [$usuarioId, $slug]
+    );
+
+    olvidarModoNino();
+
+    return $quitadas;
 }
 
 

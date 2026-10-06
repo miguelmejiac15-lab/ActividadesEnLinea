@@ -1088,6 +1088,65 @@
         return linea;
     }
 
+    /**
+     * Dibuja lo que acompaña a una pregunta según su tipo.
+     *
+     * Lo comparten la opción múltiple y el desafío final: el desafío
+     * repite preguntas de las estaciones, y si solo supiera pintar emojis,
+     * «¿Este color es claro u oscuro?» llegaba sin el color.
+     */
+    function pintaVisual(contenedor, it) {
+        if (!it.visual || it.tipoVisual === 'ninguno') return;
+
+        if (it.tipoVisual === 'emoji') {
+            contenedor.appendChild(dibujo(it.visual));
+
+        } else if (it.tipoVisual === 'serie') {
+            contenedor.appendChild(serie(it.visual));
+
+        } else if (it.tipoVisual === 'grupos') {
+            // «¿Dónde hay más?»: cada grupo en su caja, con su nombre,
+            // para que «el primero» y «el segundo» se vean y no se adivinen.
+            const par = el('div', 'juego-grupos');
+            (it.visual || []).forEach((g, k) => {
+                const caja = el('div', 'juego-grupo');
+                caja.appendChild(el('span', 'juego-grupo-nombre', k === 0 ? 'Primero' : 'Segundo'));
+                caja.appendChild(serie(g));
+                par.appendChild(caja);
+            });
+            contenedor.appendChild(par);
+
+        } else if (it.tipoVisual === 'color') {
+            const m = el('div', 'juego-muestra');
+            m.style.background = it.visual;
+            contenedor.appendChild(m);
+
+        } else if (it.tipoVisual === 'dosColores') {
+            const par = el('div', 'juego-mezcla');
+            const a = el('div', 'juego-muestra'); a.style.background = it.visual.a;
+            const b = el('div', 'juego-muestra'); b.style.background = it.visual.b;
+            par.appendChild(a);
+            par.appendChild(el('span', 'juego-signo', '+'));
+            par.appendChild(b);
+            par.appendChild(el('span', 'juego-signo', '='));
+            par.appendChild(el('span', 'juego-signo', '?'));
+            contenedor.appendChild(par);
+
+        } else if (it.tipoVisual === 'lista') {
+            const l = el('div', 'juego-compra');
+            (it.visual || []).forEach((p) => {
+                const f = el('div', 'juego-compra-fila');
+                f.innerHTML = '<span>' + esc(p.e || '') + ' ' + esc(p.n || '') + '</span>' +
+                              '<b>$' + esc(p.p) + '</b>';
+                l.appendChild(f);
+            });
+            contenedor.appendChild(l);
+
+        } else {
+            contenedor.appendChild(el('div', 'juego-palabra', it.visual));
+        }
+    }
+
     /*
      * ─────────────────────────────────────────────────────────────────
      *  EL SONIDO DE LA LETRA, DICHO COMO LO DIRÍA UN DOCENTE
@@ -1909,47 +1968,6 @@
             const items = Array.isArray(datos) ? datos : [];
             let i = 0, aciertos = 0;
 
-            /** Dibuja el acompañamiento visual según su tipo. */
-            function pintaVisual(contenedor, it) {
-                if (!it.visual || it.tipoVisual === 'ninguno') return;
-
-                if (it.tipoVisual === 'emoji') {
-                    contenedor.appendChild(dibujo(it.visual));
-
-                } else if (it.tipoVisual === 'serie') {
-                    contenedor.appendChild(serie(it.visual));
-
-                } else if (it.tipoVisual === 'color') {
-                    const m = el('div', 'juego-muestra');
-                    m.style.background = it.visual;
-                    contenedor.appendChild(m);
-
-                } else if (it.tipoVisual === 'dosColores') {
-                    const par = el('div', 'juego-mezcla');
-                    const a = el('div', 'juego-muestra'); a.style.background = it.visual.a;
-                    const b = el('div', 'juego-muestra'); b.style.background = it.visual.b;
-                    par.appendChild(a);
-                    par.appendChild(el('span', 'juego-signo', '+'));
-                    par.appendChild(b);
-                    par.appendChild(el('span', 'juego-signo', '='));
-                    par.appendChild(el('span', 'juego-signo', '?'));
-                    contenedor.appendChild(par);
-
-                } else if (it.tipoVisual === 'lista') {
-                    const l = el('div', 'juego-compra');
-                    (it.visual || []).forEach((p) => {
-                        const f = el('div', 'juego-compra-fila');
-                        f.innerHTML = '<span>' + esc(p.e || '') + ' ' + esc(p.n || '') + '</span>' +
-                                      '<b>$' + esc(p.p) + '</b>';
-                        l.appendChild(f);
-                    });
-                    contenedor.appendChild(l);
-
-                } else {
-                    contenedor.appendChild(el('div', 'juego-palabra', it.visual));
-                }
-            }
-
             function pinta() {
                 limpiar();
                 if (i >= items.length) return fin(aciertos, items.length);
@@ -2332,10 +2350,15 @@
                 // El reto también ilustra. Antes no tenía dónde: era el
                 // único minijuego de preguntas sin dibujo, y en preescolar
                 // eso lo dejaba como un examen de lectura.
-                if (Array.isArray(q.serie)) c.appendChild(serie(q.serie));
+                if (q.tipoVisual) pintaVisual(c, q);
+                else if (Array.isArray(q.serie)) c.appendChild(serie(q.serie));
                 else if (q.e) c.appendChild(dibujo(q.e));
 
-                const ops = el('div', 'juego-opciones vertical');
+                // Opciones que son solo dibujos (🔴 🔵 🟢): grandes y en
+                // fila, como en la estación. Apiladas a tamaño de letra
+                // eran puntitos.
+                const ops = el('div', 'juego-opciones'
+                    + (todoDibujos(q.opts || []) ? ' dibujos' : ' vertical'));
 
                 estado.pista = () => descartarUnaMala(ops, q.a);
 

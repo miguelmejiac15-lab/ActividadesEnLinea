@@ -975,6 +975,20 @@ body.sin-lectura .juego-boton {
    en el teléfono las casillas se encogen antes que partirla en dos. */
 .juego-serie { margin-bottom: 8px; }
 
+/* Dos grupos para comparar: «¿Dónde hay más?» */
+.juego-grupos { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.juego-grupo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-chico);
+}
+.juego-grupo .juego-serie { margin-bottom: 0; }
+.juego-grupo-nombre { font-weight: 700; color: var(--oscuro); }
+
 @media (max-width: 640px) {
     .juego-serie { gap: 5px; }
     .juego-serie .juego-hueco { min-width: 44px; height: 48px; padding: 0 6px; }

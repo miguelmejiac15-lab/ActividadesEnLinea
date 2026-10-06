@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" role="img" aria-label="Cuadrado">
+  <!-- Figura de Isla de las Figuras, con los colores del original. -->
+  <rect x="8" y="8" width="84" height="84" fill="hsl(150,65%,75%)" stroke="hsl(150,65%,35%)" stroke-width="4" rx="4"/>
+</svg>

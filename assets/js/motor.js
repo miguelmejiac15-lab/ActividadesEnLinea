@@ -1067,6 +1067,27 @@
         return Array.isArray(lista) && lista.length > 0 && lista.every(esSoloDibujo);
     }
 
+    /**
+     * Una serie con su hueco: 🔴 🔵 🔴 🔵 🔴 ❓ o 2 4 6 ? 10.
+     *
+     * En «¿qué sigue?» la serie ES la pregunta: sin ella solo quedan
+     * cuatro opciones sueltas y nadie —ni el adulto— sabe qué elegir.
+     * El hueco va con `null` o '?' y se dibuja vacío, con el borde a
+     * rayas, para que el niño vea dónde encaja su respuesta.
+     */
+    function serie(lista) {
+        const valores = Array.isArray(lista) ? lista : [];
+        const dibujos = todoDibujos(valores.filter((v) => v !== null && v !== '?'));
+        const linea = el('div', 'juego-huecos juego-serie');
+        valores.forEach((v) => {
+            const hueco = (v === null || v === '?');
+            const h = el('span', 'juego-hueco' + (dibujos ? ' dibujo' : ''), hueco ? '?' : String(v));
+            if (!hueco) h.classList.add('lleno');
+            linea.appendChild(h);
+        });
+        return linea;
+    }
+
     /*
      * ─────────────────────────────────────────────────────────────────
      *  EL SONIDO DE LA LETRA, DICHO COMO LO DIRÍA UN DOCENTE
@@ -1895,6 +1916,9 @@
                 if (it.tipoVisual === 'emoji') {
                     contenedor.appendChild(dibujo(it.visual));
 
+                } else if (it.tipoVisual === 'serie') {
+                    contenedor.appendChild(serie(it.visual));
+
                 } else if (it.tipoVisual === 'color') {
                     const m = el('div', 'juego-muestra');
                     m.style.background = it.visual;
@@ -2308,7 +2332,8 @@
                 // El reto también ilustra. Antes no tenía dónde: era el
                 // único minijuego de preguntas sin dibujo, y en preescolar
                 // eso lo dejaba como un examen de lectura.
-                if (q.e) c.appendChild(dibujo(q.e));
+                if (Array.isArray(q.serie)) c.appendChild(serie(q.serie));
+                else if (q.e) c.appendChild(dibujo(q.e));
 
                 const ops = el('div', 'juego-opciones vertical');
 

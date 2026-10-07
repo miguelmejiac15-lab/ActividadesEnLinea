@@ -92,6 +92,7 @@ function queSeHaceEn(array $tipos): array
         'opcion_multiple'    => ['✅', 'elegir la respuesta'],
         'juego_rapido'       => ['⚡', 'decir sí o no'],
         'emparejar'          => ['🔗', 'unir parejas'],
+        'parejas_dibujo'     => ['🖤', 'unir cada dibujo con su pareja'],
         'completar_palabra'  => ['✏️', 'completar palabras'],
         'completar_texto'    => ['📝', 'completar frases'],
         'puzle_silabas'      => ['🧩', 'armar palabras con sílabas'],

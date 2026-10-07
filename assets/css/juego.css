@@ -1339,6 +1339,71 @@ img.cruci-pista-dibujo { width: 2.3rem; height: 2.3rem; }
 .juego-carta.compacta .juego-emoji { font-size: 3rem; }
 .juego-carta.elegida { border-color: var(--azul); background: rgba(41, 182, 246, .1); }
 
+/* Parejas de dibujos: sombras y mitades */
+.juego-parejas { gap: 18px; flex-wrap: nowrap; }
+.juego-parejas .juego-carta.compacta {
+    min-width: 96px;
+    min-height: 88px;
+    justify-content: center;
+    padding: 8px 14px;
+}
+/* Un botón desactivado pinta su texto semitransparente y los emojis
+   salen desteñidos: la pareja ya unida tiene que verse a todo color. */
+.juego-parejas .juego-carta:disabled { color: inherit; }
+.juego-parejas .juego-carta.elegida { transform: scale(1.06); box-shadow: 0 0 0 4px rgba(41, 182, 246, .25); }
+.juego-parejas .juego-carta.error { animation: temblar .35s ease; }
+.juego-parejas .juego-carta.pista { border-color: var(--naranja); box-shadow: 0 0 0 4px rgba(255, 152, 0, .3); }
+
+/* La sombra: el mismo dibujo, todo en negro. */
+.juego-sombra { filter: brightness(0); opacity: .88; transition: filter .4s ease, opacity .4s ease; }
+
+/* La mitad: una ventana de medio dibujo. El dibujo va centrado en una
+   caja de 1.2em, así el corte cae en su centro sea cual sea el ancho
+   que le dé cada tipografía de emojis. */
+.juego-mitad {
+    display: inline-block;
+    position: relative;
+    width: .7em;
+    height: 1.4em;
+    overflow: hidden;
+    font-size: 3rem;
+    line-height: 1;
+}
+/* Flex y no text-align: el glifo de algunos emojis es más ancho que su
+   caja, y con text-align se desborda solo hacia la derecha —el corte
+   dejaba de caer en el centro—. Flex lo centra aunque se salga. */
+.juego-mitad > .juego-emoji,
+.juego-carta.compacta .juego-mitad > .juego-emoji {
+    position: absolute;
+    top: 0;
+    width: 1.4em;
+    height: 1.4em;
+    font-size: 1em;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.juego-mitad.izq .juego-emoji { left: 0; }
+.juego-mitad.der .juego-emoji { right: 0; }
+/* Borde de corte: dice «aquí falta algo» sin palabras. */
+.juego-mitad.izq { border-right: 3px dashed var(--borde); }
+.juego-mitad.der { border-left: 3px dashed var(--borde); }
+
+@keyframes temblar {
+    0%, 100% { transform: translateX(0); }
+    25%      { transform: translateX(-6px); }
+    75%      { transform: translateX(6px); }
+}
+
+@media (max-width: 640px) {
+    .juego-parejas .juego-carta.compacta { min-width: 84px; min-height: 76px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .juego-parejas .juego-carta.error { animation: none; }
+}
+
 /* Ayuda cuando el ejercicio se atasca */
 .juego-ayuda {
     display: flex;
@@ -1427,3 +1492,6 @@ img.cruci-pista-dibujo { width: 2.3rem; height: 2.3rem; }
     .juego-sopa { max-width: 100%; }
     .juego-celda { font-size: .92rem; }
 }
+
+/* La mitad grande, como dibujo de una pregunta. */
+.juego-mitad.grande { font-size: 5rem; }

@@ -293,6 +293,32 @@ foreach ($estaciones as $e) {
             }
             break;
 
+        case 'parejas_dibujo':
+            if (!in_array($datos['modo'] ?? null, ['sombra', 'mitad'], true)) {
+                mal($e, 'modo desconocido: tiene que ser «sombra» o «mitad»');
+            }
+            $rondas = $datos['rondas'] ?? null;
+            if (!is_array($rondas) || !$rondas) {
+                mal($e, 'faltan las rondas');
+                break;
+            }
+            foreach ($rondas as $i => $ronda) {
+                if (!is_array($ronda) || count($ronda) < 2) {
+                    mal($e, 'ronda ' . ($i + 1) . ': hacen falta al menos dos parejas');
+                    continue;
+                }
+                // Dos dibujos iguales en una ronda: dos sombras idénticas,
+                // y el niño acierta o falla por suerte.
+                $dibujos = array_map(static fn($p) => is_array($p) ? (string) ($p['e'] ?? '') : '', $ronda);
+                if (in_array('', $dibujos, true)) {
+                    mal($e, 'ronda ' . ($i + 1) . ': hay una pareja sin dibujo');
+                }
+                if (count($dibujos) !== count(array_unique($dibujos))) {
+                    mal($e, 'ronda ' . ($i + 1) . ': un dibujo se repite');
+                }
+            }
+            break;
+
         case 'memoria':
             $lista = items($datos);
 

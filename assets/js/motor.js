@@ -63,6 +63,7 @@
     // ── Utilidades ───────────────────────────────────────────────────
 
     const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => Array.from(document.querySelectorAll(sel));
 
     /** Escapa texto antes de meterlo en innerHTML. */
     function esc(t) {
@@ -1103,6 +1104,16 @@
 
         } else if (it.tipoVisual === 'serie') {
             contenedor.appendChild(serie(it.visual));
+
+        } else if (it.tipoVisual === 'sombra') {
+            // «¿De quién es esta sombra?»: el dibujo, todo en negro.
+            contenedor.appendChild(dibujo(it.visual, 'juego-emoji juego-sombra'));
+
+        } else if (it.tipoVisual === 'mitad') {
+            // «¿De qué dibujo es esta mitad?»: solo la mitad izquierda.
+            const v = el('span', 'juego-mitad izq grande');
+            v.appendChild(dibujo(it.visual, 'juego-emoji'));
+            contenedor.appendChild(v);
 
         } else if (it.tipoVisual === 'grupos') {
             // «¿Dónde hay más?»: cada grupo en su caja, con su nombre,
@@ -2234,6 +2245,148 @@
             c.appendChild(tabla);
 
             marcarProgreso(0, pares.length);
+        },
+
+        /* 15b · Parejas de dibujos: cada dibujo con su sombra o con su
+                otra mitad.
+
+               Datos: { modo: 'sombra' | 'mitad', rondas: [[{e, n}, …], …] }
+
+               A la izquierda los dibujos, a la derecha sus sombras (o
+               sus mitades derechas), las dos columnas revueltas. Se toca
+               uno de cada lado, en el orden que el niño quiera: obligarlo
+               a empezar siempre por la izquierda es una regla más que
+               recordar y no enseña nada.
+
+               Por rondas para que la pantalla no se llene: tres o cuatro
+               parejas a la vista se abarcan de un vistazo; doce, no. */
+        parejas_dibujo(datos, fin) {
+            const modo   = (datos && datos.modo) === 'mitad' ? 'mitad' : 'sombra';
+            const rondas = (datos && Array.isArray(datos.rondas)) ? datos.rondas : [];
+            const total  = rondas.reduce((s, r) => s + r.length, 0);
+            let r = 0, unidos = 0, aciertos = 0;
+
+            const TEXTO = modo === 'sombra'
+                ? { t: 'Une cada dibujo con su sombra', s: 'Toca un dibujo y luego su sombra', mal: 'Esa no es su sombra' }
+                : { t: 'Une las dos mitades',           s: 'Toca una mitad y luego la otra',  mal: 'Esas mitades no van juntas' };
+
+            /** La cara que se ve en cada lado. */
+            function cara(it, lado) {
+                if (modo === 'sombra') {
+                    const d = dibujo(it.e, 'juego-emoji' + (lado === 'der' ? ' juego-sombra' : ''));
+                    return d;
+                }
+                // Media imagen: una ventana del ancho de medio dibujo, con
+                // el dibujo entero dentro corrido hacia el lado que toca.
+                const v = el('span', 'juego-mitad ' + lado);
+                v.appendChild(dibujo(it.e, 'juego-emoji'));
+                return v;
+            }
+
+            function pintaRonda() {
+                limpiar();
+                if (r >= rondas.length) return fin(aciertos, total);
+
+                const parejas = rondas[r];
+                let elegida = null;          // carta tocada esperando pareja
+                let quedan  = parejas.length;
+                const falloEn = new Set();   // parejas que costaron un intento
+
+                titular(TEXTO.t, rondas.length > 1
+                    ? TEXTO.s + ' · Ronda ' + (r + 1) + ' de ' + rondas.length
+                    : TEXTO.s);
+
+                const c = panel('juego-centro');
+                const tabla = el('div', 'juego-emparejar juego-parejas ' + modo);
+                const cols = { izq: el('div', 'juego-columna'), der: el('div', 'juego-columna') };
+
+                function soltar() {
+                    if (elegida) elegida.classList.remove('elegida');
+                    elegida = null;
+                }
+
+                ['izq', 'der'].forEach((lado) => {
+                    barajar(parejas.map((it, k) => ({ it, k }))).forEach(({ it, k }) => {
+                        const b = el('button', 'juego-carta compacta');
+                        b.type = 'button';
+                        b.dataset.k = String(k);
+                        b.dataset.lado = lado;
+                        b.setAttribute('aria-label', (lado === 'der' && modo === 'sombra' ? 'Sombra' : it.n || 'Dibujo'));
+                        b.appendChild(cara(it, lado));
+
+                        b.onclick = () => {
+                            if (b.disabled) return;
+                            $$('.juego-parejas .pista').forEach((x) => x.classList.remove('pista'));
+
+                            // Primera carta, o cambio de idea en el mismo lado.
+                            if (!elegida || elegida.dataset.lado === lado) {
+                                soltar();
+                                elegida = b;
+                                b.classList.add('elegida');
+                                if (lado === 'izq' && it.n) hablar(it.n);
+                                return;
+                            }
+
+                            const otra = elegida;
+                            soltar();
+
+                            if (otra.dataset.k === b.dataset.k) {
+                                [otra, b].forEach((x) => { x.classList.add('acierto'); x.disabled = true; });
+
+                                // Premio a la vista: la pareja se completa.
+                                // En mitades el dibujo vuelve a estar entero;
+                                // en sombras, la sombra recupera su color.
+                                const izq = lado === 'izq' ? b : otra;
+                                if (modo === 'mitad') {
+                                    izq.innerHTML = '';
+                                    izq.appendChild(dibujo(it.e, 'juego-emoji'));
+                                } else {
+                                    const s = (lado === 'der' ? b : otra).querySelector('.juego-sombra');
+                                    if (s) s.classList.remove('juego-sombra');
+                                }
+
+                                if (!falloEn.has(k)) aciertos++;
+                                unidos++;
+                                quedan--;
+                                if (it.n) hablar(it.n);
+                                marcarProgreso(unidos, total);
+
+                                if (quedan === 0) {
+                                    avisar(r + 1 < rondas.length ? '¡Muy bien! Vamos con más 🌟' : '¡Todas unidas! 🌟', true);
+                                    r++;
+                                    setTimeout(pintaRonda, 1400);
+                                } else {
+                                    avisar('¡Esa es! ✅', true);
+                                }
+                            } else {
+                                falloEn.add(Number(otra.dataset.lado === 'izq' ? otra.dataset.k : b.dataset.k));
+                                [otra, b].forEach((x) => {
+                                    x.classList.add('error');
+                                    setTimeout(() => x.classList.remove('error'), 600);
+                                });
+                                avisar(TEXTO.mal, false);
+                            }
+                        };
+
+                        cols[lado].appendChild(b);
+                    });
+                });
+
+                // Pista: se iluminan las dos cartas de una pareja pendiente.
+                estado.pista = () => {
+                    const libre = $$('.juego-parejas .juego-columna:first-child .juego-carta:not(:disabled)')[0];
+                    if (!libre) return;
+                    $$('.juego-parejas .juego-carta[data-k="' + libre.dataset.k + '"]')
+                        .forEach((x) => x.classList.add('pista'));
+                };
+
+                tabla.appendChild(cols.izq);
+                tabla.appendChild(cols.der);
+                c.appendChild(tabla);
+            }
+
+            marcarProgreso(0, total);
+            pintaRonda();
         },
 
         /* 16 · Pronunciación: escuchar y repetir */

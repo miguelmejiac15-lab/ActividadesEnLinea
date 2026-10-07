@@ -117,6 +117,12 @@ const ARCHIVOS = [
     'idiomas-ampliacion',
     'matematica-ampliacion',
     'letras-ampliacion',
+
+    // Preescolar: sombras y mitades (minijuego `parejas_dibujo`). Toma la
+    // categoría y los bloques de `pensamiento-ampliacion`, así que va
+    // después de él. En producción lo crea migracion-sombras-y-mitades.php,
+    // que no toca ninguna otra actividad.
+    'sombras-y-mitades',
 ];
 
 /** Proporción de estaciones gratuitas: el modelo 30% del proyecto. */

@@ -59,6 +59,23 @@ declare(strict_types=1);
  */
 const DIBUJOS = [
 
+    // ── Frases que le cambian el sentido a una palabra ───────────────
+    //
+    // La palabra suelta se lee en su sentido más común, y en estas frases
+    // ese sentido es otro: «cuerpo» dibujaba una persona en «el cuerpo de
+    // un insecto» y en «cuerpo geométrico»; «primo», un niño en «número
+    // primo»; «hoja», una hoja de árbol en «hoja de cálculo»; «red» (el
+    // color, en inglés) en «tocar la red» de vóleibol; «golpe», una cara
+    // herida en el golpe de un tambor. Van con la frase entera, que es
+    // más larga y por eso gana.
+    'cuerpo de un insecto' => '🐜', 'cuerpo del insecto' => '🐜',
+    'cuerpo geometrico' => '📐', 'cuerpos geometricos' => '📐', 'que cuerpo' => '📐',
+    'numero primo' => '🔢', 'numeros primos' => '🔢', 'es primo' => '🔢',
+    'hoja de calculo' => '📊', 'hojas de calculo' => '📊', 'celda' => '📊', 'fila y columna' => '📊', 'fila y una columna' => '📊',
+    'tocar la red' => '🏐', 'golpe del punto' => '🏐', 'golpe mas fuerte' => '🥁',
+    'parte grande de una obra' => '🎭', 'linea de un poema' => '📜',
+    'angulo' => '📐', 'poligono' => '📐', 'faraon' => '🏺',
+
     // ── Animales ─────────────────────────────────────────────────────
     'perro' => '🐶', 'perros' => '🐶', 'cachorro' => '🐶',
     'gato' => '🐱', 'gatos' => '🐱', 'gatito' => '🐱',

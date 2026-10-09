@@ -258,12 +258,143 @@
         const pref = String(idioma || '').toLowerCase();
         const base = pref.slice(0, 2);
 
-        // Primero la que coincide entera («es-ES»), luego la del idioma
-        // («es-MX» sirve para leer español), y si no hay, ninguna.
-        return vocesListas.find((v) => String(v.lang).toLowerCase() === pref)
-            || vocesListas.find((v) => String(v.lang).toLowerCase().slice(0, 2) === base)
+        const exacta = (v) => String(v.lang).toLowerCase().replace('_', '-') === pref;
+        const delIdioma = (v) => String(v.lang).toLowerCase().slice(0, 2) === base;
+
+        /*
+         * Instalada en el equipo antes que por red.
+         *
+         * Las voces de red («Google español» en Chrome de escritorio)
+         * suenan mejor, pero cada frase va y vuelve de un servidor: con
+         * una conexión regular empiezan tarde y se comen la primera
+         * sílaba —«abeja» sonaba «beja»—, y sin conexión no suenan. En
+         * una actividad de sonidos iniciales, la primera sílaba es
+         * justamente lo que se está enseñando.
+         *
+         * Después, la que coincide entera («es-ES») y luego la del idioma
+         * («es-MX» sirve para leer español). Si no hay, ninguna.
+         */
+        return vocesListas.find((v) => exacta(v) && v.localService)
+            || vocesListas.find((v) => delIdioma(v) && v.localService)
+            || vocesListas.find(exacta)
+            || vocesListas.find(delIdioma)
             || null;
     }
+
+    /*
+     * ─────────────────────────────────────────────────────────────────
+     *  POR QUÉ SE CORTABA EL PRINCIPIO DE LAS PALABRAS
+     * ─────────────────────────────────────────────────────────────────
+     *
+     * Dos causas, y las dos se comían justo la primera sílaba:
+     *
+     * 1. `cancel()` y `speak()` en el mismo instante. Chrome (Windows y
+     *    Android) todavía está deteniendo lo anterior cuando le llega lo
+     *    nuevo, y arranca la frase nueva ya empezada. Por eso, después de
+     *    cortar, se espera un respiro antes de volver a hablar.
+     *
+     * 2. La salida de audio dormida. Parlantes Bluetooth, audífonos y
+     *    muchos portátiles apagan el audio tras unos segundos de silencio
+     *    y tardan un momento en despertarlo: lo primero que suena se
+     *    pierde. Mientras se juega se mantiene la salida abierta con un
+     *    sonido mudo (ver `despertarAudio()`).
+     */
+    const RESPIRO_TRAS_CORTE = 160;
+    let lanzamiento = null;     // lo que espera a que pase el respiro
+    let ultimoCorte = 0;        // cuándo se cortó algo que sonaba
+
+    /**
+     * Corta lo que suena, si suena algo, y apunta cuándo.
+     *
+     * Si no suena nada no se llama a `cancel()`: uno de más también deja
+     * a Chrome a medio detenerse.
+     */
+    function cortarVoz() {
+        const s = window.speechSynthesis;
+        if (lanzamiento) {
+            clearTimeout(lanzamiento.reloj);
+            lanzamiento = null;
+        }
+        if (!s || !(s.speaking || s.pending)) return;
+        try { s.cancel(); } catch (e) { /* da igual */ }
+        ultimoCorte = Date.now();
+    }
+
+    /** Pone a sonar una lista de locuciones, cortando o no lo anterior. */
+    function emitir(locuciones, cortar) {
+        const s = window.speechSynthesis;
+        if (!s || !locuciones.length) return;
+
+        despertarAudio();
+
+        let lista = locuciones;
+
+        if (cortar) {
+            cortarVoz();
+        } else if (lanzamiento) {
+            // Encolar detrás de algo que todavía espera su respiro: se suma.
+            clearTimeout(lanzamiento.reloj);
+            lista = lanzamiento.lista.concat(locuciones);
+            lanzamiento = null;
+        }
+
+        const lanzar = () => {
+            lanzamiento = null;
+            try { lista.forEach((u) => s.speak(u)); } catch (e) { /* sin voz */ }
+        };
+
+        // Si hace poco se cortó algo, se espera lo que falte del respiro
+        // —venga el corte de aquí o de un `callar()` justo antes—.
+        const espera = ultimoCorte + RESPIRO_TRAS_CORTE - Date.now();
+        if (espera > 0) {
+            lanzamiento = { lista, reloj: setTimeout(lanzar, espera) };
+            return;
+        }
+        lanzar();
+    }
+
+    /*
+     * La salida de audio, despierta mientras se juega.
+     *
+     * Un AudioContext con ganancia cero: no se oye nada, pero el sistema
+     * ve un sonido abierto y no apaga los parlantes entre frase y frase.
+     * Solo puede arrancar tras un toque del niño —los navegadores no dejan
+     * abrir audio por su cuenta—, y se suspende cuando la pestaña se va al
+     * fondo para no gastar batería.
+     */
+    let audioDespierto = null;
+
+    function despertarAudio() {
+        try {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (!AC) return;
+
+            if (!audioDespierto) {
+                const ctx = new AC();
+                const osc = ctx.createOscillator();
+                const mudo = ctx.createGain();
+                mudo.gain.value = 0;
+                osc.connect(mudo);
+                mudo.connect(ctx.destination);
+                osc.start();
+                audioDespierto = ctx;
+
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) audioDespierto.suspend().catch(() => {});
+                    else audioDespierto.resume().catch(() => {});
+                });
+            }
+
+            if (audioDespierto.state === 'suspended' && !document.hidden) {
+                audioDespierto.resume().catch(() => {});
+            }
+        } catch (e) {
+            /* sin Web Audio, la voz sigue funcionando igual */
+        }
+    }
+
+    // El primer toque en la página abre el audio, antes de la primera frase.
+    document.addEventListener('pointerdown', despertarAudio, { once: true, capture: true });
 
     /**
      * Lee un texto en voz alta, si el navegador puede.
@@ -324,22 +455,22 @@
             /*
              * Sin `encolar`, esto corta lo anterior, que es lo correcto
              * cuando alguien pulsa el altavoz: quiere oír ESTO, ahora.
+             * El corte lo hace `emitir()`, con su respiro.
              */
             if (!op.encolar) {
                 protegidaHasta = 0;
-                window.speechSynthesis.cancel();
             }
 
             const lang = op.idioma || idiomaVoz;
-            const v = new SpeechSynthesisUtterance(enEspanol(lang) ? paraVoz(limpio) : limpio);
-            const voz = vozPara(lang);
 
-            v.lang = lang;
-            if (voz) v.voice = voz;
+            // Lo que no hay que proteger —la instrucción, el cuento— puede
+            // ser largo: va por oraciones (ver `locucionesDe()`).
+            if (!op.proteger) {
+                emitir(locucionesDe(limpio, lang), !op.encolar);
+                return;
+            }
 
-            // Más despacio con los pequeños: a 0.85 un niño de cinco años
-            // pierde el principio de la frase mientras entiende el final.
-            v.rate = sinLectura ? 0.72 : 0.85;
+            const v = locucion(limpio, lang);
 
             if (op.proteger) {
                 const dura = duracionAproximada(limpio);
@@ -362,10 +493,64 @@
                 v.onerror = soltar;
             }
 
-            window.speechSynthesis.speak(v);
+            emitir([v], !op.encolar);
         } catch (e) {
             /* si falla, la actividad sigue funcionando sin voz */
         }
+    }
+
+    /** Una locución con la voz, el idioma y la velocidad del motor. */
+    function locucion(texto, lang) {
+        const v = new SpeechSynthesisUtterance(enEspanol(lang) ? paraVoz(texto) : texto);
+        const voz = vozPara(lang);
+
+        v.lang = lang;
+        if (voz) v.voice = voz;
+
+        // Más despacio con los pequeños: a 0.85 un niño de cinco años
+        // pierde el principio de la frase mientras entiende el final.
+        v.rate = sinLectura ? 0.72 : 0.85;
+        return v;
+    }
+
+    /*
+     * Un texto largo, oración por oración.
+     *
+     * Chrome corta en seco una locución que pasa de unos quince segundos
+     * con varias de sus voces: la página de un cuento se quedaba a mitad
+     * de frase y no volvía. Partido en oraciones —y las muy largas por sus
+     * comas—, cada trozo dura poco y el navegador los dice seguidos.
+     */
+    const LARGO_MAXIMO = 180;
+
+    function trozosDe(texto) {
+        const oraciones = String(texto).match(/[^.!?…]+[.!?…]*["»”)]*\s*/g) || [texto];
+        const trozos = [];
+
+        oraciones.forEach((o) => {
+            const t = o.trim();
+            if (!t) return;
+            if (t.length <= LARGO_MAXIMO) { trozos.push(t); return; }
+
+            let actual = '';
+            // Sin `(?<=…)`: un Safari anterior a 16.4 no lo entiende y un
+            // literal así rompe el archivo entero al cargarlo.
+            t.replace(/([,;:])\s+/g, '$1\u0000').split('\u0000').forEach((parte) => {
+                if (actual && (actual + ' ' + parte).length > LARGO_MAXIMO) {
+                    trozos.push(actual);
+                    actual = parte;
+                } else {
+                    actual = actual ? actual + ' ' + parte : parte;
+                }
+            });
+            if (actual) trozos.push(actual);
+        });
+
+        return trozos.length ? trozos : [String(texto)];
+    }
+
+    function locucionesDe(texto, lang) {
+        return trozosDe(texto).map((t) => locucion(t, lang));
     }
 
     /**
@@ -381,7 +566,7 @@
         if (suave && hayProtegida()) return;
 
         protegidaHasta = 0;
-        try { window.speechSynthesis.cancel(); } catch (e) { /* da igual */ }
+        cortarVoz();
     }
 
     /**
@@ -400,22 +585,20 @@
          * está diciendo, la instrucción nueva espera su turno en vez de
          * cortarlo. El navegador encola solo.
          */
-        callar(true);
+        const cortar = !hayProtegida();
 
         try {
+            const locuciones = [];
             lista.forEach((t) => {
                 const limpio = soloPalabras(t);
                 if (!limpio) return;
 
-                const v = new SpeechSynthesisUtterance(enEspanol(idiomaVoz) ? paraVoz(limpio) : limpio);
-                const voz = vozPara(idiomaVoz);
-
-                v.lang = idiomaVoz;
-                if (voz) v.voice = voz;
-                v.rate = sinLectura ? 0.72 : 0.85;
-
-                window.speechSynthesis.speak(v);
+                locuciones.push(...locucionesDe(limpio, idiomaVoz));
             });
+
+            // Si hay algo protegido sonando, esto va detrás; si no, corta
+            // lo anterior —con su respiro— y empieza.
+            emitir(locuciones, cortar);
         } catch (e) {
             /* sin voz, la actividad sigue igual */
         }
@@ -1256,16 +1439,16 @@
                 p.appendChild(ops);
 
                 /*
-                 * La primera palabra va DETRÁS del sonido de la letra, no
-                 * encima. Antes se pedía sin encolar, y `hablar()` sin
-                 * encolar cancela lo que suena: el sonido de la letra se
-                 * cortaba a la primera sílaba y se oía como un chasquido.
+                 * La palabra va a la cola de la pantalla, DETRÁS de la
+                 * instrucción («¿Empieza con A?… abeja») y del sonido de
+                 * la letra si se está presentando. Antes se lanzaba sola
+                 * al pintar, y 350 ms después llegaba la instrucción en
+                 * cola y la cortaba: o se perdía su principio, o su final.
                  */
-                hablar(it.n, i === 0 && presentado ? { encolar: true } : undefined);
+                decir(it.n);
             }
 
             const sonido = sonidoDeLetra(extra && extra.letra, extra && extra.sonido);
-            const presentado = !!sonido;
             if (sonido) hablar(sonido, { proteger: true });
 
             marcarProgreso(0, items.length);
@@ -1540,7 +1723,7 @@
                 campo.onkeydown = (ev) => { if (ev.key === 'Enter') comprobar(); };
 
                 campo.focus();
-                hablar(w);
+                decir(w);
             }
 
             marcarProgreso(0, palabras.length);
@@ -1919,7 +2102,7 @@
                 };
                 c.appendChild(sig);
 
-                hablar(s.text);
+                decir(s.text);
             }
 
             function verPregunta() {
@@ -2419,7 +2602,7 @@
                 };
                 c.appendChild(listo);
 
-                hablar(p.w);
+                decir(p.w);
             }
 
             marcarProgreso(0, palabras.length);

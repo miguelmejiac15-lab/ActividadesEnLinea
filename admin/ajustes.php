@@ -22,12 +22,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'estaciones_libres_def', 'nuevas_actividades_dias', 'plan_recomendado',
         'exigir_cuenta_para_jugar', 'exigir_correo_verificado',
         'ga_medicion_id', 'gsc_verificacion',
+        'meta_pixel_id', 'meta_verificacion', 'meta_consentimiento',
     ];
 
     foreach ($permitidas as $clave) {
         // Las casillas de verificación no se envían cuando están
         // desmarcadas: si no llega, es que se apagó.
-        if (in_array($clave, ['exigir_cuenta_para_jugar', 'exigir_correo_verificado'], true)) {
+        if (in_array($clave, ['exigir_cuenta_para_jugar', 'exigir_correo_verificado', 'meta_consentimiento'], true)) {
             guardarAjuste($clave, empty($_POST[$clave]) ? '0' : '1');
             continue;
         }
@@ -59,6 +60,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($clave === 'ga_medicion_id' && $valor !== ''
             && !preg_match('/^G-[A-Z0-9]{8,12}$/i', $valor)) {
             mensaje('error', 'El identificador de Analytics debe tener la forma G-XXXXXXXXXX.');
+            continue;
+        }
+
+        // El píxel de Meta es un número de 15 o 16 cifras.
+        if ($clave === 'meta_pixel_id' && $valor !== '' && !preg_match('/^d{10,20}$/', $valor)) {
+            mensaje('error', 'El identificador del píxel de Meta es solo un número (15 o 16 cifras).');
             continue;
         }
 
@@ -274,6 +281,59 @@ require __DIR__ . '/includes/cabecera-admin.php';
                 <?php endif; ?>
                 El mapa del sitio se publica en
                 <a href="<?= e(url('sitemap.xml')) ?>" target="_blank" rel="noopener">/sitemap.xml</a>.
+            </p>
+
+            <h3 style="margin-top:22px">Píxel de Meta (Facebook e Instagram)</h3>
+
+            <div class="aviso info" style="margin-bottom:14px">
+                <b>Mismas reglas que Google:</b> solo en las páginas públicas, nunca donde
+                juega un niño ni con la cuenta de un menor. No envía nombres, correos ni
+                teléfonos. Registra: ver los planes, cuenta creada (solo de adultos), inicio
+                del pago y compra confirmada, con su valor.
+            </div>
+
+            <div class="campo">
+                <label for="meta_pixel_id">Identificador del píxel</label>
+                <input id="meta_pixel_id" name="meta_pixel_id" type="text" maxlength="20"
+                       inputmode="numeric" placeholder="1673744254417728"
+                       value="<?= e(ajuste('meta_pixel_id', '')) ?>">
+                <p class="ayuda">
+                    Administrador de eventos → el conjunto de datos «Actividades en Línea».
+                    Solo el número. Déjalo vacío para apagar el píxel.
+                </p>
+            </div>
+
+            <div class="campo">
+                <label for="meta_verificacion">Verificación de dominio de Meta</label>
+                <input id="meta_verificacion" name="meta_verificacion" type="text" maxlength="120"
+                       value="<?= e(ajuste('meta_verificacion', '')) ?>">
+                <p class="ayuda">
+                    Solo el contenido de la etiqueta <code>facebook-domain-verification</code>.
+                    No envía nada a Meta.
+                </p>
+            </div>
+
+            <div class="campo">
+                <label>
+                    <input type="checkbox" name="meta_consentimiento" value="1"
+                        <?= metaPideConsentimiento() ? 'checked' : '' ?>>
+                    Pedir permiso antes de activar el píxel (aviso de cookies)
+                </label>
+                <p class="ayuda">
+                    Recomendado: el píxel guarda una cookie y comparte datos con Meta.
+                    Apagarlo mide más visitas, pero sin el permiso de quien visita.
+                </p>
+            </div>
+
+            <p class="ayuda">
+                <b>Estado ahora mismo:</b>
+                <?php if (metaPixelId() === ''): ?>
+                    sin identificador, el píxel está apagado.
+                <?php elseif (ES_DESARROLLO): ?>
+                    configurado, pero <b>apagado</b> porque este entorno es de desarrollo.
+                <?php else: ?>
+                    activo en las páginas públicas<?= metaPideConsentimiento() ? ', después de que la persona acepte' : '' ?>.
+                <?php endif; ?>
             </p>
         </div>
     </div>

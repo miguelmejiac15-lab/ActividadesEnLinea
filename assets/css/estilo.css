@@ -2052,3 +2052,26 @@ a.etiqueta:hover { color: var(--azul); border-color: var(--azul); }
     color: var(--texto);
     line-height: 1.6;
 }
+
+/* Aviso de cookies (píxel de Meta). Solo aparece en páginas públicas y
+   solo si la persona todavía no ha decidido. */
+.aviso-cookies {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    z-index: 1000;
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 16px 18px;
+    background: var(--blanco);
+    border: 1px solid var(--borde);
+    border-radius: var(--radio-medio);
+    box-shadow: var(--sombra-alta);
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+.aviso-cookies p { margin: 0; flex: 1 1 260px; font-size: .92rem; color: var(--texto); }
+.aviso-cookies-botones { display: flex; gap: 8px; flex-wrap: wrap; }

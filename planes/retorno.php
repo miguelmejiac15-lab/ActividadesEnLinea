@@ -130,6 +130,12 @@ if ($pago['status'] === PAGO_PENDIENTE
 
 $estado = etiquetaEstadoPago($pago['status']);
 
+// Para Meta: la compra, una sola vez por referencia aunque se recargue.
+if ($pago['status'] === PAGO_CONFIRMADO) {
+    metaEvento('Purchase', ['value' => (int) $pago['amount_cop'], 'currency' => 'COP'],
+               'compra-' . $pago['reference']);
+}
+
 $titulo        = 'Pago ' . $pago['reference'];
 $seccionActiva = 'planes';
 $hojasExtra    = ['assets/css/pago.css'];

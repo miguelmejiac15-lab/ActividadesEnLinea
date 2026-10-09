@@ -82,6 +82,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($r['ok']) {
         anotarIntento('registro', ipCliente(), true);
 
+        // Para Meta: una cuenta nueva, solo si es de un adulto. Este
+        // formulario también acepta cuentas de menores con acudiente.
+        if ($v['birth_year'] === '' || !esCuentaDeMenor(['birth_year' => (int) $v['birth_year']])) {
+            metaEvento('CompleteRegistration', [], 'registro-' . (int) $r['usuario_id']);
+        }
+
         /*
          * El enlace de confirmación sale si hay correo saliente. Si además
          * se exige, la cuenta no entra hasta confirmarlo; si no, entra ya

@@ -20,6 +20,8 @@ $descripcion = 'Empieza gratis con todas las actividades, desbloquea la Bibliote
 $seccionActiva = 'planes';
 $canonica    = url('planes/');
 
+metaEvento('ViewContent', ['content_name' => 'planes']);
+
 require RUTA_INCLUDES . '/cabecera.php';
 ?>
 

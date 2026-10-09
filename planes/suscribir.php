@@ -155,6 +155,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ]);
 
     if ($r['ok']) {
+        // Para Meta: alguien empezó a pagar. Solo el plan y el valor.
+        metaEvento('InitiateCheckout', [
+            'value'        => (int) $r['pago']['amount_cop'],
+            'currency'     => 'COP',
+            'content_name' => (string) $plan['slug'],
+        ], 'pago-' . $r['pago']['reference']);
         redirigir('planes/pagar.php?ref=' . urlencode($r['pago']['reference']));
     }
 

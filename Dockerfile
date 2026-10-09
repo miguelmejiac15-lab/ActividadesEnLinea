@@ -26,7 +26,11 @@
 # `.dockerignore` y toda la configuración llega por variables de entorno
 # al ARRANCAR (ver `config/entorno.php`).
 
-FROM php:8.2-apache
+# La misma imagen oficial de Docker Hub, servida por el espejo de Google.
+# Docker Hub limita las descargas anónimas por IP, y las máquinas de
+# GitHub Actions comparten IP: un despliegue falló con «429 Too Many
+# Requests» antes de llegar a construir nada (2026-10-09).
+FROM mirror.gcr.io/library/php:8.2-apache
 
 # ── Extensiones de PHP ───────────────────────────────────────────────
 # `pdo_mysql` es la única que falta: mbstring, curl y json vienen en la

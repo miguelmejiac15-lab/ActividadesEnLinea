@@ -356,8 +356,17 @@
     /*
      * La salida de audio, despierta mientras se juega.
      *
-     * Un AudioContext con ganancia cero: no se oye nada, pero el sistema
-     * ve un sonido abierto y no apaga los parlantes entre frase y frase.
+     * Un tono de 20 Hz a −66 dB: por debajo de lo que se oye y de lo que
+     * reproduce casi cualquier parlante, pero NO es silencio.
+     *
+     * Primero fue silencio absoluto (ganancia cero) y no bastó. Medido el
+     * 2026-10-09 grabando la salida de Windows: Chrome entregaba «Ala»
+     * completa, y aun así se oía «la». El corte ocurría en la pantalla
+     * —una HISENSE por HDMI—, que con silencio digital se da por
+     * desconectada y tarda en despertar cuando llega la voz. Pasa igual
+     * con barras de sonido y parlantes Bluetooth. Con una señal real,
+     * por débil que sea, se quedan despiertos.
+     *
      * Solo puede arrancar tras un toque del niño —los navegadores no dejan
      * abrir audio por su cuenta—, y se suspende cuando la pestaña se va al
      * fondo para no gastar batería.
@@ -373,7 +382,8 @@
                 const ctx = new AC();
                 const osc = ctx.createOscillator();
                 const mudo = ctx.createGain();
-                mudo.gain.value = 0;
+                osc.frequency.value = 20;
+                mudo.gain.value = 0.0005;   // −66 dB
                 osc.connect(mudo);
                 mudo.connect(ctx.destination);
                 osc.start();

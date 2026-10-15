@@ -43,6 +43,13 @@ try {
     $pagosEsperando = 0;
 }
 
+// Solicitudes de información sin atender: la tabla puede no existir aún.
+try {
+    $solicitudesNuevas = (int) traerValor('SELECT COUNT(*) FROM info_requests WHERE status = "nueva"');
+} catch (Throwable $e) {
+    $solicitudesNuevas = 0;
+}
+
 /** Marca el enlace de la sección en la que estamos. */
 function zonaActiva(string $zona): string
 {
@@ -111,6 +118,12 @@ function zonaActiva(string $zona): string
         </a>
 
         <div class="grupo">Negocio</div>
+        <a class="<?= zonaActiva('solicitudes') ?>" href="<?= e(url('admin/solicitudes/')) ?>">
+            <span class="ico" aria-hidden="true">📬</span> Solicitudes
+            <?php if ($solicitudesNuevas > 0): ?>
+                <span class="pendiente-aviso" title="<?= $solicitudesNuevas ?> solicitudes nuevas"><?= $solicitudesNuevas ?></span>
+            <?php endif; ?>
+        </a>
         <a class="<?= zonaActiva('metricas') ?>" href="<?= e(url('admin/metricas/')) ?>">
             <span class="ico" aria-hidden="true">📈</span> Métricas
         </a>

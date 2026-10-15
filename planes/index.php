@@ -111,7 +111,7 @@ require RUTA_INCLUDES . '/cabecera.php';
                     $enlace = $usuario ? url('actividades/') : url('registro.php');
                     $texto  = $usuario ? 'Explorar actividades' : 'Comenzar gratis';
                 } elseif ($esEscuela) {
-                    $enlace = '#escuela';
+                    $enlace = url('solicitar-informacion.php?perfil=colegio');
                     $texto  = 'Solicitar información';
                 } else {
                     $enlace = url('planes/suscribir.php?plan=' . urlencode($p['slug']));

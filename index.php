@@ -259,7 +259,7 @@ $materiasEnPalabras = $nombresNumero[$cuantasMaterias] ?? (string) $cuantasMater
                     $enlace = url('registro.php');
                     $texto  = 'Comenzar gratis';
                 } elseif ($esEscuela) {
-                    $enlace = url('planes/#escuela');
+                    $enlace = url('solicitar-informacion.php?perfil=colegio');
                     $texto  = 'Solicitar información';
                 } else {
                     $enlace = url('planes/suscribir.php?plan=' . urlencode($p['slug']));

@@ -37,6 +37,7 @@ $categoriasPie = categoriasConConteo();
                     <?php /* La guía para adultos: quien la busca, la busca aquí. */ ?>
                     <li><a href="<?= e(url('actividades/apoyos.php')) ?>">♿ Apoyos para aprender</a></li>
                     <li><a href="<?= e(url('planes/')) ?>">Planes y precios</a></li>
+                    <li><a href="<?= e(url('solicitar-informacion.php')) ?>">Solicitar información</a></li>
                 </ul>
             </div>
 

@@ -109,8 +109,13 @@ function correoConfigurado(): bool
  *
  * @return array{ok:bool, error:?string}
  */
-function enviarCorreo(string $para, string $asunto, string $html, string $texto = ''): array
+function enviarCorreo(string $para, string $asunto, string $html, string $texto = '', string $responderA = ''): array
 {
+    // A quién va la respuesta si quien lo recibe pulsa «Responder». Sirve
+    // para las solicitudes de información: se responde al interesado, no
+    // al buzón que envía. Solo vale para este envío.
+    correoResponderA($responderA);
+
     $para = correoValido($para) ?? '';
 
     if ($para === '') {
@@ -134,17 +139,35 @@ function enviarCorreo(string $para, string $asunto, string $html, string $texto 
         : mailPhpEnviar($para, $asunto, $html, $texto);
 }
 
+/**
+ * La dirección de «Responder a» del envío en curso, o cadena vacía.
+ * Con argumento la fija (validada: una dirección inválida no entra en
+ * una cabecera); sin él la lee.
+ */
+function correoResponderA(?string $direccion = null): string
+{
+    static $actual = '';
+
+    if ($direccion !== null) {
+        $actual = $direccion === '' ? '' : (correoValido($direccion) ?? '');
+    }
+
+    return $actual;
+}
+
 /** Cabeceras comunes a los dos métodos. */
 function correoCabeceras(string $limite): array
 {
-    return [
+    $responder = correoResponderA();
+
+    return array_merge($responder !== '' ? ['Reply-To: ' . $responder] : [], [
         'From: ' . correoNombreDireccion(correoDesdeNombre(), correoDesde()),
         'MIME-Version: 1.0',
         'Content-Type: multipart/alternative; boundary="' . $limite . '"',
         'Date: ' . date('r'),
         // Un Message-ID propio evita que algunos servidores lo descarten.
         'Message-ID: <' . bin2hex(random_bytes(12)) . '@' . correoDominio() . '>',
-    ];
+    ]);
 }
 
 /** Dominio del remitente, para el Message-ID. */

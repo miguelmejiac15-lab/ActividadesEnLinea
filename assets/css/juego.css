@@ -1499,3 +1499,15 @@ img.cruci-pista-dibujo { width: 2.3rem; height: 2.3rem; }
 /* Letras del alemán que no están en un teclado en español. */
 .juego-teclas-extra { display: flex; gap: 8px; justify-content: center; margin: 8px 0; }
 .juego-teclas-extra .btn { min-width: 48px; font-size: 1.15rem; }
+
+/* Aviso cuando el dispositivo no tiene voz del idioma que se aprende. */
+.aviso-sin-voz {
+    position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 1000;
+    max-width: 560px; margin: 0 auto; padding: 14px 40px 14px 16px;
+    background: #fff8e1; border: 2px solid var(--naranja); border-radius: var(--radio-medio);
+    box-shadow: var(--sombra-alta); font-size: .9rem; color: var(--texto);
+}
+.aviso-sin-voz-cerrar {
+    position: absolute; top: 8px; right: 8px; border: none; background: none;
+    font-size: 1rem; cursor: pointer; color: var(--texto-tenue);
+}

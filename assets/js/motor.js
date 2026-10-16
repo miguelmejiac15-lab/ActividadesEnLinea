@@ -283,6 +283,15 @@
 
     /** La mejor voz disponible para un idioma, o null si no hay ninguna. */
     function vozPara(idioma) {
+        /*
+         * La lista se vuelve a pedir CADA vez. Chrome entrega primero las
+         * voces del equipo y, un momento después, las de Google; si la
+         * lista se guardaba al cargar, en un equipo con solo voces
+         * españolas instaladas no había ninguna inglesa ni alemana, la voz
+         * quedaba sin elegir y el navegador ponía la suya: una voz
+         * española leyendo «der Hund» sílaba por sílaba.
+         */
+        cargarVoces();
         if (!vocesListas.length) return null;
 
         const pref = String(idioma || '').toLowerCase();
@@ -292,21 +301,30 @@
         const delIdioma = (v) => String(v.lang).toLowerCase().slice(0, 2) === base;
 
         /*
-         * Instalada en el equipo antes que por red.
-         *
-         * Las voces de red («Google español» en Chrome de escritorio)
-         * suenan mejor, pero cada frase va y vuelve de un servidor: con
-         * una conexión regular empiezan tarde y se comen la primera
-         * sílaba —«abeja» sonaba «beja»—, y sin conexión no suenan. En
-         * una actividad de sonidos iniciales, la primera sílaba es
-         * justamente lo que se está enseñando.
-         *
-         * Después, la que coincide entera («es-ES») y luego la del idioma
-         * («es-MX» sirve para leer español). Si no hay, ninguna.
+         * Español: la instalada en el equipo primero. Casi siempre es la
+         * de Windows o la del teléfono en español latino (Raúl, Sabina),
+         * más cercana al acento de los niños que la de España, y suena
+         * fluida.
          */
-        return vocesListas.find((v) => exacta(v) && v.localService)
-            || vocesListas.find((v) => delIdioma(v) && v.localService)
+        if (base === 'es') {
+            return vocesListas.find((v) => exacta(v) && v.localService)
+                || vocesListas.find((v) => delIdioma(v) && v.localService)
+                || vocesListas.find(exacta)
+                || vocesListas.find(delIdioma)
+                || null;
+        }
+
+        /*
+         * Inglés, alemán: la de mejor calidad. Las «Natural» de Edge y las
+         * de Google suenan como una persona; las antiguas de Windows
+         * (David, Hedda) leen a trompicones, y en una actividad para
+         * aprender a pronunciar eso enseña a pronunciar mal.
+         */
+        const buena = (v) => /natural|neural|online|google|premium|enhanced/i.test(String(v.name));
+
+        return vocesListas.find((v) => exacta(v) && buena(v))
             || vocesListas.find(exacta)
+            || vocesListas.find((v) => delIdioma(v) && buena(v))
             || vocesListas.find(delIdioma)
             || null;
     }
@@ -511,6 +529,7 @@
             }
 
             const v = locucion(limpio, lang);
+            if (!v) return;
 
             if (op.proteger) {
                 const dura = duracionAproximada(limpio);
@@ -540,7 +559,59 @@
     }
 
     /** Una locución con la voz, el idioma y la velocidad del motor. */
+    /*
+     * Sin voz del idioma, mejor callar que leerlo con acento español.
+     *
+     * Si el equipo no tiene voz alemana (o inglesa), el navegador lee
+     * «der Hund» con la española, sílaba por sílaba: el niño aprende a
+     * pronunciar mal justo lo que vino a aprender a pronunciar. Solo se
+     * calla cuando la lista de voces YA cargó y no trae ninguna de ese
+     * idioma; si las de Google llegan después, la siguiente frase suena.
+     */
+    const NOMBRE_IDIOMA = { en: 'inglés', de: 'alemán', fr: 'francés', it: 'italiano', pt: 'portugués' };
+    const avisadoSinVoz = new Set();
+
+    function sinVozDelIdioma(lang) {
+        if (enEspanol(lang)) return false;
+        const voz = vozPara(lang);
+        return !voz && vocesListas.length > 0;
+    }
+
+    /** Espera, como mucho `maxMs`, a que haya voz para ese idioma. */
+    function esperarVoz(lang, maxMs) {
+        return new Promise((listo) => {
+            if (!window.speechSynthesis || enEspanol(lang) || vozPara(lang)) return listo();
+            const desde = Date.now();
+            const mirar = () => (vozPara(lang) || Date.now() - desde > maxMs) ? listo() : setTimeout(mirar, 150);
+            mirar();
+        });
+    }
+
+    function avisarSinVoz(lang) {
+        const base = String(lang).toLowerCase().slice(0, 2);
+        if (avisadoSinVoz.has(base)) return;
+        avisadoSinVoz.add(base);
+
+        const a = el('div', 'aviso-sin-voz');
+        a.setAttribute('role', 'status');
+        a.innerHTML = '<b>🔇 Este dispositivo no tiene voz en ' + esc(NOMBRE_IDIOMA[base] || lang) + '.</b> '
+            + 'Para no enseñar una mala pronunciación, esas palabras no se leen en voz alta. '
+            + 'Para oírlas: abre la actividad en Chrome, o instala la voz en tu dispositivo '
+            + '(en Android: Ajustes → Texto a voz; en iPhone: Ajustes → Accesibilidad → Contenido leído → Voces).';
+        const cerrar = el('button', 'aviso-sin-voz-cerrar', '✕');
+        cerrar.type = 'button';
+        cerrar.setAttribute('aria-label', 'Cerrar aviso');
+        cerrar.onclick = () => a.remove();
+        a.appendChild(cerrar);
+        document.body.appendChild(a);
+    }
+
     function locucion(texto, lang) {
+        if (sinVozDelIdioma(lang)) {
+            avisarSinVoz(lang);
+            return null;
+        }
+
         const v = new SpeechSynthesisUtterance(enEspanol(lang) ? paraVoz(texto) : texto);
         const voz = vozPara(lang);
 
@@ -590,7 +661,7 @@
     }
 
     function locucionesDe(texto, lang) {
-        return trozosDe(texto).map((t) => locucion(t, lang));
+        return trozosDe(texto).map((t) => locucion(t, lang)).filter(Boolean);
     }
 
     /**
@@ -3439,6 +3510,12 @@
         // para que salir de una estación de inglés no deje al resto de
         // la actividad hablando en inglés.
         idiomaVoz = datos.estacion.idioma || 'es-ES';
+
+        // Chrome trae sus voces de Google unos segundos después de abrir
+        // la página. Se les da ese tiempo antes de empezar: si no, la
+        // primera palabra en alemán se callaba por «falta de voz» y la
+        // voz llegaba justo después.
+        await esperarVoz(idiomaVoz, 3000);
 
         /*
          * Y si el niño lee o no. Lo decide el SERVIDOR con el nivel de la

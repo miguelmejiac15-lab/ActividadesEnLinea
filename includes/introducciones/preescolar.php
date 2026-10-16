@@ -136,4 +136,11 @@ return [
     'moverme-y-jugar' => breve('Correr, saltar y trepar: tu cuerpo **aprende moviéndose**.'),
     'cuidarme-de-los-peligros' => breve('La estufa, los enchufes y la calle pueden ser **peligrosos**. Vas a aprender qué no se toca.'),
 
+
+    // ── Alemán · Kindergarten ────────────────────────────────────────
+    'deutsch-die-farben' => breve('Vas a aprender los **colores en alemán**: rot es rojo y blau es azul.'),
+    'deutsch-die-tiere' => breve('Vas a aprender los **animales en alemán**. Cada uno trae su compañero: **der** Hund, **die** Katze.'),
+    'deutsch-mein-koerper' => breve('Vas a aprender las partes del **cuerpo en alemán**: die Hand es la mano y der Fuß es el pie.'),
+    'deutsch-hallo' => breve('En alemán, **Hallo** es hola, **Tschüss** es chao y **Danke** es gracias.'),
+
 ];

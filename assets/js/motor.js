@@ -239,6 +239,36 @@
 
     const enEspanol = (lang) => String(lang || '').toLowerCase().slice(0, 2) === 'es';
 
+    /*
+     * ─────────────────────────────────────────────────────────────────
+     *  EN UNA ESTACIÓN DE IDIOMAS, CADA FRASE CON SU VOZ
+     * ─────────────────────────────────────────────────────────────────
+     *
+     * La regla de Idiomas es: instrucciones en español, contenido en el
+     * idioma que se aprende. La voz se fijaba por estación, así que la
+     * voz inglesa (o alemana) leía también «¿Cómo se dice este color en
+     * inglés?», y a un niño de preescolar le llegaba una ristra de sonidos
+     * sin sentido justo en la instrucción.
+     *
+     * Aquí se decide frase por frase: si parece español —tildes, ¿ ¡ ñ, o
+     * palabras que solo usa el español— va con voz española; si no, con la
+     * del idioma de la estación. Las listas evitan a propósito palabras que
+     * también existen en inglés o alemán («es», «die», «a», «in»).
+     */
+    const PALABRAS_ESPANOL = /(?:^|[^\p{L}])(el|la|los|las|de|del|que|qué|un|una|unos|en|con|por|para|y|se|su|sus|cómo|cuál|dónde|este|esta|toca|elige|escribe|palabra|escucha|une|ordena|era|otra|vez|prueba|muy|bien|mi|yo|al)(?=$|[^\p{L}])/iu;
+
+    function pareceEspanol(texto) {
+        const t = String(texto || '');
+        if (/[¿¡ñÑáéíóúÁÉÍÓÚ]/.test(t)) return true;
+        try { return PALABRAS_ESPANOL.test(t); } catch (e) { return false; }
+    }
+
+    /** La voz para esta frase: la de la estación, salvo que sea español. */
+    function idiomaPara(texto) {
+        if (enEspanol(idiomaVoz)) return idiomaVoz;
+        return pareceEspanol(texto) ? 'es-ES' : idiomaVoz;
+    }
+
     function paraVoz(texto) {
         const t = String(texto);
         if (!reDigrafo) return t;
@@ -471,7 +501,7 @@
                 protegidaHasta = 0;
             }
 
-            const lang = op.idioma || idiomaVoz;
+            const lang = op.idioma || idiomaPara(limpio);
 
             // Lo que no hay que proteger —la instrucción, el cuento— puede
             // ser largo: va por oraciones (ver `locucionesDe()`).
@@ -603,7 +633,7 @@
                 const limpio = soloPalabras(t);
                 if (!limpio) return;
 
-                locuciones.push(...locucionesDe(limpio, idiomaVoz));
+                locuciones.push(...locucionesDe(limpio, idiomaPara(limpio)));
             });
 
             // Si hay algo protegido sonando, esto va detrás; si no, corta
@@ -691,6 +721,41 @@
             hablar(texto);
         };
         return b;
+    }
+
+    /*
+     * ─────────────────────────────────────────────────────────────────
+     *  LAS LETRAS QUE NO ESTÁN EN UN TECLADO COLOMBIANO
+     * ─────────────────────────────────────────────────────────────────
+     *
+     * En alemán, «Mütter» y «Mutter» son palabras distintas, y la ß es
+     * una letra. Un niño de seis años con un teclado en español no sabe
+     * dónde están: sin estos botones, la estación le pide algo que no
+     * puede escribir.
+     */
+    const enAleman = () => /^de/i.test(String(idiomaVoz || ''));
+
+    function teclasEspeciales(campo) {
+        const fila = el('div', 'juego-teclas-extra');
+        ['ä', 'ö', 'ü', 'ß'].forEach((letra) => {
+            const b = el('button', 'btn btn-secundario btn-chico', letra);
+            b.type = 'button';
+            b.setAttribute('aria-label', 'Escribir ' + letra);
+            b.onclick = () => {
+                const ini = campo.selectionStart ?? campo.value.length;
+                const fin = campo.selectionEnd ?? campo.value.length;
+                campo.value = campo.value.slice(0, ini) + letra + campo.value.slice(fin);
+                campo.focus();
+                campo.setSelectionRange(ini + 1, ini + 1);
+            };
+            fila.appendChild(b);
+        });
+        return fila;
+    }
+
+    /** El aviso cuando solo falla el acento (o, en alemán, los puntitos). */
+    function avisoCasi() {
+        return enAleman() ? '¡Casi! Fíjate en los puntitos: ä, ö, ü ✍️' : '¡Casi! Fíjate en la tilde ✍️';
     }
 
     // ── Interfaz de juego ────────────────────────────────────────────
@@ -1661,6 +1726,7 @@
                 campo.autocomplete = 'off';
                 campo.setAttribute('aria-label', 'Escribe ' + w);
                 c.appendChild(campo);
+                if (enAleman()) c.appendChild(teclasEspeciales(campo));
 
                 const enviar = el('button', 'btn btn-principal', 'Comprobar');
                 c.appendChild(enviar);
@@ -1719,7 +1785,7 @@
                      * una lección.
                      */
                     if (sinTildes(val) === sinTildes(w.toUpperCase())) {
-                        avisar('¡Casi! Fíjate en la tilde ✍️', false);
+                        avisar(avisoCasi(), false);
                     } else {
                         avisar('Revisa las letras', false);
                     }
@@ -3252,6 +3318,7 @@
                 campo.setAttribute('aria-label', 'Escribe la palabra de la pista ' +
                                     numero[p.fila + ',' + p.col]);
                 caja.appendChild(campo);
+                if (enAleman()) caja.appendChild(teclasEspeciales(campo));
 
                 const enviar = el('button', 'btn btn-principal', 'Comprobar');
                 caja.appendChild(enviar);

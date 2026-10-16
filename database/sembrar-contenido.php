@@ -123,6 +123,12 @@ const ARCHIVOS = [
     // después de él. En producción lo crea migracion-sombras-y-mitades.php,
     // que no toca ninguna otra actividad.
     'sombras-y-mitades',
+
+    // Alemán, fase 1 (Kindergarten y Klasse 1–2). Redeclara la categoría
+    // Idiomas tomando la de `idiomas-ampliacion` —con el lema que ya
+    // nombra el alemán—, así que va después de él. En producción lo crea
+    // migracion-aleman.php sin tocar ninguna otra actividad.
+    'idiomas-aleman',
 ];
 
 /** Proporción de estaciones gratuitas: el modelo 30% del proyecto. */
@@ -179,6 +185,7 @@ const ETIQUETAS = [
     'seguridad'     => ['Seguridad',          'tema', '🦺'],
     'emociones'     => ['Emociones',          'tema', '💛'],
     'ingles'        => ['Inglés',             'tema', '🇬🇧'],
+    'aleman'        => ['Alemán',             'tema', '🇩🇪'],
     'tecnologia'    => ['Tecnología',         'tema', '💻'],
 
     // Tipo de experiencia

@@ -202,6 +202,12 @@ function en(string $titulo, string $descripcion, string $icono, string $tipo, $d
     return est($titulo, $descripcion, $icono, $tipo, $datos, 'en-US');
 }
 
+/** Una estación de alemán: lo mismo que `en()`, con voz de Alemania. */
+function deu(string $titulo, string $descripcion, string $icono, string $tipo, $datos): array
+{
+    return est($titulo, $descripcion, $icono, $tipo, $datos, 'de-DE');
+}
+
 /**
  * Encabezado propio para los minijuegos que traían texto de lectoescritura
  * escrito dentro del motor. Ver `desempacar()` en motor.js.

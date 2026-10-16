@@ -161,4 +161,17 @@ return [
     'sonidos-y-senas' => breve('Vas a aprender con los **oídos** y con los **ojos**: escuchar, mirar y unir.'),
     'lengua-de-senas' => breve('La **lengua de señas** se habla con las manos. Vas a aprender a saludar y a pedir.'),
 
+
+    // ── Alemán · Klasse 1 y 2 ────────────────────────────────────────
+    'deutsch-mein-klassenzimmer' => breve('Vas a aprender los **útiles del colegio en alemán** y a escuchar con qué **sonido empieza** cada palabra.'),
+    'deutsch-zahlen-und-kalender' => breve('Vas a contar **hasta 20 en alemán** y a ordenar los **días**, los **meses** y las **estaciones**.'),
+    'deutsch-meine-welt-ist-bunt' => breve('Vas a decir **de qué color es** cada cosa y a jugar **Veo, veo** en alemán.'),
+    'deutsch-wetter-und-kleidung' => breve('Para hablar del clima en alemán se empieza con **Es**: Es regnet es «está lloviendo». Y vas a elegir **la ropa** para cada clima.'),
+    'deutsch-feste' => breve('Vas a conocer las **fiestas de Alemania** —San Nicolás, Navidad, Carnaval, Pascua— y a compararlas con las de Colombia.'),
+    'deutsch-in-der-schule' => breve('Vas a entender las **órdenes de la clase** en alemán: **Lies!** es «¡lee!» y **Schreib!** es «¡escribe!».'),
+    'deutsch-lebensmittel' => breve('Vas a aprender **comidas en alemán**, a decir cómo saben —süß, sauer, salzig— y qué te gusta con **Ich mag…**'),
+    'deutsch-meine-familie' => breve('Vas a presentar a tu **familia en alemán** con **mein** y **meine**, y a decir **cuántos años** tienes.'),
+    'deutsch-gefuehle' => breve('Vas a decir **cómo te sientes en alemán**: glücklich es feliz y traurig es triste.'),
+    'deutsch-gross-oder-klein' => breve('En alemán, **todos los sustantivos se escriben con mayúscula**: der **H**und, das **H**aus. Y cada uno tiene su artículo: der, die o das.'),
+
 ];

@@ -1495,3 +1495,7 @@ img.cruci-pista-dibujo { width: 2.3rem; height: 2.3rem; }
 
 /* La mitad grande, como dibujo de una pregunta. */
 .juego-mitad.grande { font-size: 5rem; }
+
+/* Letras del alemán que no están en un teclado en español. */
+.juego-teclas-extra { display: flex; gap: 8px; justify-content: center; margin: 8px 0; }
+.juego-teclas-extra .btn { min-width: 48px; font-size: 1.15rem; }

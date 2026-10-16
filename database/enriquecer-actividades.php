@@ -864,6 +864,11 @@ function generarSopa(array $cosecha): ?array
 //  RECORRIDO
 // =====================================================================
 
+// Una migración puede incluir este archivo solo por los generadores.
+if (defined('ENRIQUECER_SOLO_FUNCIONES')) {
+    return;
+}
+
 /*
  * ── Deshacer lo generado ─────────────────────────────────────────────
  *

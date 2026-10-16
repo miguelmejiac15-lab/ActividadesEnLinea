@@ -86,7 +86,7 @@ return [
             omp('My father\'s son is my…',      ['Brother', 'Uncle', 'Cousin'], 'Brother', '👦'),
             omp('My mother\'s sister is my…',   ['Aunt', 'Grandmother', 'Cousin'], 'Aunt', '👩'),
             omp('My aunt\'s son is my…',        ['Cousin', 'Brother', 'Uncle'], 'Cousin', '🧒'),
-            omp('How do you say «familia»?',    ['Family', 'Friend', 'Home'], 'Family'),
+            omp('Mom, Dad, my sister and me. We are a…', ['Family', 'Friend', 'Home'], 'Family', '👨‍👩‍👧'),
         ]),
 
         en('Write the word', 'Escribe la palabra en inglés', '⌨️', 'teclado',
@@ -161,7 +161,7 @@ return [
             omp('The cat is ___ the table. (encima)',   ['on', 'in', 'under'], 'on', '🐱'),
             omp('The ball is ___ the box. (dentro)',    ['in', 'on', 'next to'], 'in', '⚽'),
             omp('The dog is ___ the bed. (debajo)',     ['under', 'on', 'in'], 'under', '🐶'),
-            omp('The lamp is ___ the sofa. (al lado)',  ['next to', 'in', 'under'], 'next to', '💡'),
+            omp('The lamp and the sofa are side by side. The lamp is ___ the sofa.', ['next to', 'in', 'under'], 'next to', '💡'),
             omp('We cook ___ the kitchen.',             ['in', 'on', 'under'], 'in', '🍳'),
         ]),
 
@@ -205,11 +205,11 @@ return [
         ]),
 
         en('Giving directions', 'Cómo indicar el camino', '➡️', 'opcion_multiple', [
-            omp('«Gire a la izquierda» se dice…',   ['Turn left', 'Turn right', 'Go back'], 'Turn left'),
-            omp('«Siga derecho» se dice…',          ['Go straight', 'Turn around', 'Stop here'], 'Go straight'),
-            omp('«Gire a la derecha» se dice…',     ['Turn right', 'Turn left', 'Go up'], 'Turn right'),
-            omp('«Está al lado del banco» se dice…', ['It\'s next to the bank', 'It\'s under the bank', 'It\'s the bank'], 'It\'s next to the bank'),
-            omp('«¿Dónde está la biblioteca?» se dice…', ['Where is the library?', 'What is the library?', 'Who is the library?'], 'Where is the library?'),
+            omp('Look at the arrow. Where do you go?', ['Turn left', 'Turn right', 'Go back'], 'Turn left', '⬅️'),
+            omp('Look at the arrow. Where do you go?', ['Go straight', 'Turn around', 'Stop here'], 'Go straight', '⬆️'),
+            omp('Look at the arrow. Where do you go?', ['Turn right', 'Turn left', 'Go up'], 'Turn right', '➡️'),
+            omp('Look: 🏪🏦. Where is the shop?', ['It\'s next to the bank', 'It\'s under the bank', 'It\'s the bank'], 'It\'s next to the bank'),
+            omp('You are looking for the library. You ask…', ['Where is the library?', 'What is the library?', 'Who is the library?'], 'Where is the library?'),
         ]),
 
         en('A good community', 'Qué necesita un lugar para vivir bien', '🤝', 'opcion_multiple', [
@@ -297,8 +297,8 @@ return [
             omp('It\'s raining. What do you need?',       ['An umbrella', 'Sunglasses', 'A fan'], 'An umbrella', '☂️'),
             omp('It\'s sunny and hot. What do you wear?', ['A T-shirt', 'A coat', 'Boots'], 'A T-shirt', '👕'),
             omp('It\'s cold. What do you wear?',          ['A jacket', 'Shorts', 'Sandals'], 'A jacket', '🧥'),
-            omp('«Hace viento» se dice…',                 ['It\'s windy', 'It\'s sunny', 'It\'s rainy'], 'It\'s windy'),
-            omp('«¿Qué tiempo hace?» se dice…',           ['What\'s the weather like?', 'What time is it?', 'How are you?'], 'What\'s the weather like?'),
+            omp('What is the weather like?', ['It\'s windy', 'It\'s sunny', 'It\'s rainy'], 'It\'s windy', '💨'),
+            omp('You want to know about the weather. You ask…', ['What\'s the weather like?', 'What time is it?', 'How are you?'], 'What\'s the weather like?', '🌦️'),
         ]),
 
         en('The seasons', 'Las cuatro estaciones', '🍂', 'opcion_multiple', [
@@ -392,11 +392,11 @@ return [
         ]),
 
         en('I like / I don\'t like', 'Expresar gustos', '💚', 'opcion_multiple', [
-            omp('«Me gustan las manzanas» se dice…',   ['I like apples', 'I am apples', 'I have apples'], 'I like apples'),
-            omp('«No me gusta la leche» se dice…',     ['I don\'t like milk', 'I no like milk', 'I not like milk'], 'I don\'t like milk'),
-            omp('«¿Te gusta el arroz?» se dice…',      ['Do you like rice?', 'You like rice?', 'Are you rice?'], 'Do you like rice?'),
-            omp('«Mi comida favorita» se dice…',       ['My favourite food', 'My food favourite', 'The food my'], 'My favourite food'),
-            omp('«Tengo hambre» se dice…',             ['I\'m hungry', 'I\'m thirsty', 'I\'m tired'], 'I\'m hungry'),
+            omp('You love apples. You say…', ['I like apples', 'I am apples', 'I have apples'], 'I like apples', '🍎'),
+            omp('Milk? No, thank you! You say…', ['I don\'t like milk', 'I no like milk', 'I not like milk'], 'I don\'t like milk', '🥛'),
+            omp('You ask your friend about rice. You say…', ['Do you like rice?', 'You like rice?', 'Are you rice?'], 'Do you like rice?', '🍚'),
+            omp('Which one is correct?', ['My favourite food', 'My food favourite', 'The food my'], 'My favourite food', '🍕'),
+            omp('Your tummy is empty. You say…', ['I\'m hungry', 'I\'m thirsty', 'I\'m tired'], 'I\'m hungry', '😋'),
         ]),
 
         en('Healthy or not?', 'Toca los alimentos saludables', '🥗', 'seleccion_imagenes',
@@ -435,17 +435,17 @@ return [
         ]),
 
         en('Colours', 'Los colores en inglés', '🎨', 'opcion_multiple', [
-            omp('¿Cómo se dice «rojo»?',    ['Red', 'Blue', 'Green'], 'Red', '#e53935', 'color'),
-            omp('¿Cómo se dice «azul»?',    ['Blue', 'Black', 'Brown'], 'Blue', '#1e88e5', 'color'),
-            omp('¿Cómo se dice «verde»?',   ['Green', 'Grey', 'Gold'], 'Green', '#43a047', 'color'),
-            omp('¿Cómo se dice «amarillo»?', ['Yellow', 'White', 'Purple'], 'Yellow', '#fdd835', 'color'),
-            omp('¿Cómo se dice «negro»?',   ['Black', 'Blue', 'Beige'], 'Black', '#212121', 'color'),
+            omp('What color is it?', ['Red', 'Blue', 'Green'], 'Red', '#e53935', 'color'),
+            omp('What color is it?', ['Blue', 'Black', 'Brown'], 'Blue', '#1e88e5', 'color'),
+            omp('What color is it?', ['Green', 'Grey', 'Gold'], 'Green', '#43a047', 'color'),
+            omp('What color is it?', ['Yellow', 'White', 'Purple'], 'Yellow', '#fdd835', 'color'),
+            omp('What color is it?', ['Black', 'Blue', 'Beige'], 'Black', '#212121', 'color'),
         ]),
 
         en('What are you wearing?', 'Describir la ropa', '👀', 'opcion_multiple', [
-            omp('«Llevo una camiseta azul» se dice…',   ['I\'m wearing a blue T-shirt', 'I wear blue a T-shirt', 'I am blue T-shirt'], 'I\'m wearing a blue T-shirt'),
-            omp('En inglés el color va…',               ['Antes del sustantivo', 'Después del sustantivo', 'Da igual'], 'Antes del sustantivo'),
-            omp('«Zapatos negros» se dice…',            ['Black shoes', 'Shoes black', 'Shoe blacks'], 'Black shoes'),
+            omp('Look at your T-shirt 👕. Which sentence is correct?',   ['I\'m wearing a blue T-shirt', 'I wear blue a T-shirt', 'I am blue T-shirt'], 'I\'m wearing a blue T-shirt'),
+            omp('Which one is correct?', ['a red car', 'a car red', 'car a red'], 'a red car', '🚗'),
+            omp('Which one is correct?', ['Black shoes', 'Shoes black', 'Shoe blacks'], 'Black shoes', '👞'),
             omp('What do you wear when it rains?',      ['A raincoat', 'A swimsuit', 'Sandals'], 'A raincoat'),
             omp('What do you wear to play football?',   ['Sports clothes', 'A suit', 'Pyjamas'], 'Sports clothes'),
         ]),
@@ -481,11 +481,11 @@ return [
         ]),
 
         en('How often?', 'Adverbios de frecuencia', '🔁', 'opcion_multiple', [
-            omp('«Siempre» se dice…',       ['Always', 'Never', 'Sometimes'], 'Always'),
-            omp('«Nunca» se dice…',         ['Never', 'Often', 'Always'], 'Never'),
-            omp('«A veces» se dice…',       ['Sometimes', 'Never', 'Always'], 'Sometimes'),
-            omp('«A menudo» se dice…',      ['Often', 'Rarely', 'Never'], 'Often'),
-            omp('¿Dónde va el adverbio de frecuencia?', ['Antes del verbo principal', 'Al final siempre', 'Antes del sujeto'], 'Antes del verbo principal'),
+            omp('I brush my teeth every day. I ___ brush my teeth.', ['always', 'never', 'sometimes'], 'always', '🪥'),
+            omp('I don\'t eat insects! I ___ eat insects.', ['never', 'often', 'always'], 'never', '🐛'),
+            omp('I go to the cinema two times a year. I ___ go to the cinema.', ['sometimes', 'never', 'always'], 'sometimes', '🎬'),
+            omp('I play football four times a week. I ___ play football.', ['often', 'rarely', 'never'], 'often', '⚽'),
+            omp('Which sentence is correct?', ['I always eat breakfast', 'I eat always breakfast', 'Always I breakfast eat'], 'I always eat breakfast', '🥣'),
         ]),
 
         en('Present simple', 'Hablar de lo que haces siempre', '📝', 'opcion_multiple', [
@@ -497,11 +497,11 @@ return [
         ]),
 
         en('Ask a friend', 'Preguntas sobre aficiones', '💬', 'opcion_multiple', [
-            omp('«¿Cuál es tu pasatiempo favorito?» se dice…', ['What\'s your favourite hobby?', 'Which you hobby?', 'How is your hobby?'], 'What\'s your favourite hobby?'),
-            omp('«¿Te gusta nadar?» se dice…',                 ['Do you like swimming?', 'You like swim?', 'Are you swimming?'], 'Do you like swimming?'),
-            omp('«Juego los sábados» se dice…',                ['I play on Saturdays', 'I playing Saturdays', 'I am play Saturdays'], 'I play on Saturdays'),
-            omp('«¿Con qué frecuencia lees?» se dice…',        ['How often do you read?', 'How much you read?', 'When you read?'], 'How often do you read?'),
-            omp('Una respuesta corta a «Do you like it?» es…', ['Yes, I do', 'Yes, I like', 'Yes, I am'], 'Yes, I do'),
+            omp('You want to know your friend\'s hobby. You ask…', ['What\'s your favourite hobby?', 'Which you hobby?', 'How is your hobby?'], 'What\'s your favourite hobby?'),
+            omp('You want to know if your friend likes the pool. You ask…', ['Do you like swimming?', 'You like swim?', 'Are you swimming?'], 'Do you like swimming?', '🏊'),
+            omp('Which sentence is correct?', ['I play on Saturdays', 'I playing Saturdays', 'I am play Saturdays'], 'I play on Saturdays', '⚽'),
+            omp('Which question is correct?', ['How often do you read?', 'How much you read?', 'When you read?'], 'How often do you read?', '📚'),
+            omp('«Do you like it?» A short answer is…', ['Yes, I do', 'Yes, I like', 'Yes, I am'], 'Yes, I do'),
         ]),
     ],
 ],
@@ -525,19 +525,19 @@ return [
         ]),
 
         en('I have a…', 'Decir qué te duele', '🤒', 'opcion_multiple', [
-            omp('«Me duele la cabeza» se dice…',    ['I have a headache', 'I have a stomach', 'I am headache'], 'I have a headache'),
-            omp('«Me duele el estómago» se dice…',  ['I have a stomachache', 'I have a headache', 'I am stomach'], 'I have a stomachache'),
-            omp('«Me duele una muela» se dice…',    ['I have a toothache', 'I have a tooth', 'I am tooth'], 'I have a toothache'),
-            omp('«Tengo fiebre» se dice…',          ['I have a fever', 'I am fever', 'I do fever'], 'I have a fever'),
-            omp('«¿Estás bien?» se dice…',          ['Are you OK?', 'Do you OK?', 'Have you OK?'], 'Are you OK?'),
+            omp('Your head hurts. You say…', ['I have a headache', 'I have a stomach', 'I am headache'], 'I have a headache', '🤕'),
+            omp('Your tummy hurts. You say…', ['I have a stomachache', 'I have a headache', 'I am stomach'], 'I have a stomachache', '🤢'),
+            omp('Your tooth hurts. You say…', ['I have a toothache', 'I have a tooth', 'I am tooth'], 'I have a toothache', '🦷'),
+            omp('You are very hot and sick. You say…', ['I have a fever', 'I am fever', 'I do fever'], 'I have a fever', '🤒'),
+            omp('Your friend falls down. You ask…', ['Are you OK?', 'Do you OK?', 'Have you OK?'], 'Are you OK?', '🩹'),
         ]),
 
         en('Feelings', 'Nombrar lo que sientes', '😊', 'opcion_multiple', [
-            omp('«Feliz» se dice…',      ['Happy', 'Sad', 'Angry'], 'Happy', '😀'),
-            omp('«Triste» se dice…',     ['Sad', 'Happy', 'Tired'], 'Sad', '😢'),
-            omp('«Enojado» se dice…',    ['Angry', 'Scared', 'Bored'], 'Angry', '😠'),
-            omp('«Cansado» se dice…',    ['Tired', 'Excited', 'Proud'], 'Tired', '😴'),
-            omp('«Asustado» se dice…',   ['Scared', 'Calm', 'Glad'], 'Scared', '😨'),
+            omp('How does he feel?', ['Happy', 'Sad', 'Angry'], 'Happy', '😀'),
+            omp('How does he feel?', ['Sad', 'Happy', 'Tired'], 'Sad', '😢'),
+            omp('How does he feel?', ['Angry', 'Scared', 'Bored'], 'Angry', '😠'),
+            omp('How does he feel?', ['Tired', 'Excited', 'Proud'], 'Tired', '😴'),
+            omp('How does he feel?', ['Scared', 'Calm', 'Glad'], 'Scared', '😨'),
         ]),
 
         en('Healthy habits', 'Hábitos que cuidan el cuerpo', '🏆', 'desafio_final', [
@@ -570,19 +570,19 @@ return [
         ]),
 
         en('What time is it?', 'Decir la hora', '⏰', 'opcion_multiple', [
-            omp('3:00 se dice…',    ['Three o\'clock', 'Three thirty', 'Half past three'], 'Three o\'clock'),
-            omp('4:30 se dice…',    ['Half past four', 'Four o\'clock', 'Quarter past four'], 'Half past four'),
-            omp('5:15 se dice…',    ['Quarter past five', 'Quarter to five', 'Half past five'], 'Quarter past five'),
-            omp('6:45 se dice…',    ['Quarter to seven', 'Quarter past six', 'Half past six'], 'Quarter to seven'),
-            omp('«¿Qué hora es?» se dice…', ['What time is it?', 'What hour is it?', 'How time is it?'], 'What time is it?'),
+            omp('What time is it?', ['Three o\'clock', 'Three thirty', 'Half past three'], 'Three o\'clock', '3:00', 'texto'),
+            omp('What time is it?', ['Half past four', 'Four o\'clock', 'Quarter past four'], 'Half past four', '4:30', 'texto'),
+            omp('What time is it?', ['Quarter past five', 'Quarter to five', 'Half past five'], 'Quarter past five', '5:15', 'texto'),
+            omp('What time is it?', ['Quarter to seven', 'Quarter past six', 'Half past six'], 'Quarter to seven', '6:45', 'texto'),
+            omp('You want to know the time. You ask…', ['What time is it?', 'What hour is it?', 'How time is it?'], 'What time is it?', '⏰'),
         ]),
 
         en('Months and seasons', 'Los meses del año', '🗓️', 'opcion_multiple', [
-            omp('¿Cuál es el primer mes del año?',  ['January', 'March', 'December'], 'January'),
-            omp('¿Cuál es el último mes del año?',  ['December', 'November', 'January'], 'December'),
-            omp('¿Cuántos meses tiene un año?',     ['Twelve', 'Ten', 'Fifteen'], 'Twelve'),
-            omp('«Mi cumpleaños es en mayo» se dice…', ['My birthday is in May', 'My birthday is on May', 'My birthday in May is'], 'My birthday is in May'),
-            omp('¿Qué mes va después de July?',     ['August', 'June', 'September'], 'August'),
+            omp('Which is the first month of the year?', ['January', 'March', 'December'], 'January'),
+            omp('Which is the last month of the year?', ['December', 'November', 'January'], 'December'),
+            omp('How many months are there in a year?', ['Twelve', 'Ten', 'Fifteen'], 'Twelve'),
+            omp('Which sentence is correct? 🎂', ['My birthday is in May', 'My birthday is on May', 'My birthday in May is'], 'My birthday is in May'),
+            omp('Which month comes after July?', ['August', 'June', 'September'], 'August'),
         ]),
 
         en('Daily routine', 'Ordena tu día en inglés', '🔢', 'ordenar_secuencia', [
@@ -614,7 +614,7 @@ return [
             omp('watch → ___',   ['watched', 'watchd', 'watcheds'], 'watched'),
             omp('study → ___',   ['studied', 'studyed', 'studed'], 'studied'),
             omp('walk → ___',    ['walked', 'walkd', 'walking'], 'walked'),
-            omp('¿Qué terminación llevan los verbos regulares?', ['-ed', '-ing', '-s'], '-ed'),
+            omp('In the past, regular verbs end in…', ['-ed', '-ing', '-s'], '-ed'),
         ]),
 
         en('Irregular past', 'Los que no siguen la regla', '⚠️', 'opcion_multiple', [
@@ -630,7 +630,7 @@ return [
             omp('How did people light their homes?',      ['With candles', 'With LED lamps', 'With phones'], 'With candles', '🕯️'),
             omp('How did people send messages?',          ['By letter', 'By email', 'By video call'], 'By letter', '✉️'),
             omp('What can we learn from the past?',       ['How people lived and why things changed', 'Nothing', 'Only dates'], 'How people lived and why things changed'),
-            omp('«Hace cien años» se dice…',              ['A hundred years ago', 'Before hundred years', 'Since hundred years'], 'A hundred years ago'),
+            omp('Which one is correct? ⏳',['A hundred years ago', 'Before hundred years', 'Since hundred years'], 'A hundred years ago'),
         ]),
 
         en('Past quiz', 'Cinco preguntas finales', '🏆', 'desafio_final', [
@@ -670,19 +670,19 @@ return [
         ]),
 
         en('Space words', 'Vocabulario del espacio', '🌌', 'opcion_multiple', [
-            omp('¿Cómo se dice «estrella»?',   ['Star', 'Moon', 'Sun'], 'Star', '⭐'),
-            omp('¿Cómo se dice «planeta»?',    ['Planet', 'Rocket', 'Space'], 'Planet', '🪐'),
-            omp('¿Cómo se dice «luna»?',       ['Moon', 'Sun', 'Sky'], 'Moon', '🌙'),
-            omp('¿Cómo se dice «astronauta»?', ['Astronaut', 'Pilot', 'Driver'], 'Astronaut', '👨‍🚀'),
-            omp('¿Cómo se dice «cohete»?',     ['Rocket', 'Plane', 'Car'], 'Rocket', '🚀'),
+            omp('What is this?', ['Star', 'Moon', 'Sun'], 'Star', '⭐'),
+            omp('What is this?',    ['Planet', 'Rocket', 'Space'], 'Planet', '🪐'),
+            omp('What is this?',       ['Moon', 'Sun', 'Sky'], 'Moon', '🌙'),
+            omp('Who is this?', ['Astronaut', 'Pilot', 'Driver'], 'Astronaut', '👨‍🚀'),
+            omp('What is this?',     ['Rocket', 'Plane', 'Car'], 'Rocket', '🚀'),
         ]),
 
         en('Talking about the future', 'Will y going to', '🔮', 'opcion_multiple', [
-            omp('«Iré mañana» se dice…',            ['I will go tomorrow', 'I go tomorrow', 'I went tomorrow'], 'I will go tomorrow'),
-            omp('«Voy a estudiar» (plan) se dice…', ['I\'m going to study', 'I will studying', 'I go study'], 'I\'m going to study'),
-            omp('«Puede que llueva» se dice…',      ['It might rain', 'It will rain sure', 'It rained'], 'It might rain'),
-            omp('¿Qué usamos para un plan decidido?', ['Going to', 'Will always', 'Did'], 'Going to'),
-            omp('«En el futuro» se dice…',          ['In the future', 'On the future', 'At future'], 'In the future'),
+            omp('Which sentence is correct? 📅',['I will go tomorrow', 'I go tomorrow', 'I went tomorrow'], 'I will go tomorrow'),
+            omp('You have a plan for tonight. You say…', ['I\'m going to study', 'I will studying', 'I go study'], 'I\'m going to study'),
+            omp('You are not sure about the weather. You say…',['It might rain', 'It will rain sure', 'It rained'], 'It might rain'),
+            omp('For a plan you already decided, you use…', ['Going to', 'Will always', 'Did'], 'Going to'),
+            omp('Which one is correct? 🚀',['In the future', 'On the future', 'At future'], 'In the future'),
         ]),
     ],
 ],
@@ -705,11 +705,11 @@ return [
         ]),
 
         en('Polite English', 'Hablar con cortesía', '🙏', 'opcion_multiple', [
-            omp('¿Cómo pides algo con cortesía?',    ['Could you help me, please?', 'Give me that', 'Help now'], 'Could you help me, please?'),
-            omp('¿Qué dices si alguien te ayuda?',   ['Thank you', 'Never mind', 'Go away'], 'Thank you'),
-            omp('¿Qué dices si te equivocas?',       ['I\'m sorry', 'It\'s fine', 'So what'], 'I\'m sorry'),
-            omp('¿Cómo saludas por la mañana?',      ['Good morning', 'Good night', 'Goodbye'], 'Good morning'),
-            omp('¿Cómo te despides?',                ['Goodbye', 'Hello', 'Please'], 'Goodbye'),
+            omp('How do you ask politely?', ['Could you help me, please?', 'Give me that', 'Help now'], 'Could you help me, please?'),
+            omp('Someone helps you. You say…', ['Thank you', 'Never mind', 'Go away'], 'Thank you'),
+            omp('You make a mistake. You say…', ['I\'m sorry', 'It\'s fine', 'So what'], 'I\'m sorry'),
+            omp('It is morning. You say…', ['Good morning', 'Good night', 'Goodbye'], 'Good morning'),
+            omp('You leave. You say…', ['Goodbye', 'Hello', 'Please'], 'Goodbye'),
         ]),
 
         en('Writing a letter', 'Las partes de una carta', '✉️', 'ordenar_secuencia', [
@@ -751,19 +751,19 @@ return [
         ]),
 
         en('How many?', 'Preguntar cantidades', '❓', 'opcion_multiple', [
-            omp('«¿Cuántos libros?» se dice…',    ['How many books?', 'How much books?', 'What many books?'], 'How many books?'),
-            omp('«¿Cuánta agua?» se dice…',       ['How much water?', 'How many water?', 'How many waters?'], 'How much water?'),
-            omp('¿Cuándo se usa «how many»?',     ['Con cosas que se pueden contar', 'Con líquidos', 'Siempre'], 'Con cosas que se pueden contar'),
-            omp('¿Cuándo se usa «how much»?',     ['Con cosas que no se cuentan una a una', 'Con libros', 'Nunca'], 'Con cosas que no se cuentan una a una'),
-            omp('«There are five apples» significa…', ['Hay cinco manzanas', 'Hay una manzana', 'No hay manzanas'], 'Hay cinco manzanas'),
+            omp('You want to know the number of books. You ask…', ['How many books?', 'How much books?', 'What many books?'], 'How many books?'),
+            omp('You want to know the amount of water. You ask…', ['How much water?', 'How many water?', 'How many waters?'], 'How much water?'),
+            omp('We use «how many» with…', ['things we can count', 'liquids', 'everything'], 'things we can count', '🔢'),
+            omp('We use «how much» with…', ['things we cannot count one by one', 'books', 'nothing'], 'things we cannot count one by one', '🥛'),
+            omp('How many apples are there?', ['There are five apples', 'There is one apple', 'There are no apples'], 'There are five apples', ['🍎', '🍎', '🍎', '🍎', '🍎'], 'serie'),
         ]),
 
         en('Shapes', 'Las formas en inglés', '🔷', 'opcion_multiple', [
-            omp('¿Cómo se dice «círculo»?',    ['Circle', 'Square', 'Triangle'], 'Circle', '🔴'),
-            omp('¿Cómo se dice «cuadrado»?',   ['Square', 'Circle', 'Star'], 'Square', '🟦'),
-            omp('¿Cómo se dice «triángulo»?',  ['Triangle', 'Rectangle', 'Circle'], 'Triangle', '🔺'),
-            omp('¿Cómo se dice «estrella»?',   ['Star', 'Heart', 'Square'], 'Star', '⭐'),
-            omp('¿Cómo se dice «corazón»?',    ['Heart', 'Star', 'Circle'], 'Heart', '❤️'),
+            omp('What shape is it?',   ['Circle', 'Square', 'Triangle'], 'Circle', '🔴'),
+            omp('What shape is it?',  ['Square', 'Circle', 'Star'], 'Square', '🟦'),
+            omp('What shape is it?', ['Triangle', 'Rectangle', 'Circle'], 'Triangle', '🔺'),
+            omp('What shape is it?',  ['Star', 'Heart', 'Square'], 'Star', '⭐'),
+            omp('What shape is it?',   ['Heart', 'Star', 'Circle'], 'Heart', '❤️'),
         ]),
 
         en('Write the number', 'Escribe el número en inglés', '⌨️', 'teclado',
@@ -781,11 +781,11 @@ return [
     'estaciones' => [
 
         en('Question words', 'Cada una pregunta algo distinto', '🔗', 'opcion_multiple', [
-            omp('¿Qué palabra pregunta por una cosa?',   ['What', 'Where', 'When'], 'What'),
-            omp('¿Qué palabra pregunta por un lugar?',   ['Where', 'What', 'Who'], 'Where'),
-            omp('¿Qué palabra pregunta por un momento?', ['When', 'Where', 'Why'], 'When'),
-            omp('¿Qué palabra pregunta por una persona?', ['Who', 'What', 'How'], 'Who'),
-            omp('¿Qué palabra pregunta por una razón?',  ['Why', 'When', 'Where'], 'Why'),
+            omp('Which word asks about a thing?', ['What', 'Where', 'When'], 'What'),
+            omp('Which word asks about a place?', ['Where', 'What', 'Who'], 'Where'),
+            omp('Which word asks about a time?', ['When', 'Where', 'Why'], 'When'),
+            omp('Which word asks about a person?', ['Who', 'What', 'How'], 'Who'),
+            omp('Which word asks about a reason?', ['Why', 'When', 'Where'], 'Why'),
         ]),
 
         en('Complete the question', 'Elige la palabra correcta', '✏️', 'opcion_multiple', [
@@ -797,11 +797,11 @@ return [
         ]),
 
         en('Short answers', 'Responder correctamente', '💬', 'opcion_multiple', [
-            omp('«Do you like pizza?» → respuesta corta afirmativa', ['Yes, I do', 'Yes, I like', 'Yes, I am'], 'Yes, I do'),
-            omp('«Are you happy?» → respuesta corta afirmativa',     ['Yes, I am', 'Yes, I do', 'Yes, I have'], 'Yes, I am'),
-            omp('«Can you swim?» → respuesta corta negativa',        ['No, I can\'t', 'No, I don\'t', 'No, I am not'], 'No, I can\'t'),
-            omp('«Have you got a pet?» → afirmativa',               ['Yes, I have', 'Yes, I do have', 'Yes, I am'], 'Yes, I have'),
-            omp('«Is it raining?» → negativa',                       ['No, it isn\'t', 'No, it doesn\'t', 'No, it can\'t'], 'No, it isn\'t'),
+            omp('«Do you like pizza?» Short answer: yes.', ['Yes, I do', 'Yes, I like', 'Yes, I am'], 'Yes, I do'),
+            omp('«Are you happy?» Short answer: yes.', ['Yes, I am', 'Yes, I do', 'Yes, I have'], 'Yes, I am'),
+            omp('«Can you swim?» Short answer: no.', ['No, I can\'t', 'No, I don\'t', 'No, I am not'], 'No, I can\'t'),
+            omp('«Have you got a pet?» Short answer: yes.', ['Yes, I have', 'Yes, I do have', 'Yes, I am'], 'Yes, I have'),
+            omp('«Is it raining?» Short answer: no.', ['No, it isn\'t', 'No, it doesn\'t', 'No, it can\'t'], 'No, it isn\'t'),
         ]),
 
         en('Match question and answer', 'Une la pregunta con su respuesta', '🔗', 'emparejar', [
@@ -845,7 +845,7 @@ return [
             omp('A cheetah is the ___ land animal.',    ['fastest', 'faster', 'fast'], 'fastest', '🐆'),
             omp('A mouse is ___ than an elephant.',     ['smaller', 'bigger', 'the smallest'], 'smaller', '🐭'),
             omp('A giraffe is ___ than a horse.',       ['taller', 'shorter', 'the tallest'], 'taller', '🦒'),
-            omp('«Tan alto como» se dice…',             ['as tall as', 'more tall as', 'the tallest as'], 'as tall as'),
+            omp('Ana is 1.20 m. Tom is 1.20 m. Ana is ___ Tom.', ['as tall as', 'more tall as', 'the tallest as'], 'as tall as', '📏'),
         ]),
 
         en('English crossword', 'Cada pista está en inglés', '🔠', 'crucigrama',
@@ -863,7 +863,7 @@ return [
             reto('Which is correct?',        ['This is the best book', 'This is the goodest book', 'This is the more good book'], 'This is the best book'),
             reto('When do we add «-er»?',    ['With short adjectives', 'With long adjectives', 'Always'], 'With short adjectives'),
             reto('When do we use «more»?',   ['With long adjectives', 'With short adjectives', 'Never'], 'With long adjectives'),
-            reto('What does «the same as» mean?', ['Igual que', 'Más que', 'Menos que'], 'Igual que'),
+            reto('Which symbol means «the same as»?', ['=', '>', '<'], '='),
         ]),
     ],
 ],
@@ -938,11 +938,11 @@ return [
             ])),
 
         en('Reading strategies', 'Cómo leer mejor en otro idioma', '💡', 'opcion_multiple', [
-            omp('Si no entiendo una palabra, ¿qué hago primero?', ['Sigo leyendo y la deduzco por el contexto', 'Me detengo', 'Cierro el libro'], 'Sigo leyendo y la deduzco por el contexto'),
-            omp('¿Hace falta entender todas las palabras?', ['No, basta con la idea general', 'Sí, todas', 'Solo el título'], 'No, basta con la idea general'),
-            omp('¿Qué ayuda a anticipar de qué trata un texto?', ['El título y las imágenes', 'La última línea', 'Nada'], 'El título y las imágenes'),
-            omp('¿Sirve leer el texto dos veces?',      ['Sí, la segunda se entiende mucho más', 'No', 'Solo si es corto'], 'Sí, la segunda se entiende mucho más'),
-            omp('¿Qué es un cognado, como «animal» o «color»?', ['Una palabra parecida en los dos idiomas', 'Un error', 'Un verbo'], 'Una palabra parecida en los dos idiomas'),
+            omp('You don\'t know a word. What do you do first?', ['Keep reading and guess from the context', 'Stop reading', 'Close the book'], 'Keep reading and guess from the context', '📖'),
+            omp('Do you need to understand every word?', ['No, the main idea is enough', 'Yes, every word', 'Only the title'], 'No, the main idea is enough', '💡'),
+            omp('What helps you guess what a text is about?', ['The title and the pictures', 'The last line', 'Nothing'], 'The title and the pictures', '🖼️'),
+            omp('Is it good to read a text two times?', ['Yes, it is easier the second time', 'No', 'Only if it is short'], 'Yes, it is easier the second time', '🔁'),
+            omp('«Animal» and «color» look almost the same in English and in Spanish. They are…', ['cognates', 'mistakes', 'verbs'], 'cognates', '🔤'),
         ]),
     ],
 ],
@@ -967,19 +967,19 @@ return [
         ]),
 
         en('My day', 'Cuenta tu rutina', '📝', 'opcion_multiple', [
-            omp('«Me levanto a las siete» se dice…',   ['I wake up at seven', 'I wake up in seven', 'I wake at seven'], 'I wake up at seven'),
-            omp('«Voy al colegio en bus» se dice…',    ['I go to school by bus', 'I go school in bus', 'I going school bus'], 'I go to school by bus'),
-            omp('«Ella desayuna a las ocho» se dice…', ['She has breakfast at eight', 'She have breakfast at eight', 'She has breakfast in eight'], 'She has breakfast at eight'),
-            omp('¿Qué preposición se usa con las horas?', ['at', 'in', 'on'], 'at'),
-            omp('¿Qué preposición se usa con los días?',  ['on', 'at', 'in'], 'on'),
+            omp('It is 7:00 and you get up. You say…', ['I wake up at seven', 'I wake up in seven', 'I wake at seven'], 'I wake up at seven', '⏰'),
+            omp('Which sentence is correct? 🚌',    ['I go to school by bus', 'I go school in bus', 'I going school bus'], 'I go to school by bus'),
+            omp('Which sentence is correct? 🥐', ['She has breakfast at eight', 'She have breakfast at eight', 'She has breakfast in eight'], 'She has breakfast at eight'),
+            omp('I get up ___ seven o\'clock.', ['at', 'in', 'on'], 'at', '⏰'),
+            omp('I play football ___ Saturday.', ['on', 'at', 'in'], 'on', '⚽'),
         ]),
 
         en('Before and after', 'El orden de las acciones', '↔️', 'opcion_multiple', [
             omp('I have breakfast ___ I go to school.', ['before', 'after that I', 'while to'], 'before'),
             omp('I brush my teeth ___ breakfast.',      ['after', 'before that', 'in'], 'after'),
-            omp('«Primero» se dice…',                   ['First', 'Then', 'Finally'], 'First'),
-            omp('«Después» se dice…',                   ['Then', 'First', 'Before'], 'Then'),
-            omp('«Por último» se dice…',                ['Finally', 'First', 'Then'], 'Finally'),
+            omp('___, I wake up. Then I have breakfast.', ['First', 'Then', 'Finally'], 'First', '1️⃣'),
+            omp('First I wake up. ___ I have breakfast.', ['Then', 'First', 'Before'], 'Then', '2️⃣'),
+            omp('First I study. Then I eat. ___, I go to bed.', ['Finally', 'First', 'Then'], 'Finally', '3️⃣'),
         ]),
 
         en('Order the day', 'Ordena la rutina en inglés', '🔢', 'ordenar_secuencia', [
@@ -1000,18 +1000,18 @@ return [
 
         en('Where is it?', 'Preposiciones de lugar', '📍', 'opcion_multiple', [
             omp('The bank is ___ the school and the park. (entre)', ['between', 'behind', 'in front of'], 'between'),
-            omp('The car is ___ the house. (delante de)',  ['in front of', 'behind', 'under'], 'in front of'),
-            omp('The garden is ___ the house. (detrás de)', ['behind', 'in front of', 'on'], 'behind'),
-            omp('The shop is ___ the corner. (en la esquina)', ['on the corner', 'in the corner of', 'at corner'], 'on the corner'),
-            omp('The library is ___ the street. (al otro lado)', ['across the street', 'in the street', 'under the street'], 'across the street'),
+            omp('The car is ___ the house. From the street you see the car first.',  ['in front of', 'behind', 'under'], 'in front of'),
+            omp('The garden is ___ the house. From the street you cannot see it.', ['behind', 'in front of', 'on'], 'behind'),
+            omp('The shop is where two streets meet. It is…', ['on the corner', 'in the corner of', 'at corner'], 'on the corner'),
+            omp('To get to the library, you cross the street. Where is it?', ['across the street', 'in the street', 'under the street'], 'across the street', '🚸'),
         ]),
 
         en('Giving directions', 'Indicar el camino', '➡️', 'opcion_multiple', [
-            omp('«Siga derecho dos cuadras» se dice…',  ['Go straight for two blocks', 'Go direct two blocks', 'Straight two blocks go'], 'Go straight for two blocks'),
-            omp('«Gire a la izquierda en el semáforo» se dice…', ['Turn left at the traffic light', 'Turn left in traffic light', 'Left turn the light'], 'Turn left at the traffic light'),
-            omp('«Está a la derecha» se dice…',         ['It\'s on the right', 'It\'s in the right', 'It\'s at right'], 'It\'s on the right'),
-            omp('«Disculpe, ¿dónde está el hospital?» se dice…', ['Excuse me, where is the hospital?', 'Sorry, what is hospital?', 'Please, hospital where?'], 'Excuse me, where is the hospital?'),
-            omp('«Está muy lejos» se dice…',            ['It\'s very far', 'It\'s very near', 'It\'s very long'], 'It\'s very far'),
+            omp('Which sentence is correct? ⬆️',  ['Go straight for two blocks', 'Go direct two blocks', 'Straight two blocks go'], 'Go straight for two blocks'),
+            omp('Which sentence is correct? 🚦', ['Turn left at the traffic light', 'Turn left in traffic light', 'Left turn the light'], 'Turn left at the traffic light'),
+            omp('Look at the arrow. Where is it?', ['It\'s on the right', 'It\'s in the right', 'It\'s at right'], 'It\'s on the right', '➡️'),
+            omp('You are looking for the hospital. You ask…', ['Excuse me, where is the hospital?', 'Sorry, what is hospital?', 'Please, hospital where?'], 'Excuse me, where is the hospital?'),
+            omp('The beach is 100 km away. You say…', ['It\'s very far', 'It\'s very near', 'It\'s very long'], 'It\'s very far', '🏖️'),
         ]),
 
         en('Transport', 'Cómo llegar', '🚌', 'emparejar', [
@@ -1025,9 +1025,9 @@ return [
 
         en('Directions quiz', 'Cinco preguntas finales', '🏆', 'desafio_final', [
             reto('Which sentence asks for directions?', ['How do I get to the park?', 'What is the park?', 'Who is the park?'], 'How do I get to the park?'),
-            reto('«Next to» means…',                    ['Al lado de', 'Debajo de', 'Encima de'], 'Al lado de'),
-            reto('«Opposite» means…',                   ['Enfrente de', 'Al lado de', 'Dentro de'], 'Enfrente de'),
-            reto('If someone says «turn right», you…',  ['Giras a la derecha', 'Sigues derecho', 'Te devuelves'], 'Giras a la derecha'),
+            reto('«Next to» means…', ['beside', 'under', 'on top of'], 'beside'),
+            reto('«Opposite» means…', ['across from', 'next to', 'inside'], 'across from'),
+            reto('Someone says «turn right». Where do you go?', ['➡️', '⬆️', '↩️'], '➡️'),
             reto('How do you thank someone for directions?', ['Thank you very much', 'Please', 'Excuse me'], 'Thank you very much'),
         ]),
     ],
@@ -1057,15 +1057,15 @@ return [
             omp('A teacher works at a ___.',      ['school', 'hospital', 'farm'], 'school'),
             omp('A firefighter puts out ___.',    ['fires', 'books', 'plants'], 'fires'),
             omp('A farmer grows ___.',            ['food', 'houses', 'cars'], 'food'),
-            omp('«¿Qué hace tu mamá?» se dice…',  ['What does your mother do?', 'What make your mother?', 'Who is your mother do?'], 'What does your mother do?'),
+            omp('You want to know your mother\'s job. Which question is correct?',  ['What does your mother do?', 'What make your mother?', 'Who is your mother do?'], 'What does your mother do?'),
         ]),
 
         en('Describing people', 'Cómo es alguien', '👤', 'opcion_multiple', [
-            omp('«Es alta» se dice…',        ['She is tall', 'She has tall', 'She tall'], 'She is tall'),
-            omp('«Tiene el pelo rizado» se dice…', ['She has curly hair', 'She is curly hair', 'She have curly hair'], 'She has curly hair'),
-            omp('«Es amable» se dice…',      ['He is kind', 'He has kind', 'He kind'], 'He is kind'),
-            omp('¿Qué verbo se usa para el aspecto físico que se «tiene»?', ['have / has', 'be', 'do'], 'have / has'),
-            omp('¿Y para las cualidades?',   ['be: am, is, are', 'have', 'do'], 'be: am, is, are'),
+            omp('Which sentence is correct?', ['She is tall', 'She has tall', 'She tall'], 'She is tall', '👩'),
+            omp('Which sentence is correct?', ['She has curly hair', 'She is curly hair', 'She have curly hair'], 'She has curly hair', '👩‍🦱'),
+            omp('Which sentence is correct?', ['He is kind', 'He has kind', 'He kind'], 'He is kind', '😊'),
+            omp('For hair and eyes we use…', ['have / has', 'be', 'do'], 'have / has'),
+            omp('For words like «kind» or «tall» we use…',['be: am, is, are', 'have', 'do'], 'be: am, is, are'),
         ]),
 
         en('Jobs quiz', 'Cinco preguntas', '🏆', 'desafio_final', [
@@ -1073,7 +1073,7 @@ return [
             reto('Who flies a plane?',       ['A pilot', 'A driver', 'A nurse'], 'A pilot'),
             reto('Who builds houses?',       ['A builder', 'A dentist', 'A singer'], 'A builder'),
             reto('Who sells things in a shop?', ['A shop assistant', 'A doctor', 'A farmer'], 'A shop assistant'),
-            reto('«Quiero ser ingeniero» se dice…', ['I want to be an engineer', 'I want be engineer', 'I want to engineer'], 'I want to be an engineer'),
+            reto('You want to build bridges when you grow up. You say…', ['I want to be an engineer', 'I want be engineer', 'I want to engineer'], 'I want to be an engineer'),
         ]),
     ],
 ],
@@ -1105,11 +1105,11 @@ return [
         ]),
 
         en('Talking about sports', 'Expresar gustos y habilidad', '💬', 'opcion_multiple', [
-            omp('«Sé nadar» se dice…',          ['I can swim', 'I know swim', 'I swim can'], 'I can swim'),
-            omp('«No sé jugar tenis» se dice…', ['I can\'t play tennis', 'I no play tennis', 'I don\'t can play tennis'], 'I can\'t play tennis'),
-            omp('«Mi deporte favorito es…» se dice…', ['My favourite sport is…', 'My sport favourite is…', 'The favourite my sport…'], 'My favourite sport is…'),
-            omp('«Juego todos los sábados» se dice…', ['I play every Saturday', 'I playing every Saturday', 'I play all Saturday'], 'I play every Saturday'),
-            omp('«¿Practicas algún deporte?» se dice…', ['Do you play any sport?', 'You play sport?', 'Are you play sport?'], 'Do you play any sport?'),
+            omp('You know how to swim. You say…', ['I can swim', 'I know swim', 'I swim can'], 'I can swim', '🏊'),
+            omp('You don\'t know how to play tennis. You say…', ['I can\'t play tennis', 'I no play tennis', 'I don\'t can play tennis'], 'I can\'t play tennis'),
+            omp('Which one is correct? 🏅', ['My favourite sport is…', 'My sport favourite is…', 'The favourite my sport…'], 'My favourite sport is…'),
+            omp('Which sentence is correct? 📅', ['I play every Saturday', 'I playing every Saturday', 'I play all Saturday'], 'I play every Saturday'),
+            omp('You ask a new friend about sports. You say…', ['Do you play any sport?', 'You play sport?', 'Are you play sport?'], 'Do you play any sport?'),
         ]),
 
         en('Sports quiz', 'Decide rápido', '⚡', 'juego_rapido',
@@ -1143,26 +1143,26 @@ return [
         ]),
 
         en('Saying how you feel', 'Estructuras útiles', '💬', 'opcion_multiple', [
-            omp('«Estoy cansado» se dice…',       ['I am tired', 'I have tired', 'I tired'], 'I am tired'),
-            omp('«¿Cómo te sientes?» se dice…',   ['How do you feel?', 'How are you feel?', 'What you feel?'], 'How do you feel?'),
-            omp('«Me siento mejor» se dice…',     ['I feel better', 'I feel gooder', 'I am feel better'], 'I feel better'),
-            omp('«Estoy preocupado» se dice…',    ['I am worried', 'I have worried', 'I worry am'], 'I am worried'),
-            omp('«No pasa nada» se dice…',        ['It\'s OK', 'It\'s nothing pass', 'No pass nothing'], 'It\'s OK'),
+            omp('You want to sleep. You say…', ['I am tired', 'I have tired', 'I tired'], 'I am tired', '😴'),
+            omp('You ask a friend about feelings. You say…',   ['How do you feel?', 'How are you feel?', 'What you feel?'], 'How do you feel?'),
+            omp('You were sick. Now you are OK. You say…', ['I feel better', 'I feel gooder', 'I am feel better'], 'I feel better', '🙂'),
+            omp('You think about the test all night. You say…', ['I am worried', 'I have worried', 'I worry am'], 'I am worried', '😟'),
+            omp('Your friend says «Sorry!». You say…',        ['It\'s OK', 'It\'s nothing pass', 'No pass nothing'], 'It\'s OK'),
         ]),
 
         en('Helping a friend', 'Ofrecer apoyo', '🤝', 'opcion_multiple', [
-            omp('«¿Estás bien?» se dice…',        ['Are you OK?', 'Do you OK?', 'You are OK?'], 'Are you OK?'),
-            omp('«¿Puedo ayudarte?» se dice…',    ['Can I help you?', 'Can I helping you?', 'I can help you?'], 'Can I help you?'),
-            omp('«Lo siento» se dice…',           ['I\'m sorry', 'I sorry', 'Sorry I am not'], 'I\'m sorry'),
-            omp('«No te preocupes» se dice…',     ['Don\'t worry', 'No worry', 'Not you worry'], 'Don\'t worry'),
-            omp('«Cuenta conmigo» se dice…',      ['You can count on me', 'You count me', 'Count with me'], 'You can count on me'),
+            omp('Your friend is crying. You ask…', ['Are you OK?', 'Do you OK?', 'You are OK?'], 'Are you OK?', '😢'),
+            omp('You want to help a friend. You ask…',    ['Can I help you?', 'Can I helping you?', 'I can help you?'], 'Can I help you?'),
+            omp('You break your friend\'s pencil. You say…',           ['I\'m sorry', 'I sorry', 'Sorry I am not'], 'I\'m sorry'),
+            omp('Your friend is nervous. You say…',     ['Don\'t worry', 'No worry', 'Not you worry'], 'Don\'t worry'),
+            omp('Your friend needs help. You say…',      ['You can count on me', 'You count me', 'Count with me'], 'You can count on me'),
         ]),
 
         en('Friendship quiz', 'Cinco preguntas', '🏆', 'desafio_final', [
             reto('A friend is sad. What can you say?', ['Are you OK? Do you want to talk?', 'Go away', 'Nothing'], 'Are you OK? Do you want to talk?'),
-            reto('«Gracias por ayudarme» se dice…',    ['Thank you for helping me', 'Thanks for help me', 'Thank for helping'], 'Thank you for helping me'),
-            reto('What does «kind» mean?',             ['Amable', 'Enojado', 'Cansado'], 'Amable'),
-            reto('What does «to share» mean?',         ['Compartir', 'Esconder', 'Correr'], 'Compartir'),
+            reto('Someone helped you. You say…',    ['Thank you for helping me', 'Thanks for help me', 'Thank for helping'], 'Thank you for helping me'),
+            reto('Which face is «kind»?', ['😊', '😠', '😴'], '😊'),
+            reto('«To share» means…', ['to give part of what you have', 'to hide something', 'to run fast'], 'to give part of what you have', '🤲'),
             reto('Why is it good to talk about feelings?', ['It helps us understand each other', 'It is not good', 'Only adults do it'], 'It helps us understand each other'),
         ]),
     ],

@@ -56,19 +56,19 @@ return [
     'estaciones' => [
 
         en('Hello!', 'Saludar en inglés', '👋', 'opcion_multiple', [
-            omp('«Hola» en inglés es…',        ['Hello', 'Goodbye', 'Please'], 'Hello', '👋'),
-            omp('«Adiós» en inglés es…',       ['Goodbye', 'Hello', 'Thanks'], 'Goodbye', '👋'),
-            omp('«Buenos días» es…',           ['Good morning', 'Good night', 'Good boy'], 'Good morning', '🌅'),
-            omp('«Buenas noches» es…',         ['Good night', 'Good morning', 'Good day'], 'Good night', '🌙'),
-            omp('«Gracias» en inglés es…',     ['Thank you', 'Please', 'Sorry'], 'Thank you'),
+            omp('You meet a friend. You say…', ['Hello', 'Goodbye', 'Please'], 'Hello', '👋'),
+            omp('You go home. You say…', ['Goodbye', 'Hello', 'Thanks'], 'Goodbye', '🚶'),
+            omp('It is morning. You say…',['Good morning', 'Good night', 'Good boy'], 'Good morning', '🌅'),
+            omp('You go to bed. You say…',['Good night', 'Good morning', 'Good day'], 'Good night', '🌙'),
+            omp('Someone gives you a present. You say…', ['Thank you', 'Please', 'Sorry'], 'Thank you', '🎁'),
         ]),
 
         en('What is your name?', 'Decir mi nombre', '🙋', 'opcion_multiple', [
-            omp('Para decir mi nombre digo…',  ['My name is…', 'My cat is…', 'I am five'], 'My name is…'),
-            omp('«¿Cómo te llamas?» es…',      ['What is your name?', 'How are you?', 'Where are you?'], 'What is your name?'),
-            omp('«¿Cómo estás?» es…',          ['How are you?', 'What is this?', 'Who are you?'], 'How are you?'),
-            omp('Si estoy bien respondo…',     ['I am fine', 'I am a cat', 'Good night'], 'I am fine'),
-            omp('«Por favor» en inglés es…',   ['Please', 'Thanks', 'Sorry'], 'Please'),
+            omp('You say your name…',['My name is…', 'My cat is…', 'I am five'], 'My name is…'),
+            omp('You want to know a new friend\'s name. You ask…',['What is your name?', 'How are you?', 'Where are you?'], 'What is your name?'),
+            omp('You want to know how your friend is. You ask…',['How are you?', 'What is this?', 'Who are you?'], 'How are you?'),
+            omp('«How are you?» You are fine. You say…',['I am fine', 'I am a cat', 'Good night'], 'I am fine'),
+            omp('You want some water. You ask: «Water, …»', ['please', 'thanks', 'sorry'], 'please', '💧'),
         ]),
 
         en('Listen and match', 'Une el saludo con el momento', '🔗', 'emparejar', [
@@ -100,19 +100,19 @@ return [
     'estaciones' => [
 
         en('Colors', 'Los colores en inglés', '🎨', 'opcion_multiple', [
-            omp('🔴 es…',  ['Red', 'Blue', 'Green'], 'Red', '🔴'),
-            omp('🔵 es…',  ['Blue', 'Red', 'Yellow'], 'Blue', '🔵'),
-            omp('🟡 es…',  ['Yellow', 'Green', 'Black'], 'Yellow', '🟡'),
-            omp('🟢 es…',  ['Green', 'Blue', 'White'], 'Green', '🟢'),
-            omp('⚫ es…',  ['Black', 'White', 'Red'], 'Black', '⚫'),
+            omp('What color is it?',['Red', 'Blue', 'Green'], 'Red', '🔴'),
+            omp('What color is it?',['Blue', 'Red', 'Yellow'], 'Blue', '🔵'),
+            omp('What color is it?',['Yellow', 'Green', 'Black'], 'Yellow', '🟡'),
+            omp('What color is it?',['Green', 'Blue', 'White'], 'Green', '🟢'),
+            omp('What color is it?',['Black', 'White', 'Red'], 'Black', '⚫'),
         ]),
 
         en('Numbers 1 to 10', 'Contar en inglés', '🔢', 'opcion_multiple', [
-            omp('1 es…',  ['One', 'Two', 'Ten'], 'One'),
-            omp('3 es…',  ['Three', 'Four', 'Five'], 'Three'),
-            omp('5 es…',  ['Five', 'Nine', 'One'], 'Five'),
-            omp('8 es…',  ['Eight', 'Seven', 'Six'], 'Eight'),
-            omp('10 es…', ['Ten', 'Two', 'Nine'], 'Ten'),
+            omp('What number is it?', ['One', 'Two', 'Ten'], 'One', '1', 'texto'),
+            omp('What number is it?', ['Three', 'Four', 'Five'], 'Three', '3', 'texto'),
+            omp('What number is it?', ['Five', 'Nine', 'One'], 'Five', '5', 'texto'),
+            omp('What number is it?', ['Eight', 'Seven', 'Six'], 'Eight', '8', 'texto'),
+            omp('What number is it?', ['Ten', 'Two', 'Nine'], 'Ten', '10', 'texto'),
         ]),
 
         en('Match the color', 'Une el color con su palabra', '🔗', 'emparejar', [
@@ -141,11 +141,11 @@ return [
     'estaciones' => [
 
         en('Family words', 'Cada uno tiene su palabra', '👪', 'opcion_multiple', [
-            omp('«Mamá» en inglés es…',    ['Mother', 'Father', 'Sister'], 'Mother', '👩'),
-            omp('«Papá» en inglés es…',    ['Father', 'Brother', 'Mother'], 'Father', '👨'),
-            omp('«Hermano» es…',           ['Brother', 'Sister', 'Baby'], 'Brother', '🧒'),
-            omp('«Hermana» es…',           ['Sister', 'Brother', 'Mother'], 'Sister', '👧'),
-            omp('«Bebé» es…',              ['Baby', 'Boy', 'Girl'], 'Baby', '👶'),
+            omp('Who is this?',['Mother', 'Father', 'Sister'], 'Mother', '👩'),
+            omp('Who is this?',['Father', 'Brother', 'Mother'], 'Father', '👨'),
+            omp('Who is this?',['Brother', 'Sister', 'Baby'], 'Brother', '🧒'),
+            omp('Who is this?',['Sister', 'Brother', 'Mother'], 'Sister', '👧'),
+            omp('Who is this?',['Baby', 'Boy', 'Girl'], 'Baby', '👶'),
         ]),
 
         en('Match the family', 'Une el dibujo con la palabra', '🔗', 'emparejar', [
@@ -158,11 +158,11 @@ return [
         ]),
 
         en('This is my house', 'Los cuartos de la casa', '🏠', 'opcion_multiple', [
-            omp('«Casa» en inglés es…',     ['House', 'Horse', 'Mouse'], 'House', '🏠'),
-            omp('«Cuarto» es…',             ['Bedroom', 'Kitchen', 'Garden'], 'Bedroom', '🛏️'),
-            omp('«Cocina» es…',             ['Kitchen', 'Bathroom', 'Bedroom'], 'Kitchen', '🍳'),
-            omp('«Baño» es…',               ['Bathroom', 'Kitchen', 'Living room'], 'Bathroom', '🛁'),
-            omp('«Puerta» es…',             ['Door', 'Window', 'Wall'], 'Door', '🚪'),
+            omp('What is this?',['House', 'Horse', 'Mouse'], 'House', '🏠'),
+            omp('What room is this?',['Bedroom', 'Kitchen', 'Garden'], 'Bedroom', '🛏️'),
+            omp('What room is this?',['Kitchen', 'Bathroom', 'Bedroom'], 'Kitchen', '🍳'),
+            omp('What room is this?',['Bathroom', 'Kitchen', 'Living room'], 'Bathroom', '🛁'),
+            omp('What is this?',['Door', 'Window', 'Wall'], 'Door', '🚪'),
         ]),
 
         en('Memory: family', 'Encuentra las parejas', '🧠', 'memoria',
@@ -180,11 +180,11 @@ return [
     'estaciones' => [
 
         en('Animal words', 'Cada animal, su palabra', '🐾', 'opcion_multiple', [
-            omp('🐱 en inglés es…',  ['Cat', 'Dog', 'Bird'], 'Cat', '🐱'),
-            omp('🐶 en inglés es…',  ['Dog', 'Cat', 'Fish'], 'Dog', '🐶'),
-            omp('🐦 en inglés es…',  ['Bird', 'Bear', 'Cow'], 'Bird', '🐦'),
-            omp('🐠 en inglés es…',  ['Fish', 'Frog', 'Duck'], 'Fish', '🐠'),
-            omp('🐄 en inglés es…',  ['Cow', 'Horse', 'Pig'], 'Cow', '🐄'),
+            omp('What animal is it?',['Cat', 'Dog', 'Bird'], 'Cat', '🐱'),
+            omp('What animal is it?',['Dog', 'Cat', 'Fish'], 'Dog', '🐶'),
+            omp('What animal is it?',['Bird', 'Bear', 'Cow'], 'Bird', '🐦'),
+            omp('What animal is it?',['Fish', 'Frog', 'Duck'], 'Fish', '🐠'),
+            omp('What animal is it?',['Cow', 'Horse', 'Pig'], 'Cow', '🐄'),
         ]),
 
         en('Match the animal', 'Une el dibujo con la palabra', '🔗', 'emparejar', [

@@ -254,7 +254,8 @@ foreach ($estaciones as $e) {
             }
             $vistas = [];
             foreach ($lista as $i => $p) {
-                if (($p['w'] ?? '') === '' || ($p['e'] ?? '') === '') {
+                // Dibujo ↔ palabra, o pregunta ↔ respuesta (emparejar con «q»).
+                if (($p['w'] ?? '') === '' || (($p['e'] ?? '') === '' && ($p['q'] ?? '') === '')) {
                     mal($e, "pareja $i incompleta");
                 }
                 // En «emparejar» el motor busca por la palabra: dos

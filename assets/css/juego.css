@@ -1511,3 +1511,7 @@ img.cruci-pista-dibujo { width: 2.3rem; height: 2.3rem; }
     position: absolute; top: 8px; right: 8px; border: none; background: none;
     font-size: 1rem; cursor: pointer; color: var(--texto-tenue);
 }
+
+/* Emparejar pregunta ↔ respuesta: la carta lleva texto, no solo dibujo. */
+.juego-carta.con-texto { min-width: 150px; max-width: 220px; }
+.juego-carta-texto { font-weight: 700; color: var(--oscuro); font-size: 1rem; line-height: 1.3; text-align: center; }

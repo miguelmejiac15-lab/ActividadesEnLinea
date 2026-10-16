@@ -796,6 +796,97 @@
 
     /*
      * ─────────────────────────────────────────────────────────────────
+     *  EN UNA ESTACIÓN DE IDIOMAS, EL JUEGO HABLA ESE IDIOMA
+     * ─────────────────────────────────────────────────────────────────
+     *
+     * Lo pidieron los docentes de alemán: instrucciones, avisos y botones
+     * en el idioma que se aprende, no en español. Inmersión: el niño oye
+     * y lee «Schreib das Wort» y «Richtig!», no «Escribe la palabra».
+     * Fuera de una estación de idiomas, T() devuelve el español de siempre.
+     */
+    const TRADUCCIONES = {
+        "Une cada pregunta con su respuesta": { en: "Match each question with its answer", de: "Verbinde jede Frage mit der Antwort" },
+        "Toca una pregunta y luego su respuesta": { en: "Tap a question, then its answer", de: "Tippe auf eine Frage und dann auf die Antwort" },
+        "Elige primero una pregunta": { en: "Choose a question first", de: "Wähle zuerst eine Frage" },
+        "¡Correcto! 🏆": { en: "Correct! 🏆", de: "Richtig! 🏆" },
+        "¡Sí! ⚡": { en: "Yes! ⚡", de: "Ja! ⚡" },
+        "Ups": { en: "Oops", de: "Hoppla" },
+        "💡 Descartamos una opción equivocada": { en: "💡 One wrong answer is gone", de: "💡 Eine falsche Antwort ist weg" },
+        "Escucha y decide": { en: "Listen and decide", de: "Hör zu und entscheide" },
+        "🔊 Escuchar": { en: "🔊 Listen", de: "🔊 Hören" },
+        "🔊 Escuchar de nuevo": { en: "🔊 Listen again", de: "🔊 Noch einmal hören" },
+        "✅ Sí": { en: "✅ Yes", de: "✅ Ja" },
+        "❌ No": { en: "❌ No", de: "❌ Nein" },
+        "Toca todas las correctas": { en: "Tap all the right ones", de: "Tippe auf alle richtigen" },
+        "¡Las encontraste todas! 🌟": { en: "You found them all! 🌟", de: "Du hast alle gefunden! 🌟" },
+        "Esa no era": { en: "Not that one", de: "Das war es nicht" },
+        "Arma la palabra": { en: "Build the word", de: "Bau das Wort" },
+        "Toca las letras en orden": { en: "Tap the letters in order", de: "Tippe die Buchstaben der Reihe nach" },
+        "Esa letra no va aquí": { en: "That letter does not go here", de: "Dieser Buchstabe passt hier nicht" },
+        "Escribe la palabra": { en: "Write the word", de: "Schreib das Wort" },
+        "Usa el teclado": { en: "Use the keyboard", de: "Benutze die Tastatur" },
+        "Comprobar": { en: "Check", de: "Prüfen" },
+        "¡Perfecto! 🎉": { en: "Perfect! 🎉", de: "Super! 🎉" },
+        "Revisa las letras": { en: "Check the letters", de: "Prüf die Buchstaben" },
+        "¿Cómo se escribe?": { en: "How do you spell it?", de: "Wie schreibt man das?" },
+        "Elige la forma correcta": { en: "Choose the right spelling", de: "Wähle die richtige Schreibweise" },
+        "¡Así se escribe! ✅": { en: "That is right! ✅", de: "Richtig geschrieben! ✅" },
+        "Esa no es": { en: "Not that one", de: "Das passt nicht" },
+        "¡Secuencia completa! 🌟": { en: "All in order! 🌟", de: "Alles in der richtigen Reihenfolge! 🌟" },
+        "Ese va más adelante": { en: "That one comes later", de: "Das kommt später" },
+        "Responde rápido": { en: "Answer fast", de: "Antworte schnell" },
+        "¡Se acabó el tiempo!": { en: "Time is up!", de: "Die Zeit ist um!" },
+        "Encuentra las parejas": { en: "Find the pairs", de: "Finde die Paare" },
+        "Toca dos cartas iguales": { en: "Tap two matching cards", de: "Tippe auf zwei gleiche Karten" },
+        "¡Todas las parejas! 🧠": { en: "All the pairs! 🧠", de: "Alle Paare! 🧠" },
+        "Sopa de letras": { en: "Word search", de: "Buchstabensalat" },
+        "Toca la primera y la última letra de cada palabra": { en: "Tap the first and the last letter of each word", de: "Tippe auf den ersten und den letzten Buchstaben jedes Wortes" },
+        "Ahí no hay palabra": { en: "There is no word there", de: "Da ist kein Wort" },
+        "Cuento": { en: "Story", de: "Geschichte" },
+        "Une cada imagen con su palabra": { en: "Match each picture with its word", de: "Verbinde jedes Bild mit seinem Wort" },
+        "Toca una imagen y luego su palabra": { en: "Tap a picture, then its word", de: "Tippe auf ein Bild und dann auf sein Wort" },
+        "Elige primero una imagen": { en: "Choose a picture first", de: "Wähle zuerst ein Bild" },
+        "¡Todas emparejadas! 🌟": { en: "All matched! 🌟", de: "Alles verbunden! 🌟" },
+        "¡Esa es! ✅": { en: "That is it! ✅", de: "Genau! ✅" },
+        "Escucha y repite": { en: "Listen and repeat", de: "Hör zu und sprich nach" },
+        "Di la palabra en voz alta": { en: "Say the word out loud", de: "Sag das Wort laut" },
+        "✅ Ya la dije": { en: "✅ I said it", de: "✅ Ich habe es gesagt" },
+        "¿Qué letra falta?": { en: "Which letter is missing?", de: "Welcher Buchstabe fehlt?" },
+        "Completa la palabra": { en: "Complete the word", de: "Ergänze das Wort" },
+        "¡Correcto! ✅": { en: "Correct! ✅", de: "Richtig! ✅" },
+        "Prueba con otra": { en: "Try another one", de: "Versuch einen anderen" },
+        "Completa el texto": { en: "Complete the text", de: "Ergänze den Text" },
+        "¡Texto completo! 📖": { en: "Text complete! 📖", de: "Text fertig! 📖" },
+        "Esa no encaja ahí. Lee la frase otra vez": { en: "That does not fit there. Read the sentence again", de: "Das passt da nicht. Lies den Satz noch einmal" },
+        "Todavía no. Mira la pista otra vez": { en: "Not yet. Look at the clue again", de: "Noch nicht. Schau dir den Hinweis noch einmal an" },
+        "¡Muy bien!": { en: "Great job!", de: "Super gemacht!" },
+        "Esa no era. Prueba otra vez.": { en: "Not that one. Try again.", de: "Das war es nicht. Versuch es noch einmal." },
+        "Ordena la historia": { en: "Put it in order", de: "Bring es in die richtige Reihenfolge" },
+        "Toca los elementos en orden": { en: "Tap the items in order", de: "Tippe in der richtigen Reihenfolge" },
+        "Crucigrama": { en: "Crossword", de: "Kreuzworträtsel" },
+        "Toca una pista y escribe la palabra": { en: "Tap a clue and write the word", de: "Tippe auf einen Hinweis und schreib das Wort" },
+        "Escucha y escribe": { en: "Listen and write", de: "Hör zu und schreib" },
+        "Escucha y elige": { en: "Listen and choose", de: "Hör zu und wähle" },
+    };
+
+    function T(es) {
+        const base = String(idiomaVoz || '').toLowerCase().slice(0, 2);
+        const t = TRADUCCIONES[es];
+        return (t && t[base]) || es;
+    }
+
+    /** «Pregunta 2 de 6», en el idioma de la estación. */
+    function contador(i, n, palabraEs) {
+        const base = String(idiomaVoz || '').toLowerCase().slice(0, 2);
+        const de = { Pregunta: 'Frage', Ejercicio: 'Aufgabe', 'Página': 'Seite' };
+        const en = { Pregunta: 'Question', Ejercicio: 'Exercise', 'Página': 'Page' };
+        if (base === 'en') return en[palabraEs] + ' ' + i + ' of ' + n;
+        if (base === 'de') return de[palabraEs] + ' ' + i + ' von ' + n;
+        return palabraEs + ' ' + i + ' de ' + n;
+    }
+
+    /*
+     * ─────────────────────────────────────────────────────────────────
      *  LAS LETRAS QUE NO ESTÁN EN UN TECLADO COLOMBIANO
      * ─────────────────────────────────────────────────────────────────
      *
@@ -826,7 +917,7 @@
 
     /** El aviso cuando solo falla el acento (o, en alemán, los puntitos). */
     function avisoCasi() {
-        return enAleman() ? '¡Casi! Fíjate en los puntitos: ä, ö, ü ✍️' : '¡Casi! Fíjate en la tilde ✍️';
+        return enAleman() ? 'Fast! Achte auf die Punkte: ä, ö, ü ✍️' : '¡Casi! Fíjate en la tilde ✍️';
     }
 
     // ── Interfaz de juego ────────────────────────────────────────────
@@ -1163,7 +1254,7 @@
          *    a nadie.
          */
         if (sinLectura) {
-            hablar(bien ? '¡Muy bien!' : 'Esa no era. Prueba otra vez.',
+            hablar(bien ? T('¡Muy bien!') : T('Esa no era. Prueba otra vez.'),
                    { encolar: true, proteger: true });
         }
     }
@@ -1257,7 +1348,7 @@
 
         if (tipo === 'pista') {
             estado.pista();
-            avisar('💡 Descartamos una opción equivocada', true);
+            avisar(T('💡 Descartamos una opción equivocada'), true);
         } else {
             /*
              * Saltar registra la estación como pasada pero SIN mérito:
@@ -1274,7 +1365,7 @@
         const texto = $('#texto-juego');
         const pct = total > 0 ? Math.round((hechos / total) * 100) : 0;
         if (barra) barra.style.width = pct + '%';
-        if (texto) texto.textContent = hechos + ' de ' + total;
+        if (texto) texto.textContent = hechos + ({ en: ' of ', de: ' von ' }[String(idiomaVoz || '').slice(0, 2)] || ' de ') + total;
     }
 
     /**
@@ -1539,7 +1630,7 @@
          * estaciones antiguas siguen funcionando igual.
          */
         sonido_letra(datos, fin, extra) {
-            const d = desempacar(datos, '¿Empieza con esta letra?', 'Escucha y decide');
+            const d = desempacar(datos, '¿Empieza con esta letra?', T('Escucha y decide'));
             const items = d.items;
             let i = 0, aciertos = 0;
 
@@ -1557,7 +1648,7 @@
                 p.appendChild(cara);
                 p.appendChild(el('div', 'juego-palabra', it.n));
 
-                const oir = el('button', 'btn btn-secundario', '🔊 Escuchar');
+                const oir = el('button', 'btn btn-secundario', T('🔊 Escuchar'));
                 oir.onclick = () => hablar(it.n);
                 p.appendChild(oir);
 
@@ -1570,7 +1661,7 @@
                  * distingue verde de rojo.
                  */
                 const ops = el('div', 'juego-opciones');
-                [['✅ Sí', true, 'juego-si'], ['❌ No', false, 'juego-no']].forEach(([txt, val, clase]) => {
+                [[T('✅ Sí'), true, 'juego-si'], [T('❌ No'), false, 'juego-no']].forEach(([txt, val, clase]) => {
                     const b = el('button', 'btn juego-boton ' + clase, txt);
                     b.onclick = () => {
                         const bien = (!!it.ok === val);
@@ -1603,7 +1694,7 @@
 
         /* 2 · Seleccionar todas las imágenes correctas */
         seleccion_imagenes(datos, fin) {
-            const d = desempacar(datos, 'Toca todas las correctas',
+            const d = desempacar(datos, T('Toca todas las correctas'),
                                         'Elige las que empiezan con la letra');
             const items = barajar(d.items);
             const correctas = items.filter((x) => x.ok).length;
@@ -1627,12 +1718,12 @@
                         elegidas.add(idx);
                         marcarProgreso(elegidas.size, correctas);
                         if (elegidas.size === correctas) {
-                            avisar('¡Las encontraste todas! 🌟', true);
+                            avisar(T('¡Las encontraste todas! 🌟'), true);
                             setTimeout(() => fin(correctas, correctas), 1100);
                         }
                     } else {
                         c.classList.add('error');
-                        avisar('Esa no era', false);
+                        avisar(T('Esa no era'), false);
                         setTimeout(() => c.classList.remove('error'), 600);
                     }
                 };
@@ -1720,7 +1811,7 @@
                 const letras = p.w.split('');
                 let puestas = 0;
 
-                titular('Arma la palabra', 'Toca las letras en orden');
+                titular(T('Arma la palabra'), T('Toca las letras en orden'));
 
                 const c = panel('juego-centro');
                 c.appendChild(dibujo(p.e));
@@ -1758,7 +1849,7 @@
                                 setTimeout(pinta, 1200);
                             }
                         } else {
-                            avisar('Esa letra no va aquí', false);
+                            avisar(T('Esa letra no va aquí'), false);
                         }
                     };
                     bolsa.appendChild(b);
@@ -1783,23 +1874,34 @@
                 const w = String(palabras[i]);
                 let intentos = 0;
 
-                titular('Escribe la palabra', 'Usa el teclado');
+                /*
+                 * En idiomas es un DICTADO: la palabra no se muestra, se
+                 * oye. Copiar una palabra que está a la vista no enseña a
+                 * escribirla; escucharla y escribirla, sí. Lo pidieron los
+                 * docentes de alemán. En español sigue a la vista, porque
+                 * ahí lo que se practica es copiar con buena letra.
+                 */
+                const dictado = !enEspanol(idiomaVoz);
+
+                titular(dictado ? T('Escucha y escribe') : T('Escribe la palabra'), T('Usa el teclado'));
 
                 const c = panel('juego-centro');
-                c.appendChild(el('div', 'juego-palabra grande', w));
+                c.appendChild(dictado
+                    ? el('div', 'juego-emoji', '🎧')
+                    : el('div', 'juego-palabra grande', w));
 
-                const oir = el('button', 'btn btn-secundario', '🔊 Escuchar');
+                const oir = el('button', 'btn btn-secundario', T('🔊 Escuchar'));
                 oir.onclick = () => hablar(w);
                 c.appendChild(oir);
 
                 const campo = el('input', 'juego-campo');
                 campo.type = 'text';
                 campo.autocomplete = 'off';
-                campo.setAttribute('aria-label', 'Escribe ' + w);
+                campo.setAttribute('aria-label', dictado ? T('Escucha y escribe') : 'Escribe ' + w);
                 c.appendChild(campo);
                 if (enAleman()) c.appendChild(teclasEspeciales(campo));
 
-                const enviar = el('button', 'btn btn-principal', 'Comprobar');
+                const enviar = el('button', 'btn btn-principal', T('Comprobar'));
                 c.appendChild(enviar);
 
                 // Salida de emergencia. Sin esto, un niño que todavía no
@@ -1836,7 +1938,7 @@
                     if (val === w.toUpperCase()) {
                         aciertos++;
                         hablar(w);
-                        avisar('¡Perfecto! 🎉', true);
+                        avisar(T('¡Perfecto! 🎉'), true);
                         i++;
                         marcarProgreso(i, palabras.length);
                         setTimeout(pinta, 1000);
@@ -1858,7 +1960,7 @@
                     if (sinTildes(val) === sinTildes(w.toUpperCase())) {
                         avisar(avisoCasi(), false);
                     } else {
-                        avisar('Revisa las letras', false);
+                        avisar(T('Revisa las letras'), false);
                     }
 
                     campo.select();
@@ -1887,7 +1989,7 @@
                 if (i >= items.length) return fin(aciertos, items.length);
 
                 const it = items[i];
-                titular('¿Cómo se escribe?', 'Elige la forma correcta');
+                titular(T('¿Cómo se escribe?'), T('Elige la forma correcta'));
 
                 const c = panel('juego-centro');
                 c.appendChild(dibujo(it.e));
@@ -1901,13 +2003,13 @@
                             aciertos++;
                             b.classList.add('acierto');
                             hablar(it.correct);
-                            avisar('¡Así se escribe! ✅', true);
+                            avisar(T('¡Así se escribe! ✅'), true);
                             i++;
                             marcarProgreso(i, items.length);
                             setTimeout(pinta, 1100);
                         } else {
                             b.classList.add('error');
-                            avisar('Esa no es', false);
+                            avisar(T('Esa no es'), false);
                         }
                     };
                     ops.appendChild(b);
@@ -1948,7 +2050,7 @@
             let puestos = 0;
 
             limpiar();
-            titular(d.title || 'Ordena la historia', 'Toca los elementos en orden');
+            titular(d.title || T('Ordena la historia'), T('Toca los elementos en orden'));
 
             const c = panel('juego-centro');
             const linea = el('div', 'juego-huecos');
@@ -2002,11 +2104,11 @@
                         repinta();
                         marcarProgreso(puestos, items.length);
                         if (puestos === items.length) {
-                            avisar('¡Secuencia completa! 🌟', true);
+                            avisar(T('¡Secuencia completa! 🌟'), true);
                             setTimeout(() => fin(items.length, items.length), 1100);
                         }
                     } else {
-                        avisar('Ese va más adelante', false);
+                        avisar(T('Ese va más adelante'), false);
                     }
                 };
                 bolsa.appendChild(b);
@@ -2022,7 +2124,7 @@
 
         /* 8 · Juego rápido: sí o no contra el reloj */
         juego_rapido(datos, fin) {
-            const d = desempacar(datos, '¿Lleva la letra?', 'Responde rápido');
+            const d = desempacar(datos, '¿Lleva la letra?', T('Responde rápido'));
             const items = d.items;
             let i = 0, aciertos = 0, tiempo = 30, reloj = null;
 
@@ -2049,12 +2151,12 @@
                 // rojo para el no. Aquí importa más todavía, porque el
                 // juego es contrarreloj y no hay tiempo de leer.
                 const ops = el('div', 'juego-opciones');
-                [['✅ Sí', true, 'juego-si'], ['❌ No', false, 'juego-no']].forEach(([txt, val, clase]) => {
+                [[T('✅ Sí'), true, 'juego-si'], [T('❌ No'), false, 'juego-no']].forEach(([txt, val, clase]) => {
                     const b = el('button', 'btn juego-boton ' + clase, txt);
                     b.onclick = () => {
                         const bien = (!!it.ok === val);
                         if (bien) aciertos++;
-                        avisar(bien ? '¡Sí! ⚡' : 'Ups', bien);
+                        avisar(bien ? T('¡Sí! ⚡') : T('Ups'), bien);
                         i++;
                         marcarProgreso(i, items.length);
                         setTimeout(pinta, 550);
@@ -2069,7 +2171,7 @@
                         const m = $('.juego-reloj');
                         if (m) m.textContent = '⏱ ' + tiempo + 's';
                         if (tiempo <= 0) {
-                            avisar('¡Se acabó el tiempo!', false);
+                            avisar(T('¡Se acabó el tiempo!'), false);
                             acabar();
                         }
                     }, 1000);
@@ -2088,7 +2190,7 @@
             let halladas = 0, bloqueo = false;
 
             limpiar();
-            titular('Encuentra las parejas', 'Toca dos cartas iguales');
+            titular(T('Encuentra las parejas'), T('Toca dos cartas iguales'));
 
             const rej = panel('juego-rejilla memoria');
 
@@ -2116,7 +2218,7 @@
                             volteadas.length = 0;
                             bloqueo = false;
                             if (halladas === base.length) {
-                                avisar('¡Todas las parejas! 🧠', true);
+                                avisar(T('¡Todas las parejas! 🧠'), true);
                                 setTimeout(() => fin(base.length, base.length), 1100);
                             }
                         } else {
@@ -2147,7 +2249,7 @@
             let primera = null;
 
             limpiar();
-            titular('Sopa de letras', 'Toca la primera y la última letra de cada palabra');
+            titular(T('Sopa de letras'), T('Toca la primera y la última letra de cada palabra'));
 
             const c = panel('juego-centro');
 
@@ -2205,7 +2307,7 @@
                                 setTimeout(() => fin(palabras.length, palabras.length), 1100);
                             }
                         } else {
-                            avisar('Ahí no hay palabra', false);
+                            avisar(T('Ahí no hay palabra'), false);
                         }
 
                         primera = null;
@@ -2230,13 +2332,13 @@
                 limpiar();
                 const s = slides[i];
 
-                titular('Cuento', 'Página ' + (i + 1) + ' de ' + slides.length);
+                titular(T('Cuento'), contador(i + 1, slides.length, 'Página'));
 
                 const c = panel('juego-centro');
                 c.appendChild(dibujo(s.img, 'juego-emoji grande'));
                 c.appendChild(el('p', 'juego-texto', s.text));
 
-                const oir = el('button', 'btn btn-secundario', '🔊 Escuchar');
+                const oir = el('button', 'btn btn-secundario', T('🔊 Escuchar'));
                 oir.onclick = () => hablar(s.text);
                 c.appendChild(oir);
 
@@ -2260,7 +2362,7 @@
                 }
 
                 const q = preguntas[qi];
-                titular(q.q, 'Pregunta ' + (qi + 1) + ' de ' + preguntas.length);
+                titular(q.q, contador(qi + 1, preguntas.length, 'Pregunta'));
 
                 const c = panel('juego-centro');
 
@@ -2286,7 +2388,7 @@
                         const bien = (k === q.a);
                         if (bien) aciertos++;
                         b.classList.add(bien ? 'acierto' : 'error');
-                        avisar(bien ? '¡Correcto! ✅' : 'Esa no era', bien);
+                        avisar(bien ? T('¡Correcto! ✅') : T('Esa no era'), bien);
                         qi++;
                         marcarProgreso(slides.length + qi, slides.length + preguntas.length);
                         setTimeout(verPregunta, 1100);
@@ -2314,10 +2416,28 @@
                 if (i >= items.length) return fin(aciertos, items.length);
 
                 const it = items[i];
-                titular(it.enunciado, 'Pregunta ' + (i + 1) + ' de ' + items.length);
+
+                /*
+                 * `oir`: la frase solo se oye, no se lee. Lo pidieron los
+                 * docentes de alemán: «escucha la orden y escoge la
+                 * oración». Con la frase escrita arriba el niño copia en
+                 * vez de escuchar.
+                 */
+                titular(it.oir ? T('Escucha y elige') : it.enunciado,
+                        contador(i + 1, items.length, 'Pregunta'));
 
                 const c = panel('juego-centro');
-                pintaVisual(c, it);
+
+                if (it.oir) {
+                    const oir = el('button', 'btn btn-secundario', T('🔊 Escuchar de nuevo'));
+                    oir.type = 'button';
+                    oir.onclick = () => hablar(it.oir);
+                    c.appendChild(dibujo('🎧'));
+                    c.appendChild(oir);
+                    hablar(it.oir, { encolar: true });
+                } else {
+                    pintaVisual(c, it);
+                }
 
                 // Cómo dar una pista aquí: apagar una opción equivocada.
                 // El niño sigue teniendo que elegir entre las que quedan.
@@ -2345,7 +2465,7 @@
                         const bien = (k === it.correcta);
                         if (bien) aciertos++;
                         b.classList.add(bien ? 'acierto' : 'error');
-                        avisar(bien ? '¡Correcto! ✅' : 'Esa no era', bien);
+                        avisar(bien ? T('¡Correcto! ✅') : T('Esa no era'), bien);
                         i++;
                         marcarProgreso(i, items.length);
                         setTimeout(pinta, 1050);
@@ -2395,7 +2515,7 @@
 
                 titular(
                     it.op === 'contar' ? '¿Cuántos hay?' : 'Resuelve la operación',
-                    'Ejercicio ' + (i + 1) + ' de ' + items.length
+                    contador(i + 1, items.length, 'Ejercicio')
                 );
 
                 const c = panel('juego-centro');
@@ -2466,7 +2586,7 @@
                 if (i >= items.length) return fin(aciertos, items.length);
 
                 const it = items[i];
-                titular('¿Qué número falta?', 'Ejercicio ' + (i + 1) + ' de ' + items.length);
+                titular('¿Qué número falta?', contador(i + 1, items.length, 'Ejercicio'));
 
                 const c = panel('juego-centro');
 
@@ -2518,8 +2638,17 @@
             let unidos = 0;
             let elegido = null;
 
+            /*
+             * Dos formas: dibujo ↔ palabra ({e, w}) o pregunta ↔ respuesta
+             * ({q, w}). La segunda la pidieron los docentes de alemán para
+             * «Wie heißt du?»: ver las preguntas juntas y unir cada una con
+             * su respuesta, en vez de traducirlas una por una.
+             */
+            const preguntas = pares.some((p) => p && p.q);
+
             limpiar();
-            titular('Une cada imagen con su palabra', 'Toca una imagen y luego su palabra');
+            titular(preguntas ? T('Une cada pregunta con su respuesta') : T('Une cada imagen con su palabra'),
+                    preguntas ? T('Toca una pregunta y luego su respuesta') : T('Toca una imagen y luego su palabra'));
 
             const c = panel('juego-centro');
             const tabla = el('div', 'juego-emparejar');
@@ -2528,14 +2657,20 @@
             const colDer = el('div', 'juego-columna');
 
             barajar(pares).forEach((p) => {
-                const b = el('button', 'juego-carta compacta');
-                b.innerHTML = dibujoHtml(p.e);
+                const b = el('button', 'juego-carta compacta' + (p.q ? ' con-texto' : ''));
+                if (p.q) {
+                    if (p.e) b.innerHTML = dibujoHtml(p.e);
+                    b.appendChild(el('span', 'juego-carta-texto', p.q));
+                } else {
+                    b.innerHTML = dibujoHtml(p.e);
+                }
                 b.dataset.w = p.w;
                 b.onclick = () => {
                     if (b.disabled) return;
                     colIzq.querySelectorAll('.elegida').forEach((x) => x.classList.remove('elegida'));
                     b.classList.add('elegida');
                     elegido = b;
+                    if (p.q) hablar(p.q);
                 };
                 colIzq.appendChild(b);
             });
@@ -2546,7 +2681,7 @@
                 b.onclick = () => {
                     if (b.disabled) return;
                     if (!elegido) {
-                        avisar('Elige primero una imagen', false);
+                        avisar(preguntas ? T('Elige primero una pregunta') : T('Elige primero una imagen'), false);
                         return;
                     }
                     if (elegido.dataset.w === p.w) {
@@ -2560,11 +2695,11 @@
                         elegido = null;
                         marcarProgreso(unidos, pares.length);
                         if (unidos === pares.length) {
-                            avisar('¡Todas emparejadas! 🌟', true);
+                            avisar(T('¡Todas emparejadas! 🌟'), true);
                             setTimeout(() => fin(pares.length, pares.length), 1100);
                         }
                     } else {
-                        avisar('Esa no es', false);
+                        avisar(T('Esa no es'), false);
                     }
                 };
                 colDer.appendChild(b);
@@ -2686,7 +2821,7 @@
                                     r++;
                                     setTimeout(pintaRonda, 1400);
                                 } else {
-                                    avisar('¡Esa es! ✅', true);
+                                    avisar(T('¡Esa es! ✅'), true);
                                 }
                             } else {
                                 falloEn.add(Number(otra.dataset.lado === 'izq' ? otra.dataset.k : b.dataset.k));
@@ -2729,19 +2864,19 @@
                 if (i >= palabras.length) return fin(palabras.length, palabras.length);
 
                 const p = palabras[i];
-                titular('Escucha y repite', 'Di la palabra en voz alta');
+                titular(T('Escucha y repite'), T('Di la palabra en voz alta'));
 
                 const c = panel('juego-centro');
                 c.appendChild(dibujo(p.e));
                 c.appendChild(el('div', 'juego-palabra grande', p.w));
 
-                const oir = el('button', 'btn btn-secundario', '🔊 Escuchar de nuevo');
+                const oir = el('button', 'btn btn-secundario', T('🔊 Escuchar de nuevo'));
                 oir.onclick = () => hablar(p.w);
                 c.appendChild(oir);
 
                 // No se evalúa la voz: se confía en el niño. El valor
                 // pedagógico está en escuchar y repetir, no en calificar.
-                const listo = el('button', 'btn btn-principal', '✅ Ya la dije');
+                const listo = el('button', 'btn btn-principal', T('✅ Ya la dije'));
                 listo.onclick = () => {
                     i++;
                     marcarProgreso(i, palabras.length);
@@ -2772,7 +2907,7 @@
                 if (i >= items.length) return fin(aciertos, items.length);
 
                 const it = items[i];
-                titular('¿Qué letra falta?', 'Completa la palabra');
+                titular(T('¿Qué letra falta?'), T('Completa la palabra'));
 
                 const c = panel('juego-centro');
                 c.appendChild(dibujo(it.e));
@@ -2797,13 +2932,13 @@
                             linea.textContent = (it.before || '') + it.a + (it.after || '');
                             b.classList.add('acierto');
                             hablar(linea.textContent);
-                            avisar('¡Correcto! ✅', true);
+                            avisar(T('¡Correcto! ✅'), true);
                             i++;
                             marcarProgreso(i, items.length);
                             setTimeout(pinta, 1200);
                         } else {
                             b.classList.add('error');
-                            avisar('Prueba con otra', false);
+                            avisar(T('Prueba con otra'), false);
                         }
                     };
                     ops.appendChild(b);
@@ -2826,7 +2961,7 @@
                 if (i >= preguntas.length) return fin(aciertos, preguntas.length);
 
                 const q = preguntas[i];
-                titular(q.q, 'Pregunta ' + (i + 1) + ' de ' + preguntas.length);
+                titular(q.q, contador(i + 1, preguntas.length, 'Pregunta'));
 
                 const c = panel('juego-centro');
 
@@ -2853,7 +2988,7 @@
                         const bien = (k === q.a);
                         if (bien) aciertos++;
                         b.classList.add(bien ? 'acierto' : 'error');
-                        avisar(bien ? '¡Correcto! 🏆' : 'Esa no era', bien);
+                        avisar(bien ? T('¡Correcto! 🏆') : T('Esa no era'), bien);
                         i++;
                         marcarProgreso(i, preguntas.length);
                         setTimeout(pinta, 1000);
@@ -3141,7 +3276,7 @@
          * a llevar la cuenta de dónde iba en vez de a leer.
          */
         completar_texto(datos, fin) {
-            const d = desempacar(datos, 'Completa el texto',
+            const d = desempacar(datos, T('Completa el texto'),
                                         'Toca la palabra que falta en cada hueco');
             const items = d.items;
             let i = 0, aciertos = 0;
@@ -3212,12 +3347,12 @@
                             if (puestos === huecos.length) {
                                 aciertos++;
                                 hablar(trozos.join(' '));
-                                avisar('¡Texto completo! 📖', true);
+                                avisar(T('¡Texto completo! 📖'), true);
                                 i++;
                                 setTimeout(pinta, 1400);
                             }
                         } else {
-                            avisar('Esa no encaja ahí. Lee la frase otra vez', false);
+                            avisar(T('Esa no encaja ahí. Lee la frase otra vez'), false);
                         }
                     };
                     bolsa.appendChild(b);
@@ -3252,7 +3387,7 @@
             const resueltas = new Set();
 
             limpiar();
-            titular(d.t || 'Crucigrama', d.s || 'Toca una pista y escribe la palabra');
+            titular(d.t || T('Crucigrama'), d.s || T('Toca una pista y escribe la palabra'));
 
             const c = panel('juego-centro');
 
@@ -3391,7 +3526,7 @@
                 caja.appendChild(campo);
                 if (enAleman()) caja.appendChild(teclasEspeciales(campo));
 
-                const enviar = el('button', 'btn btn-principal', 'Comprobar');
+                const enviar = el('button', 'btn btn-principal', T('Comprobar'));
                 caja.appendChild(enviar);
 
                 const ayuda = el('div', 'juego-ayuda');
@@ -3419,7 +3554,7 @@
                     }
 
                     intentos++;
-                    avisar('Todavía no. Mira la pista otra vez', false);
+                    avisar(T('Todavía no. Mira la pista otra vez'), false);
                     campo.select();
 
                     // Misma salida de emergencia que en el teclado: al
@@ -3810,7 +3945,27 @@
         if (!intro) return;
 
         estado.actual = null;
-        idiomaVoz = 'es-ES';
+
+        /*
+         * La presentación explica en español, pero su título es el de la
+         * actividad: «Wie ist das Wetter heute?». Con la voz fijada en
+         * español, ese título salía leído con fonética española y no se
+         * entendía. Con el idioma de la actividad, cada frase toma su voz
+         * (el español sigue en español: ver idiomaPara()).
+         */
+        idiomaVoz = estado.idiomaActividad || 'es-ES';
+
+        /*
+         * Las voces de Google (las alemanas e inglesas buenas) llegan un
+         * momento después de cargar la página. La intro es lo primero que
+         * se pinta: sin esperar, el título se quedaba mudo y salía el
+         * aviso de «no hay voz en alemán». Igual que al abrir una estación.
+         */
+        if (!enEspanol(idiomaVoz) && !intro.__voz) {
+            intro.__voz = true;
+            esperarVoz(idiomaVoz, 3000).then(mostrarIntroduccion);
+            return;
+        }
         marcarActivo(null);
 
         const cab = $('#titulo-estacion');
@@ -4025,6 +4180,8 @@
         estado.base = config.base;
         estado.csrf = config.csrf || '';
         estado.slug = config.slug || '';
+        // Idioma de la actividad (de-DE, en-US…), para la presentación.
+        estado.idiomaActividad = config.idioma || null;
         estado.personaje = config.personaje || null;
         estado.intro = config.intro || null;
 

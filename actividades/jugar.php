@@ -93,6 +93,17 @@ if (!$estaciones) {
 }
 
 $preparadas = prepararEstaciones($actividad, $estaciones);
+
+// El idioma de la actividad (de-DE, en-US…), si sus estaciones declaran
+// uno. Lo usa la presentación «Antes de empezar» para leer el título con
+// la voz correcta. No es contenido: es el mismo para todas las estaciones.
+$idiomaActividad = traerValor(
+    "SELECT JSON_UNQUOTE(JSON_EXTRACT(config, '$.idioma'))
+       FROM activity_stations
+      WHERE activity_id = ? AND JSON_EXTRACT(config, '$.idioma') IS NOT NULL
+      LIMIT 1",
+    [(int) $actividad['id']]
+) ?: null;
 $resumen    = resumenEstaciones($actividad);
 $usuario    = usuarioActual();
 
@@ -226,6 +237,7 @@ require RUTA_INCLUDES . '/cabecera.php';
     MotorActividades.iniciar({
         base: <?= jsonSeguro(URL_BASE . '/') ?>,
         slug: <?= jsonSeguro($actividad['slug']) ?>,
+        idioma: <?= jsonSeguro($idiomaActividad) ?>,
         csrf: <?= jsonSeguro(tokenCsrf()) ?>,
         estaciones: <?= jsonSeguro($paraElMotor) ?>,
         intro: <?= jsonSeguro($intro) ?>,

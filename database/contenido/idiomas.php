@@ -67,12 +67,12 @@ return [
         ], VOZ_EN),
 
         est('What color is it?', 'Elige el nombre correcto en inglés', '🎨', 'opcion_multiple', [
-            omp('¿Cómo se dice este color en inglés?', ['Red', 'Blue', 'Green'], 'Red', '🔴'),
-            omp('¿Cómo se dice este color en inglés?', ['Blue', 'Yellow', 'Black'], 'Blue', '🔵'),
-            omp('¿Cómo se dice este color en inglés?', ['Yellow', 'White', 'Red'], 'Yellow', '🟡'),
-            omp('¿Cómo se dice este color en inglés?', ['Green', 'Blue', 'Orange'], 'Green', '🟢'),
-            omp('¿Cómo se dice este color en inglés?', ['Orange', 'Purple', 'Pink'], 'Orange', '🟠'),
-            omp('¿Cómo se dice este color en inglés?', ['Purple', 'Brown', 'Green'], 'Purple', '🟣'),
+            omp('What color is it?', ['Red', 'Blue', 'Green'], 'Red', '🔴'),
+            omp('What color is it?', ['Blue', 'Yellow', 'Black'], 'Blue', '🔵'),
+            omp('What color is it?', ['Yellow', 'White', 'Red'], 'Yellow', '🟡'),
+            omp('What color is it?', ['Green', 'Blue', 'Orange'], 'Green', '🟢'),
+            omp('What color is it?', ['Orange', 'Purple', 'Pink'], 'Orange', '🟠'),
+            omp('What color is it?', ['Purple', 'Brown', 'Green'], 'Purple', '🟣'),
         ], VOZ_EN),
 
         est('Match the color', 'Une cada color con su palabra', '🔗', 'emparejar', [
@@ -108,12 +108,12 @@ return [
         ], VOZ_EN),
 
         est('What animal is it?', 'Elige el nombre correcto', '🐾', 'opcion_multiple', [
-            omp('¿Qué animal es?', ['Dog', 'Cat', 'Bird'], 'Dog', '🐶'),
-            omp('¿Qué animal es?', ['Cat', 'Cow', 'Fish'], 'Cat', '🐱'),
-            omp('¿Qué animal es?', ['Fish', 'Horse', 'Bird'], 'Fish', '🐟'),
-            omp('¿Qué animal es?', ['Lion', 'Bear', 'Duck'], 'Lion', '🦁'),
-            omp('¿Qué animal es?', ['Elephant', 'Monkey', 'Rabbit'], 'Elephant', '🐘'),
-            omp('¿Qué animal es?', ['Monkey', 'Cow', 'Frog'], 'Monkey', '🐵'),
+            omp('What animal is it?', ['Dog', 'Cat', 'Bird'], 'Dog', '🐶'),
+            omp('What animal is it?', ['Cat', 'Cow', 'Fish'], 'Cat', '🐱'),
+            omp('What animal is it?', ['Fish', 'Horse', 'Bird'], 'Fish', '🐟'),
+            omp('What animal is it?', ['Lion', 'Bear', 'Duck'], 'Lion', '🦁'),
+            omp('What animal is it?', ['Elephant', 'Monkey', 'Rabbit'], 'Elephant', '🐘'),
+            omp('What animal is it?', ['Monkey', 'Cow', 'Frog'], 'Monkey', '🐵'),
         ], VOZ_EN),
 
         est('Match animal and word', 'Une cada animal con su palabra en inglés', '🔗', 'emparejar', [
@@ -126,7 +126,7 @@ return [
         ], VOZ_EN),
 
         est('Farm animals', 'Toca solo los animales de la granja', '🚜', 'seleccion_imagenes',
-            conTitulo('Touch the farm animals', 'Toca solo los animales de la granja', [
+            conTitulo('Touch the farm animals', 'Only the animals that live on a farm', [
                 ['e' => '🐮', 'n' => 'Cow',      'ok' => true],
                 ['e' => '🐷', 'n' => 'Pig',      'ok' => true],
                 ['e' => '🐔', 'n' => 'Chicken',  'ok' => true],
@@ -158,12 +158,12 @@ return [
         ], VOZ_EN),
 
         est('How do you say it?', 'Del español al inglés', '🔤', 'opcion_multiple', [
-            omp('¿Cómo se dice «mano» en inglés?',   ['Hand', 'Foot', 'Head'], 'Hand', '✋'),
-            omp('¿Cómo se dice «ojo» en inglés?',    ['Eye', 'Ear', 'Arm'], 'Eye', '👁️'),
-            omp('¿Cómo se dice «boca» en inglés?',   ['Mouth', 'Nose', 'Hair'], 'Mouth', '👄'),
-            omp('¿Cómo se dice «pie» en inglés?',    ['Foot', 'Leg', 'Hand'], 'Foot', '🦶'),
-            omp('¿Cómo se dice «cabeza» en inglés?', ['Head', 'Heart', 'Hand'], 'Head', '🧠'),
-            omp('¿Cómo se dice «oreja» en inglés?',  ['Ear', 'Eye', 'Arm'], 'Ear', '👂'),
+            omp('What is this?', ['Hand', 'Foot', 'Head'], 'Hand', '✋'),
+            omp('What is this?', ['Eye', 'Ear', 'Arm'], 'Eye', '👁️'),
+            omp('What is this?', ['Mouth', 'Nose', 'Hair'], 'Mouth', '👄'),
+            omp('What is this?', ['Foot', 'Leg', 'Hand'], 'Foot', '🦶'),
+            omp('What is this?', ['Head', 'Heart', 'Hand'], 'Head', '🙂'),
+            omp('What is this?', ['Ear', 'Eye', 'Arm'], 'Ear', '👂'),
         ], VOZ_EN),
 
         est('Match the body part', 'Une cada parte con su palabra', '🔗', 'emparejar', [
@@ -176,7 +176,7 @@ return [
         ], VOZ_EN),
 
         est('Parts of the face', 'Toca solo lo que está en la cara', '😀', 'seleccion_imagenes',
-            conTitulo('Touch the parts of the face', 'Toca solo lo que está en la cara', [
+            conTitulo('Touch the parts of the face', 'Only what is on your face', [
                 ['e' => '👁️', 'n' => 'Eye',   'ok' => true],
                 ['e' => '👃', 'n' => 'Nose',  'ok' => true],
                 ['e' => '👄', 'n' => 'Mouth', 'ok' => true],
@@ -207,16 +207,16 @@ return [
         ], VOZ_EN),
 
         est('What do you say?', 'Elige qué dirías en cada momento', '💬', 'opcion_multiple', [
-            omp('Llegas al salón por la mañana. ¿Qué dices?',   ['Good morning!', 'Good night!', 'Goodbye!'], 'Good morning!', '🌅'),
-            omp('Te vas para tu casa. ¿Qué dices?',             ['Goodbye!', 'Hello!', 'Please'], 'Goodbye!', '🚪'),
-            omp('Alguien te da un regalo. ¿Qué dices?',         ['Thank you!', 'Goodbye!', 'Good night!'], 'Thank you!', '🎁'),
-            omp('Quieres pedir algo con amabilidad. Dices…',    ['Please', 'Goodbye', 'Good night'], 'Please', '🤲'),
-            omp('Te vas a dormir. ¿Qué dices?',                 ['Good night!', 'Good morning!', 'Thank you!'], 'Good night!', '🌙'),
-            omp('Te preguntan «How are you?». Puedes decir…',   ['I am fine, thank you', 'Good night', 'Please'], 'I am fine, thank you', '🙂'),
+            omp('You arrive at school in the morning. You say…', ['Good morning!', 'Good night!', 'Goodbye!'], 'Good morning!', '🌅'),
+            omp('You go home. You say…', ['Goodbye!', 'Hello!', 'Please'], 'Goodbye!', '🚪'),
+            omp('Someone gives you a present. You say…', ['Thank you!', 'Goodbye!', 'Good night!'], 'Thank you!', '🎁'),
+            omp('You ask for something nicely. You say…', ['Please', 'Goodbye', 'Good night'], 'Please', '🤲'),
+            omp('You go to bed. You say…', ['Good night!', 'Good morning!', 'Thank you!'], 'Good night!', '🌙'),
+            omp('Someone asks «How are you?». You say…', ['I am fine, thank you', 'Good night', 'Please'], 'I am fine, thank you', '🙂'),
         ], VOZ_EN),
 
         est('Order the conversation', 'Pon la conversación en orden', '💬', 'ordenar_secuencia', [
-            'title' => 'Ordena esta conversación en inglés',
+            'title' => 'Put the conversation in order',
             'items' => ['Hello!', 'How are you?', 'I am fine, thank you', 'Goodbye!'],
         ], VOZ_EN),
     ],
@@ -255,12 +255,12 @@ return [
         ], VOZ_EN),
 
         est('Translate it', 'Del español al inglés', '🔤', 'opcion_multiple', [
-            omp('¿Cómo se dice «casa» en inglés?',    ['House', 'Horse', 'Mouse'], 'House', '🏠'),
-            omp('¿Cómo se dice «agua» en inglés?',    ['Water', 'Winter', 'Wall'], 'Water', '💧'),
-            omp('¿Cómo se dice «escuela» en inglés?', ['School', 'Shoe', 'Ship'], 'School', '🏫'),
-            omp('¿Cómo se dice «amigo» en inglés?',   ['Friend', 'Family', 'Father'], 'Friend', '🧑‍🤝‍🧑'),
-            omp('¿Cómo se dice «libro» en inglés?',   ['Book', 'Box', 'Ball'], 'Book', '📕'),
-            omp('¿Cómo se dice «sol» en inglés?',     ['Sun', 'Son', 'Snow'], 'Sun', '☀️'),
+            omp('What is this?', ['House', 'Horse', 'Mouse'], 'House', '🏠'),
+            omp('What is this?', ['Water', 'Winter', 'Wall'], 'Water', '💧'),
+            omp('What is this?', ['School', 'Shoe', 'Ship'], 'School', '🏫'),
+            omp('Who is this?', ['Friend', 'Family', 'Father'], 'Friend', '🧑‍🤝‍🧑'),
+            omp('What is this?', ['Book', 'Box', 'Ball'], 'Book', '📕'),
+            omp('What is this?', ['Sun', 'Son', 'Snow'], 'Sun', '☀️'),
         ], VOZ_EN),
 
         est('How is it written?', 'Elige la escritura correcta', '✍️', 'ortografia', [
@@ -284,16 +284,16 @@ return [
     'estaciones' => [
 
         est('My family', 'Ordena las palabras de la frase', '🧩', 'ordenar_secuencia', [
-            'title' => 'Ordena la frase: «Ella es mi hermana»',
+            'title' => 'Put the words in order: she is my sister',
             'items' => ['She', 'is', 'my', 'sister'],
         ], VOZ_EN),
 
         est('Which one is correct?', 'Solo una frase está bien escrita', '✅', 'opcion_multiple', [
-            omp('¿Cuál frase está bien escrita?', ['I have a cat', 'Cat a have I', 'Have cat I a'], 'I have a cat', '🐱'),
-            omp('¿Cuál frase está bien escrita?', ['The dog is black', 'Black dog the is', 'Is the black dog'], 'The dog is black', '🐶'),
-            omp('¿Cuál frase está bien escrita?', ['My name is Ana', 'Name my Ana is', 'Is Ana my name'], 'My name is Ana', '🙋'),
-            omp('¿Cuál frase está bien escrita?', ['I like apples', 'Apples I like the', 'Like I apples am'], 'I like apples', '🍎'),
-            omp('¿Cuál frase está bien escrita?', ['She is my teacher', 'Teacher my is she', 'My she teacher is'], 'She is my teacher', '👩‍🏫'),
+            omp('Which sentence is correct?', ['I have a cat', 'Cat a have I', 'Have cat I a'], 'I have a cat', '🐱'),
+            omp('Which sentence is correct?', ['The dog is black', 'Black dog the is', 'Is the black dog'], 'The dog is black', '🐶'),
+            omp('Which sentence is correct?', ['My name is Ana', 'Name my Ana is', 'Is Ana my name'], 'My name is Ana', '🙋'),
+            omp('Which sentence is correct?', ['I like apples', 'Apples I like the', 'Like I apples am'], 'I like apples', '🍎'),
+            omp('Which sentence is correct?', ['She is my teacher', 'Teacher my is she', 'My she teacher is'], 'She is my teacher', '👩‍🏫'),
         ], VOZ_EN),
 
         est('Complete the sentence', 'Elige la palabra que falta', '🔤', 'opcion_multiple', [
@@ -306,7 +306,7 @@ return [
         ], VOZ_EN),
 
         est('At the park', 'Ordena una frase más larga', '🧩', 'ordenar_secuencia', [
-            'title' => 'Ordena la frase: «Yo juego con mis amigos en el parque»',
+            'title' => 'Put the words in order: I play with my friends in the park',
             'items' => ['I', 'play', 'with', 'my', 'friends', 'in', 'the', 'park'],
         ], VOZ_EN),
     ],
@@ -360,7 +360,7 @@ return [
     'estaciones' => [
 
         est('My day', 'Ordena tu día en inglés', '🌅', 'ordenar_secuencia', [
-            'title' => 'Ordena las acciones del día, de la mañana a la noche',
+            'title' => 'Put your day in order, from morning to night',
             'items' => [
                 'I wake up',
                 'I brush my teeth',
@@ -430,11 +430,11 @@ return [
         ], VOZ_EN),
 
         est('Words in context', '¿Qué significa cada palabra?', '📖', 'opcion_multiple', [
-            omp('«Hungry» significa…',  ['Con hambre', 'Cansado', 'Feliz'], 'Con hambre', '🍽️'),
-            omp('«Garden» significa…',  ['Jardín', 'Cocina', 'Cuarto'], 'Jardín', '🌷'),
-            omp('«Gone» significa…',    ['Ya no está', 'Muy grande', 'Dormido'], 'Ya no está', '💨'),
-            omp('«Crumbs» significa…',  ['Migas', 'Cucharas', 'Manchas'], 'Migas', '🍞'),
-            omp('«Clue» significa…',    ['Pista', 'Puerta', 'Reloj'], 'Pista', '🔍'),
+            omp('Which face is «hungry»?', ['😋', '😴', '😀'], '😋'),
+            omp('Which picture is a «garden»?', ['🌷', '🍳', '🛏️'], '🌷'),
+            omp('«The cake is gone» means the cake is…', ['not there anymore', 'very big', 'asleep'], 'not there anymore', '💨'),
+            omp('«Crumbs» are…', ['tiny pieces of bread', 'big spoons', 'dirty spots'], 'tiny pieces of bread', '🍞'),
+            omp('A «clue» is…', ['something that helps you find the answer', 'a door', 'a clock'], 'something that helps you find the answer', '🔍'),
         ], VOZ_EN),
 
         // La sopa lleva idioma aunque no lo parezca: al encontrar una
@@ -471,7 +471,7 @@ return [
         ], VOZ_EN),
 
         est('At the shop', 'Ordena la conversación en la tienda', '🛒', 'ordenar_secuencia', [
-            'title' => 'Ordena esta conversación en la tienda',
+            'title' => 'Put the conversation at the shop in order',
             'items' => [
                 'Good morning!',
                 'Can I help you?',
@@ -483,10 +483,10 @@ return [
         ], VOZ_EN),
 
         est('Asking questions', 'Elige la pregunta correcta', '❓', 'opcion_multiple', [
-            omp('Quieres saber la hora. Preguntas…',        ['What time is it?', 'How are you?', 'Where is it?'], 'What time is it?', '🕐'),
-            omp('Quieres saber dónde está el baño. Preguntas…', ['Where is the bathroom?', 'What is the bathroom?', 'Who is the bathroom?'], 'Where is the bathroom?', '🚻'),
-            omp('Quieres saber cuánto cuesta. Preguntas…',  ['How much is it?', 'How many is it?', 'How old is it?'], 'How much is it?', '💵'),
-            omp('Quieres saber su nombre. Preguntas…',      ['What is your name?', 'Where is your name?', 'How is your name?'], 'What is your name?', '🙋'),
+            omp('You want to know the time. You ask…',['What time is it?', 'How are you?', 'Where is it?'], 'What time is it?', '🕐'),
+            omp('You are looking for the bathroom. You ask…', ['Where is the bathroom?', 'What is the bathroom?', 'Who is the bathroom?'], 'Where is the bathroom?', '🚻'),
+            omp('You want to know the price. You ask…',['How much is it?', 'How many is it?', 'How old is it?'], 'How much is it?', '💵'),
+            omp('You want to know her name. You ask…', ['What is your name?', 'Where is your name?', 'How is your name?'], 'What is your name?', '🙋'),
             omp('No entendiste algo. Puedes decir…',        ['Can you repeat, please?', 'Goodbye!', 'You are welcome'], 'Can you repeat, please?', '🔁'),
         ], VOZ_EN),
 

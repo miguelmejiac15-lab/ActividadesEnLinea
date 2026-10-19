@@ -107,14 +107,14 @@ return [
     'ayer-hoy-y-manana' => breve('**Ayer** ya pasó, **hoy** es ahora y **mañana** todavía no llega.'),
 
     // ── Idiomas ──────────────────────────────────────────────────────
-    'colors-hunt' => breve('Vas a aprender los **colores en inglés**: red es rojo y blue es azul.'),
-    'animals-english' => breve('Vas a aprender los **animales en inglés**: dog es perro y cat es gato.'),
-    'my-body-english' => breve('Vas a aprender las partes del **cuerpo en inglés**: hand es mano y head es cabeza.'),
-    'hello-english' => breve('En inglés, **hello** es hola, **goodbye** es adiós y **thank you** es gracias.'),
+    'colors-hunt' => breve('Vas a aprender los **colores en inglés**: {{red}} es rojo y {{blue}} es azul.'),
+    'animals-english' => breve('Vas a aprender los **animales en inglés**: {{dog}} es perro y {{cat}} es gato.'),
+    'my-body-english' => breve('Vas a aprender las partes del **cuerpo en inglés**: {{hand}} es mano y {{head}} es cabeza.'),
+    'hello-english' => breve('En inglés, {{hello}} es hola, {{goodbye}} es adiós y {{thank you}} es gracias.'),
     'hello-and-goodbye' => breve('Vas a saludar, despedirte y decir **tu nombre** en inglés.'),
     'colors-and-numbers' => breve('Vas a aprender los **colores** y los **números del uno al diez** en inglés.'),
-    'my-family-in-english' => breve('**Mom** es mamá y **dad** es papá. Vas a aprender la familia en inglés.'),
-    'animals-in-english' => breve('**Cat**, **dog**, **bird**, **fish**: los animales que ya conoces, ahora en inglés.'),
+    'my-family-in-english' => breve('{{Mom}} es mamá y {{dad}} es papá. Vas a aprender la familia en inglés.'),
+    'animals-in-english' => breve('{{Cat}}, {{dog}}, {{bird}}, {{fish}}: los animales que ya conoces, ahora en inglés.'),
 
     // ── Pensamiento y Lógica ─────────────────────────────────────────
     'que-sigue' => breve('Cuando algo **se repite**, podemos adivinar **qué sigue**.'),
@@ -138,9 +138,9 @@ return [
 
 
     // ── Alemán · Kindergarten ────────────────────────────────────────
-    'deutsch-die-farben' => breve('Vas a aprender los **colores en alemán**: rot es rojo y blau es azul.'),
-    'deutsch-die-tiere' => breve('Vas a aprender los **animales en alemán**. Cada uno trae su compañero: **der** Hund, **die** Katze.'),
-    'deutsch-mein-koerper' => breve('Vas a aprender las partes del **cuerpo en alemán**: die Hand es la mano y der Fuß es el pie.'),
-    'deutsch-hallo' => breve('En alemán, **Hallo** es hola, **Tschüss** es chao y **Danke** es gracias.'),
+    'deutsch-die-farben' => breve('Vas a aprender los **colores en alemán**: {{rot}} es rojo y {{blau}} es azul.'),
+    'deutsch-die-tiere' => breve('Vas a aprender los **animales en alemán**. Cada uno trae su compañero: {{der Hund}}, {{die Katze}}.'),
+    'deutsch-mein-koerper' => breve('Vas a aprender las partes del **cuerpo en alemán**: {{die Hand}} es la mano y {{der Fuß}} es el pie.'),
+    'deutsch-hallo' => breve('En alemán, {{Hallo}} es hola, {{Tschüss}} es chao y {{Danke}} es gracias.'),
 
 ];

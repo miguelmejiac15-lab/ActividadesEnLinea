@@ -263,6 +263,24 @@
         try { return PALABRAS_ESPANOL.test(t); } catch (e) { return false; }
     }
 
+    /*
+     * Una instrucción en español con palabras del otro idioma dentro:
+     * «Vas a aprender los colores en alemán: {{rot}} es rojo». Raúl leía
+     * «rot» con fonética española y los docentes lo notaron enseguida.
+     * Lo marcado con {{ }} va con la voz del idioma de la actividad; el
+     * resto, en español.
+     */
+    function porIdioma(texto) {
+        const t = String(texto == null ? '' : texto);
+        if (t.indexOf('{{') < 0) return [{ texto: t, lang: null }];
+
+        const otro = estado.idiomaActividad || idiomaVoz;
+        return t.split(/\{\{(.+?)\}\}/).map((p, k) => ({
+            texto: p,
+            lang: k % 2 ? otro : 'es-ES',
+        }));
+    }
+
     /** La voz para esta frase: la de la estación, salvo que sea español. */
     function idiomaPara(texto) {
         if (enEspanol(idiomaVoz)) return idiomaVoz;
@@ -280,6 +298,10 @@
             .replace(reDigrafoPar, (m, a, b) => di(a) + ', ' + di(b))
             .replace(reDigrafo, di);
     }
+
+    // Voces femeninas en español de Windows, macOS, iOS, Android y Chrome.
+    // «Google español» es femenina en todas sus variantes.
+    const VOCES_FEMENINAS = /sabina|dalia|helena|laura|elvira|paloma|paulina|m[oó]nica|marisol|luc[ií]a|elena|ximena|camila|salom[eé]|francisca|catalina|larissa|renata|google espa[ñn]ol|female|mujer/i;
 
     /** La mejor voz disponible para un idioma, o null si no hay ninguna. */
     function vozPara(idioma) {
@@ -307,6 +329,18 @@
          * fluida.
          */
         if (base === 'es') {
+            /*
+             * En inglés y alemán, las instrucciones con voz femenina.
+             * Lo pidió Miguel tras probar alemán: la voz del idioma
+             * (Google Deutsch, Google US English) es femenina, y Raúl
+             * entre una y otra sonaba torpe al lado. Sabina primero.
+             */
+            if (estado.idiomaActividad && !enEspanol(estado.idiomaActividad)) {
+                const mujer = (v) => delIdioma(v) && VOCES_FEMENINAS.test(String(v.name));
+                const f = vocesListas.find((v) => mujer(v) && v.localService) || vocesListas.find(mujer);
+                if (f) return f;
+            }
+
             return vocesListas.find((v) => exacta(v) && v.localService)
                 || vocesListas.find((v) => delIdioma(v) && v.localService)
                 || vocesListas.find(exacta)
@@ -701,10 +735,12 @@
         try {
             const locuciones = [];
             lista.forEach((t) => {
-                const limpio = soloPalabras(t);
-                if (!limpio) return;
+                porIdioma(t).forEach((p) => {
+                    const limpio = soloPalabras(p.texto);
+                    if (!limpio) return;
 
-                locuciones.push(...locucionesDe(limpio, idiomaPara(limpio)));
+                    locuciones.push(...locucionesDe(limpio, p.lang || idiomaPara(limpio)));
+                });
             });
 
             // Si hay algo protegido sonando, esto va detrás; si no, corta
@@ -3932,7 +3968,10 @@
 
     /** Escapa y convierte `**término**` en negrita. */
     function conNegritas(texto) {
-        return esc(texto).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        const lang = esc(estado.idiomaActividad || '');
+        return esc(texto)
+            .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\{\{(.+?)\}\}/g, '<strong lang="' + lang + '">$1</strong>');
     }
 
     function marcarIntro(activa) {

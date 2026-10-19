@@ -278,8 +278,11 @@
         return t.split(/\{\{(.+?)\}\}/).map((p, k) => ({
             texto: p,
             lang: k % 2 ? otro : 'es-ES',
-        }));
+        })).filter((p) => /[A-Za-zÀ-ÿ0-9]/.test(p.texto));   // un «.» suelto no se dice
     }
+
+    /** El texto para la pantalla, sin las marcas de idioma. */
+    const sinLlaves = (t) => String(t == null ? '' : t).replace(/\{\{(.+?)\}\}/g, '$1');
 
     /** La voz para esta frase: la de la estación, salvo que sea español. */
     function idiomaPara(texto) {
@@ -556,9 +559,15 @@
             const lang = op.idioma || idiomaPara(limpio);
 
             // Lo que no hay que proteger —la instrucción, el cuento— puede
-            // ser largo: va por oraciones (ver `locucionesDe()`).
+            // ser largo: va por oraciones (ver `locucionesDe()`). Si mezcla
+            // idiomas con {{ }}, cada trozo con su voz (ver porIdioma()).
             if (!op.proteger) {
-                emitir(locucionesDe(limpio, lang), !op.encolar);
+                const lista = op.idioma ? locucionesDe(limpio, lang)
+                    : porIdioma(limpio).flatMap((p) => {
+                        const t = soloPalabras(p.texto);
+                        return t ? locucionesDe(t, p.lang || idiomaPara(t)) : [];
+                    });
+                emitir(lista, !op.encolar);
                 return;
             }
 
@@ -1008,7 +1017,7 @@
         const dicho = String(texto || sub || '').trim();
 
         if (texto) {
-            const h = el('h2', null, texto);
+            const h = el('h2', null, sinLlaves(texto));
 
             if (dicho) h.appendChild(botonOir(dicho, 'en-titulo'));
             c.appendChild(h);
@@ -1401,7 +1410,7 @@
         const texto = $('#texto-juego');
         const pct = total > 0 ? Math.round((hechos / total) * 100) : 0;
         if (barra) barra.style.width = pct + '%';
-        if (texto) texto.textContent = hechos + ({ en: ' of ', de: ' von ' }[String(idiomaVoz || '').slice(0, 2)] || ' de ') + total;
+        if (texto) texto.textContent = hechos + ((estado.actual && { en: ' of ', de: ' von ' }[String(idiomaVoz || '').slice(0, 2)]) || ' de ') + total;
     }
 
     /**
@@ -4150,7 +4159,7 @@
             let hueco = null;
             if (completar) {
                 const frase = el('p', 'intro-frase');
-                const partes = String(q.enunciado).split('___');
+                const partes = sinLlaves(q.enunciado).split('___');
                 frase.appendChild(document.createTextNode(partes[0] || ''));
                 hueco = el('span', 'intro-hueco', '      ');
                 frase.appendChild(hueco);

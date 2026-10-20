@@ -720,6 +720,21 @@
     color: var(--texto);
 }
 
+/* La fecha y el «disponible» de cada fila de la ruta: se cambian ahí mismo. */
+.celda-fecha input[type="date"],
+.select-acceso {
+    font-family: inherit;
+    font-size: .84rem;
+    border: 2px solid var(--borde);
+    border-radius: var(--radio-chico);
+    padding: 4px 8px;
+    color: var(--texto);
+    background: var(--blanco);
+}
+
+.select-acceso.acceso-abierta { border-color: var(--verde); color: var(--verde); font-weight: 700; }
+.select-acceso.acceso-cerrada { border-color: var(--borde-fuerte); color: var(--texto-tenue); }
+
 /* Credenciales recién creadas: hay que copiarlas ahora o se pierden. */
 .credenciales-nuevas {
     border: 2px solid var(--naranja);

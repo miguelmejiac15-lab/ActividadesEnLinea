@@ -111,10 +111,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $accion === 'casa_marcadas',
             post('fecha_casa') ?: null
         );
+        if ($accion === 'clase_marcadas' && post('fecha_casa')) {
+            fijarFechaDeEntrega($cursoId, (array) ($_POST['asignadas'] ?? []), post('fecha_casa'));
+        }
         olvidarRuta();
 
         mensaje($n > 0 ? 'ok' : 'info', $n > 0
             ? "$n actividad(es) " . ($accion === 'casa_marcadas' ? 'ahora son tarea para casa.' : 'vuelven a ser de clase.')
+            : 'No marcaste ninguna, o ya estaban así.');
+    }
+
+    // ── La fecha de entrega, después de asignar ──────────────────────
+    //
+    // Antes la fecha solo se ponía al añadir. Una actividad ya asignada
+    // no tenía forma de llevar fecha, y la de «Para cuándo» junto a las
+    // casillas solo la usaba el botón de casa: el docente la ponía y no
+    // la tomaba nadie.
+    if ($accion === 'fecha_fila') {
+        fijarFechaDeEntrega($cursoId, [(int) post('actividad')], post('fecha_entrega') ?: null);
+        olvidarRuta();
+        mensaje('ok', post('fecha_entrega') ? 'Fecha guardada.' : 'Fecha quitada.');
+    }
+
+    if ($accion === 'fecha_marcadas') {
+        $n = fijarFechaDeEntrega($cursoId, (array) ($_POST['asignadas'] ?? []), post('fecha_casa') ?: null);
+        olvidarRuta();
+        mensaje($n > 0 ? 'ok' : 'info', $n > 0
+            ? "Fecha puesta a $n actividad(es)."
+            : 'Marca al menos una actividad y elige la fecha.');
+    }
+
+    // ── Disponible o no, lo decide el docente ────────────────────────
+    //
+    // En una ruta en orden, la siguiente se abría solo al terminar la
+    // anterior. Pero la clase avanza: hoy toca la M aunque no todos
+    // terminaron la A. «Abierta» la deja disponible ya; «Cerrada», no
+    // todavía; «Según el orden» la devuelve a la ruta.
+    $textosAcceso = [
+        'abierta' => 'Abierta: tus estudiantes ya la pueden hacer.',
+        'cerrada' => 'Cerrada: tus estudiantes todavía no la pueden abrir.',
+        'auto'    => 'Vuelve a seguir el orden de la ruta.',
+    ];
+
+    if ($accion === 'acceso_fila') {
+        fijarAccesoDocente($cursoId, [(int) post('actividad')], (string) post('acceso'));
+        olvidarRuta();
+        mensaje('ok', $textosAcceso[post('acceso')] ?? 'Guardado.');
+    }
+
+    $enLote = ['abrir_marcadas' => 'abierta', 'cerrar_marcadas' => 'cerrada', 'auto_marcadas' => 'auto'];
+
+    if (isset($enLote[$accion])) {
+        $n = fijarAccesoDocente($cursoId, (array) ($_POST['asignadas'] ?? []), $enLote[$accion]);
+        olvidarRuta();
+        mensaje($n > 0 ? 'ok' : 'info', $n > 0
+            ? "$n actividad(es). " . $textosAcceso[$enLote[$accion]]
             : 'No marcaste ninguna, o ya estaban así.');
     }
 
@@ -206,6 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $asignadas   = actividadesDelCurso($cursoId);
 $yaAsignadas = array_map('intval', array_column($asignadas, 'id'));
 $modoRuta    = modoDeRuta($curso);
+$accesoDocente = accesoDocenteInstalado();
 
 // ── Buscador ─────────────────────────────────────────────────────────
 $fCategoria = get('categoria');
@@ -628,6 +680,7 @@ require __DIR__ . '/includes/cabecera-escuela.php';
                     <th>Materia</th>
                     <th class="num">La terminaron</th>
                     <th>Para cuándo</th>
+                    <?php if ($accesoDocente): ?><th>Disponible</th><?php endif; ?>
                     <?php if (casaInstalada()): ?><th>Dónde</th><?php endif; ?>
                     <th style="width:96px">Orden</th>
                 </tr>
@@ -653,9 +706,40 @@ require __DIR__ . '/includes/cabecera-escuela.php';
                     </td>
                     <td class="tenue"><?= e(($a['categoria_icon'] ?? '') . ' ' . ($a['categoria'] ?? '')) ?></td>
                     <td class="num"><?= (int) $a['empezaron'] ?></td>
-                    <td class="<?= $a['due_date'] ? '' : 'tenue' ?>">
-                        <?= $a['due_date'] ? e(fechaLarga($a['due_date'])) : 'Sin fecha' ?>
+                    <td>
+                        <?php /* Se guarda sola al elegir la fecha. Sin
+                                 JavaScript, con el botón. */ ?>
+                        <form method="post" class="celda-fecha">
+                            <?= campoCsrf() ?>
+                            <input type="hidden" name="accion" value="fecha_fila">
+                            <input type="hidden" name="actividad" value="<?= (int) $a['id'] ?>">
+                            <input type="date" name="fecha_entrega"
+                                   value="<?= e((string) ($a['due_date'] ?? '')) ?>"
+                                   aria-label="Para cuándo: <?= e($a['title']) ?>"
+                                   onchange="this.form.submit()">
+                            <noscript><button class="btn btn-secundario btn-chico" type="submit">Guardar</button></noscript>
+                        </form>
                     </td>
+                    <?php if ($accesoDocente): ?>
+                        <?php $acc = (string) ($a['acceso'] ?? 'auto'); ?>
+                        <td>
+                            <form method="post">
+                                <?= campoCsrf() ?>
+                                <input type="hidden" name="accion" value="acceso_fila">
+                                <input type="hidden" name="actividad" value="<?= (int) $a['id'] ?>">
+                                <select name="acceso" class="select-acceso acceso-<?= e($acc) ?>"
+                                        aria-label="Disponible: <?= e($a['title']) ?>"
+                                        onchange="this.form.submit()">
+                                    <option value="auto" <?= $acc === 'auto' ? 'selected' : '' ?>>
+                                        <?= $modoRuta === 'secuencial' ? 'Según el orden' : 'Sí' ?>
+                                    </option>
+                                    <option value="abierta" <?= $acc === 'abierta' ? 'selected' : '' ?>>🔓 Abierta ya</option>
+                                    <option value="cerrada" <?= $acc === 'cerrada' ? 'selected' : '' ?>>🔒 Cerrada</option>
+                                </select>
+                                <noscript><button class="btn btn-secundario btn-chico" type="submit">Guardar</button></noscript>
+                            </form>
+                        </td>
+                    <?php endif; ?>
                     <?php if (casaInstalada()): ?>
                         <?php $esCasa = (int) $a['para_casa'] === 1; ?>
                         <td>
@@ -704,21 +788,53 @@ require __DIR__ . '/includes/cabecera-escuela.php';
                 Quitar las marcadas
             </button>
 
+            <label class="fecha-opcional">
+                Para cuándo
+                <input type="date" name="fecha_casa" form="quitar-marcadas">
+            </label>
+            <button class="btn btn-secundario btn-chico" type="submit" form="quitar-marcadas"
+                    name="accion" value="fecha_marcadas">
+                📅 Poner esta fecha a las marcadas
+            </button>
+
             <?php if (casaInstalada()): ?>
                 <button class="btn btn-principal btn-chico" type="submit" form="quitar-marcadas"
                         name="accion" value="casa_marcadas">
                     🏠 Marcadas → para casa
                 </button>
-                <label class="fecha-opcional">
-                    Para cuándo (opcional)
-                    <input type="date" name="fecha_casa" form="quitar-marcadas">
-                </label>
                 <button class="btn btn-secundario btn-chico" type="submit" form="quitar-marcadas"
                         name="accion" value="clase_marcadas">
                     🏫 Marcadas → de clase
                 </button>
             <?php endif; ?>
         </div>
+
+        <?php if ($accesoDocente): ?>
+            <div class="pie-bloque">
+                <button class="btn btn-principal btn-chico" type="submit" form="quitar-marcadas"
+                        name="accion" value="abrir_marcadas">
+                    🔓 Abrir las marcadas
+                </button>
+                <button class="btn btn-secundario btn-chico" type="submit" form="quitar-marcadas"
+                        name="accion" value="cerrar_marcadas">
+                    🔒 Cerrar las marcadas
+                </button>
+                <button class="btn btn-secundario btn-chico" type="submit" form="quitar-marcadas"
+                        name="accion" value="auto_marcadas">
+                    ↺ Que sigan el orden
+                </button>
+            </div>
+
+            <p class="nota-panel">
+                <b>🔓 Disponible.</b> Tú decides qué pueden hacer tus estudiantes, aunque no
+                hayan terminado la anterior. Si ayer era la A y no alcanzaron a terminarla,
+                abre hoy la M: la A sigue abierta para terminarla y la M aparece como
+                «la que toca». <b>🔒 Cerrada</b> la deja en espera hasta que la abras.
+                <?php if ($modoRuta === 'secuencial'): ?>
+                    «Según el orden» es lo de siempre: se abre al terminar la anterior.
+                <?php endif; ?>
+            </p>
+        <?php endif; ?>
 
         <?php if (casaInstalada()): ?>
             <p class="nota-panel">

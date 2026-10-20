@@ -367,6 +367,16 @@ function invitacionPorMotivo(string $motivo): array
         ];
     }
 
+    if ($motivo === 'ruta_cerrada') {
+        return [
+            'ok'      => false,
+            'motivo'  => 'ruta_cerrada',
+            'titulo'  => 'Todavía no te toca esta',
+            'mensaje' => 'Tu profe la abrirá cuando sea el momento. Mira lo que sí tienes para hacer hoy.',
+            'accion'  => ['texto' => 'Ir a la que me toca', 'url' => url('usuario/ruta.php')],
+        ];
+    }
+
     if ($motivo === 'ruta_pendiente') {
         $falta = function_exists('pasoQueFalta') ? pasoQueFalta() : null;
 

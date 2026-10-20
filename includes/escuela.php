@@ -727,11 +727,12 @@ function retirarEstudiante(int $cursoId, int $usuarioId): void
 function actividadesDelCurso(int $cursoId): array
 {
     // Sin la migración de tareas para casa, todo es de clase.
-    $casa = function_exists('casaInstalada') && casaInstalada() ? 'ca.para_casa' : '0';
+    $casa   = function_exists('casaInstalada') && casaInstalada() ? 'ca.para_casa' : '0';
+    $acceso = function_exists('accesoDocenteInstalado') && accesoDocenteInstalado() ? 'ca.acceso' : '"auto"';
 
     return traerTodo(
         'SELECT ca.id AS asignacion_id, ca.due_date, ca.sort_order, ca.assigned_at,
-                ' . $casa . ' AS para_casa,
+                ' . $casa . ' AS para_casa, ' . $acceso . ' AS acceso,
                 a.id, a.slug, a.title, a.icon, a.duration_minutes,
                 c.name AS categoria, c.icon AS categoria_icon,
                 (SELECT COUNT(*) FROM activity_stations s WHERE s.activity_id = a.id) AS estaciones,
@@ -789,6 +790,35 @@ function asignarActividad(int $cursoId, int $actividadId, ?string $fechaLimite):
 }
 
 /**
+ * Pone (o quita, con null) la fecha de entrega de actividades del curso.
+ *
+ * Solo toca asignaciones de ESTE curso. Una fecha mal formada no borra
+ * la que había: se ignora.
+ *
+ * @return int cuántas cambiaron
+ */
+function fijarFechaDeEntrega(int $cursoId, array $actividadIds, ?string $fecha): int
+{
+    $ids = array_values(array_unique(array_filter(array_map('intval', $actividadIds))));
+
+    if (!$ids) {
+        return 0;
+    }
+
+    $valida = fechaValidaOnull($fecha);
+
+    if ($valida === null && trim((string) $fecha) !== '') {
+        return 0;
+    }
+
+    $marcas = implode(',', array_fill(0, count($ids), '?'));
+
+    return ejecutar("UPDATE course_activities SET due_date = ?
+                      WHERE course_id = ? AND activity_id IN ($marcas)",
+                    array_merge([$valida, $cursoId], $ids));
+}
+
+/**
  * Asigna varias actividades de una vez.
  *
  * Es lo que convierte «asignar un bloque entero» en un clic en vez de
@@ -826,6 +856,19 @@ function asignarVarias(int $cursoId, array $actividadIds, ?string $fechaLimite =
     ));
 
     $nuevas = array_values(array_diff($validos, $ya));
+
+    /*
+     * Las que ya estaban también toman la fecha. Antes se ignoraba: el
+     * docente marcaba la A —ya asignada—, ponía la fecha y no pasaba
+     * nada. La fecha es lo que acaba de pedir, aunque la actividad no
+     * sea nueva.
+     */
+    $fechaLimite = fechaValidaOnull($fechaLimite);
+    $repetidas   = array_values(array_intersect($validos, $ya));
+
+    if ($fechaLimite !== null && $repetidas) {
+        fijarFechaDeEntrega($cursoId, $repetidas, $fechaLimite);
+    }
 
     $orden = (int) traerValor(
         'SELECT COALESCE(MAX(sort_order), 0) FROM course_activities WHERE course_id = ?',

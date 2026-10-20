@@ -63,6 +63,50 @@ function rutaInstalada(): bool
     return $listo;
 }
 
+/** ¿Está la columna con la que el docente abre o cierra actividades? */
+function accesoDocenteInstalado(): bool
+{
+    static $listo = null;
+
+    if ($listo === null) {
+        $listo = (bool) traerValor(
+            'SELECT COUNT(*) FROM information_schema.COLUMNS
+              WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = "course_activities"
+                AND COLUMN_NAME = "acceso"'
+        );
+    }
+
+    return $listo;
+}
+
+/**
+ * Abre o cierra a mano actividades del curso, o las devuelve a la ruta.
+ *
+ * Solo toca asignaciones de ESTE curso: el `WHERE course_id = ?` impide
+ * que un id cambiado en el formulario toque otro curso.
+ *
+ * @param string $acceso 'auto' | 'abierta' | 'cerrada'
+ * @return int cuántas cambiaron
+ */
+function fijarAccesoDocente(int $cursoId, array $actividadIds, string $acceso): int
+{
+    if (!accesoDocenteInstalado() || !in_array($acceso, ['auto', 'abierta', 'cerrada'], true)) {
+        return 0;
+    }
+
+    $ids = array_values(array_unique(array_filter(array_map('intval', $actividadIds))));
+
+    if (!$ids) {
+        return 0;
+    }
+
+    $marcas = implode(',', array_fill(0, count($ids), '?'));
+
+    return ejecutar("UPDATE course_activities SET acceso = ?
+                      WHERE course_id = ? AND activity_id IN ($marcas)",
+                    array_merge([$acceso, $cursoId], $ids));
+}
+
 /** El modo de un curso, tolerando instalaciones sin migrar. */
 function modoDeRuta(array $curso): string
 {
@@ -191,10 +235,11 @@ function rutaDelEstudiante(int $usuarioId, array $curso): array
     $cursoId = (int) $curso['id'];
 
     // Sin la migración de tareas para casa, todo es trabajo de clase.
-    $casa = function_exists('casaInstalada') && casaInstalada() ? 'ca.para_casa' : '0';
+    $casa   = function_exists('casaInstalada') && casaInstalada() ? 'ca.para_casa' : '0';
+    $acceso = accesoDocenteInstalado() ? 'ca.acceso' : '"auto"';
 
     $pasos = traerTodo(
-        'SELECT ca.sort_order, ca.due_date, ' . $casa . ' AS para_casa,
+        'SELECT ca.sort_order, ca.due_date, ' . $casa . ' AS para_casa, ' . $acceso . ' AS acceso,
                 a.id, a.slug, a.title, a.icon, a.duration_minutes,
                 cat.name AS categoria, cat.icon AS categoria_icon,
                 (SELECT COUNT(*) FROM activity_stations s
@@ -245,10 +290,28 @@ function rutaDelEstudiante(int $usuarioId, array $curso): array
          * Esto no concede nada que el plan no conceda: la ruta solo decide
          * qué de lo asignado se puede abrir, `acceso.php` sigue mandando.
          */
-        if ($p['para_casa']) {
+        /*
+         * Y por encima de todo, lo que decida el docente.
+         *
+         * «Abierta»: la clase ya va en la M aunque no todos terminaron la
+         * A —a algunos el crucigrama todavía les cuesta—. Lo que viene
+         * después sigue la ruta desde ella, como si se hubiera abierto
+         * sola. «Cerrada»: todavía no, y lo que va detrás espera como
+         * detrás de una sin terminar —que cerrar la A no abra sola la B
+         * es lo que el docente espera—; para seguir, abre la que toque.
+         */
+        $acceso = (string) ($p['acceso'] ?? 'auto');
+
+        if ($acceso === 'cerrada') {
+            $p['abierta'] = false;
+
+            if ($secuencial && !$p['para_casa']) {
+                $anteriorOk = $p['completa'] || $total === 0;
+            }
+        } elseif ($p['para_casa']) {
             $p['abierta'] = true;
         } else {
-            $p['abierta'] = !$secuencial || $anteriorOk;
+            $p['abierta'] = $acceso === 'abierta' || !$secuencial || $anteriorOk;
 
             if ($secuencial) {
                 $anteriorOk = $p['completa'] || $total === 0;
@@ -263,6 +326,26 @@ function rutaDelEstudiante(int $usuarioId, array $curso): array
         }
     }
     unset($p);
+
+    /*
+     * Si el docente abrió a mano una actividad, lo que toca hoy es esa
+     * —la última que abrió, la de la clase de hoy— y no la de ayer que
+     * quedó a medias. La de ayer sigue abierta para terminarla.
+     */
+    $abiertaHoy = null;
+    foreach ($pasos as $k => $p) {
+        if (($p['acceso'] ?? 'auto') === 'abierta' && !$p['para_casa']
+            && !$p['completa'] && $p['total'] > 0) {
+            $abiertaHoy = $k;
+        }
+    }
+    if ($abiertaHoy !== null) {
+        foreach ($pasos as $k => &$p) {
+            $p['es_siguiente'] = $k === $abiertaHoy;
+        }
+        unset($p);
+        $yaHayUna = true;
+    }
 
     // Lo que toca es lo de clase; si de clase no queda nada, la primera
     // tarea de casa pendiente.
@@ -375,7 +458,7 @@ function olvidarRuta(): void
  * respuestas distintas: «esto no es de tu clase» y «primero termina lo
  * anterior» son dos situaciones que no se parecen en nada.
  *
- * @return string|null 'fuera_de_ruta' | 'ruta_pendiente' | null
+ * @return string|null 'fuera_de_ruta' | 'ruta_pendiente' | 'ruta_cerrada' | null
  */
 function motivoDeRuta(array $actividad): ?string
 {
@@ -395,7 +478,12 @@ function motivoDeRuta(array $actividad): ?string
         return 'fuera_de_ruta';
     }
 
-    return $paso['abierta'] ? null : 'ruta_pendiente';
+    if ($paso['abierta']) {
+        return null;
+    }
+
+    // Cerrada por su profe no es «primero termina lo anterior».
+    return ($paso['acceso'] ?? 'auto') === 'cerrada' ? 'ruta_cerrada' : 'ruta_pendiente';
 }
 
 /** El paso que el niño tiene que hacer ahora, o null. */

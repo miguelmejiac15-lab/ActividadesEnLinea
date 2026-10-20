@@ -45,10 +45,42 @@ if ($codigo !== '' && !$curso) {
     }
 }
 
+/*
+ * ─────────────────────────────────────────────────────────────────────
+ *  EL PROFESOR PRUEBA EL ENLACE: VISTA PREVIA, NO CAMBIO DE SESIÓN
+ * ─────────────────────────────────────────────────────────────────────
+ *
+ * El docente abre el enlace que va a mandar para ver cómo queda, toca un
+ * nombre… y su sesión pasaba a ser la del niño: perdía el panel a mitad
+ * de la clase. Con una sesión de docente abierta, esta página es una
+ * vista previa: se ve igual, pero tocar un nombre no entra.
+ *
+ * Si de verdad quiere dejar que un niño entre en ESTE equipo, lo dice
+ * con un botón aparte —«ceder»—, que cierra su sesión primero.
+ */
+$vistaDocente = usuarioActual() !== null && puedeEntrarAEscuela();
+$previa       = null;   // el nombre que el docente tocó en la vista previa
+
 // ── Tocar un nombre ──────────────────────────────────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $curso) {
     exigirCsrf();
 
+    $alumnoId = (int) post('alumno');
+    $pin      = trim((string) post('pin'));
+
+    if ($vistaDocente && post('ceder') === '1') {
+        cerrarSesion();
+        session_start();
+        $vistaDocente = false;
+
+    } elseif ($vistaDocente) {
+        foreach (rosterDeAula((int) $curso['id']) as $r) {
+            if ((int) $r['id'] === $alumnoId) { $previa = $r; }
+        }
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $curso && !$vistaDocente) {
     $alumnoId = (int) post('alumno');
     $pin      = trim((string) post('pin'));
 
@@ -114,7 +146,47 @@ $titulo = $curso ? $curso['name'] : 'Entrar a mi clase';
 
 <main class="aula-cuerpo">
 
-<?php if ($cerrada): ?>
+<?php if ($vistaDocente && $curso): ?>
+    <div class="aula-aviso-docente" role="status">
+        <b>👀 Vista previa del profesor.</b>
+        Así verán esta página tus estudiantes. Tu sesión sigue abierta: tocar un nombre
+        aquí no entra a la cuenta del niño.
+        <a href="<?= e(url('escuela/')) ?>">← Volver al panel</a>
+    </div>
+<?php endif; ?>
+
+<?php if ($previa): ?>
+
+    <?php /* ── El profesor tocó un nombre en la vista previa ──────── */ ?>
+    <div class="tarjeta-codigo">
+        <div class="cara-grande"><?= personajeHtml($previa, 'grande') ?></div>
+        <h1><?= e($previa['name']) ?></h1>
+        <p>
+            Aquí <?= e($previa['name']) ?> entraría a su espacio
+            <?php if ((int) ($curso['aula_pin'] ?? 0) === 1): ?>después de escribir su PIN<?php endif; ?>.
+            Como tienes tu sesión de profesor abierta, no te sacamos de ella.
+        </p>
+        <p class="aula-pie">
+            Para probarlo como estudiante, abre el enlace en una ventana de incógnito
+            o en otro navegador.
+        </p>
+
+        <form method="post">
+            <?= campoCsrf() ?>
+            <input type="hidden" name="alumno" value="<?= (int) $previa['id'] ?>">
+            <input type="hidden" name="ceder" value="1">
+            <button type="submit" class="boton-secundario"
+                    onclick="return confirm('Se cerrará tu sesión de profesor en este equipo para que entre <?= e($previa['name']) ?>. ¿Seguir?')">
+                Dejar entrar a <?= e($previa['name']) ?> en este equipo
+            </button>
+        </form>
+
+        <p class="aula-pie">
+            <a href="<?= e(urlDeAula($codigo)) ?>">← Volver a la lista</a>
+        </p>
+    </div>
+
+<?php elseif ($cerrada): ?>
 
     <?php /* ── La clase todavía no está abierta ────────────────── */ ?>
     <div class="tarjeta-codigo">

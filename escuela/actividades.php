@@ -514,10 +514,24 @@ require __DIR__ . '/includes/cabecera-escuela.php';
             <?= campoCsrf() ?>
             <input type="hidden" name="accion" value="marcadas">
 
+            <?php /* Arriba, para no tener que bajar al final de una lista de
+                     ochenta: marcar todas y añadirlas en dos clics. */ ?>
+            <div class="pie-bloque" style="margin-bottom:12px">
+                <label class="fecha-opcional" style="margin-left:0">
+                    <input type="checkbox" data-marcar-todas="actividades[]">
+                    <b>Marcar todas</b>
+                    (<?= count(array_filter($resultados, fn($a) => !in_array((int) $a['id'], $yaAsignadas, true))) ?>)
+                </label>
+                <button class="btn btn-principal btn-chico" type="submit">Añadir las marcadas</button>
+            </div>
+
             <table class="tabla-panel">
                 <thead>
                     <tr>
-                        <th style="width:34px"></th>
+                        <th style="width:34px">
+                            <input type="checkbox" data-marcar-todas="actividades[]"
+                                   aria-label="Marcar todas" title="Marcar todas">
+                        </th>
                         <th>Actividad</th>
                         <th>Materia</th>
                         <th>Nivel</th>
@@ -552,10 +566,6 @@ require __DIR__ . '/includes/cabecera-escuela.php';
 
             <div class="pie-bloque">
                 <button class="btn btn-principal" type="submit">Añadir las marcadas</button>
-                <button class="btn btn-secundario btn-chico" type="button"
-                        onclick="document.querySelectorAll('[name=\'actividades[]\']').forEach(c=>c.checked=true)">
-                    Marcar todas
-                </button>
                 <label class="fecha-opcional">
                     Para cuándo (opcional)
                     <input type="date" name="fecha">
@@ -670,10 +680,20 @@ require __DIR__ . '/includes/cabecera-escuela.php';
             guarda solo. Las flechas siguen ahí si prefieres ir de una en una.
         </div>
 
+        <div class="pie-bloque" style="margin-bottom:12px">
+            <label class="fecha-opcional" style="margin-left:0">
+                <input type="checkbox" data-marcar-todas="asignadas[]">
+                <b>Marcar todas</b> (<?= count($asignadas) ?>) para quitarlas, ponerles fecha o abrirlas
+            </label>
+        </div>
+
         <table class="tabla-panel tabla-ruta" id="tabla-ruta">
             <thead>
                 <tr>
-                    <th style="width:34px"></th>
+                    <th style="width:34px">
+                        <input type="checkbox" data-marcar-todas="asignadas[]"
+                               aria-label="Marcar todas" title="Marcar todas">
+                    </th>
                     <th style="width:30px"></th>
                     <th style="width:44px" class="num">#</th>
                     <th>Actividad</th>
@@ -848,5 +868,31 @@ require __DIR__ . '/includes/cabecera-escuela.php';
         <script src="<?= e(urlRecurso('assets/js/orden-ruta.js')) ?>"></script>
     <?php endif; ?>
 </section>
+
+<script>
+/*
+ * «Marcar todas»: cada casilla con data-marcar-todas marca o desmarca las
+ * del nombre que indica, y se queda al día si se marcan una a una.
+ */
+document.querySelectorAll('[data-marcar-todas]').forEach((todas) => {
+    const nombre   = todas.dataset.marcarTodas;
+    const casillas = () => document.querySelectorAll('input[type=checkbox][name="' + nombre + '"]');
+    const gemelas  = () => document.querySelectorAll('[data-marcar-todas="' + nombre + '"]');
+
+    todas.addEventListener('change', () => {
+        casillas().forEach((c) => { c.checked = todas.checked; });
+        gemelas().forEach((g) => { g.checked = todas.checked; g.indeterminate = false; });
+    });
+
+    casillas().forEach((c) => c.addEventListener('change', () => {
+        const lista = Array.from(casillas());
+        const n = lista.filter((x) => x.checked).length;
+        gemelas().forEach((g) => {
+            g.checked = n > 0 && n === lista.length;
+            g.indeterminate = n > 0 && n < lista.length;
+        });
+    }));
+});
+</script>
 
 <?php require __DIR__ . '/includes/pie-escuela.php'; ?>

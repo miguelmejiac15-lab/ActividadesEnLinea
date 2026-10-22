@@ -24,7 +24,40 @@ $cerrada   = false;
 $pidePin   = false;
 $alumnoPin = null;
 
-if ($codigo !== '' && !$curso) {
+/*
+ * ─────────────────────────────────────────────────────────────────────
+ *  EL ENLACE PERSONAL: UN SOLO NOMBRE
+ * ─────────────────────────────────────────────────────────────────────
+ *
+ * `?yo=…` es el enlace que el docente manda a la casa de cada niño. La
+ * página enseña solo su nombre —ni la lista de la clase ni los de sus
+ * compañeros— y abre aunque la clase esté cerrada: es para practicar en
+ * casa. Ver «EL ENLACE PERSONAL» en includes/aula.php.
+ *
+ * Un enlace personal que no cuadra NO cae en la lista de la clase: quien
+ * lo tenga recibiría los nombres de todos, que es lo que se quería evitar.
+ */
+$yo          = trim((string) get('yo'));
+$soloAlumno  = null;
+$enlaceMalo  = false;
+
+if ($yo !== '' && $codigo !== '') {
+    $cursoCasa  = cursoDeEnlacePersonal($codigo);
+    $soloAlumno = $cursoCasa ? alumnoDeEnlace($cursoCasa, $yo) : null;
+
+    if ($soloAlumno) {
+        $curso     = $cursoCasa;
+        $resultado = ['curso' => $cursoCasa, 'motivo' => 'ok'];
+    } else {
+        $curso      = null;
+        $resultado  = ['curso' => null, 'motivo' => 'enlace'];
+        $enlaceMalo = true;
+        $error      = 'Este enlace ya no sirve. Pídele a tu profe uno nuevo.';
+        aulaFallo();
+    }
+}
+
+if ($codigo !== '' && !$curso && !$enlaceMalo) {
 
     if (aulaFrenada()) {
         $error = 'Demasiados intentos. Espera ' . aulaEsperaMinutos() . ' minuto(s).';
@@ -68,6 +101,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $curso) {
     $alumnoId = (int) post('alumno');
     $pin      = trim((string) post('pin'));
 
+    // Con el enlace personal solo se puede entrar con SU nombre.
+    if ($soloAlumno && $alumnoId !== (int) $soloAlumno['id']) {
+        $alumnoId = 0;
+    }
+
     if ($vistaDocente && post('ceder') === '1') {
         cerrarSesion();
         session_start();
@@ -83,6 +121,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $curso) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $curso && !$vistaDocente) {
     $alumnoId = (int) post('alumno');
     $pin      = trim((string) post('pin'));
+
+    if ($soloAlumno && $alumnoId !== (int) $soloAlumno['id']) {
+        $alumnoId = 0;
+    }
 
     $r = entrarPorAula($curso, $alumnoId, $pin);
 
@@ -112,9 +154,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $curso && !$vistaDocente) {
     $alumnoPin = $pidePin ? $alumnoId : null;
 }
 
-$roster = $curso ? rosterDeAula((int) $curso['id']) : [];
+$roster = $soloAlumno ? [$soloAlumno] : ($curso ? rosterDeAula((int) $curso['id']) : []);
 
 $titulo = $curso ? $curso['name'] : 'Entrar a mi clase';
+
+// «Volver» lleva a donde se llegó: con el enlace personal, a ese mismo.
+$volverA = $soloAlumno ? urlPersonalDeAula($curso, (int) $soloAlumno['id']) : urlDeAula($codigo);
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -182,7 +227,7 @@ $titulo = $curso ? $curso['name'] : 'Entrar a mi clase';
         </form>
 
         <p class="aula-pie">
-            <a href="<?= e(urlDeAula($codigo)) ?>">← Volver a la lista</a>
+            <a href="<?= e($volverA) ?>">← Volver a la lista</a>
         </p>
     </div>
 
@@ -274,7 +319,7 @@ $titulo = $curso ? $curso['name'] : 'Entrar a mi clase';
         </form>
 
         <p class="aula-pie">
-            <a href="<?= e(urlDeAula($codigo)) ?>">← Volver a la lista</a>
+            <a href="<?= e($volverA) ?>">← Volver a la lista</a>
         </p>
     </div>
 
@@ -283,7 +328,7 @@ $titulo = $curso ? $curso['name'] : 'Entrar a mi clase';
     <?php /* ── La lista de la clase ────────────────────────────── */ ?>
     <div class="tarjeta-lista">
 
-        <h1>Toca tu nombre</h1>
+        <h1><?= $soloAlumno ? '¡Hola! Toca tu nombre para entrar' : 'Toca tu nombre' ?></h1>
 
         <?php if ($error !== null): ?>
             <p class="aula-error"><?= e($error) ?></p>
@@ -312,10 +357,12 @@ $titulo = $curso ? $curso['name'] : 'Entrar a mi clase';
             </ul>
         <?php endif; ?>
 
-        <p class="aula-pie">
-            ¿No eres de esta clase?
-            <a href="<?= e(url('aula/')) ?>">Escribe otro código</a>
-        </p>
+        <?php if (!$soloAlumno): ?>
+            <p class="aula-pie">
+                ¿No eres de esta clase?
+                <a href="<?= e(url('aula/')) ?>">Escribe otro código</a>
+            </p>
+        <?php endif; ?>
     </div>
 
 <?php endif; ?>

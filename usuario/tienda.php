@@ -28,7 +28,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Se pone de una vez: quien compra un sombrero lo quiere ver
             // puesto, no buscar un segundo botón para estrenarlo.
             equiparArticulo($slug);
-            mensaje('ok', '¡' . ($r['item']['name'] ?? 'Listo') . ' es tuyo! Ya lo llevas puesto.');
+            mensaje('ok', ($r['item']['kind'] ?? '') === 'beneficio'
+                ? '¡' . ($r['item']['name'] ?? 'Listo') . ' es tuyo! Ya está funcionando.'
+                : '¡' . ($r['item']['name'] ?? 'Listo') . ' es tuyo! Ya lo llevas puesto.');
         } else {
             mensaje('error', $r['error']);
         }
@@ -66,6 +68,7 @@ $personaje = personajeDe($usuario);
 
 $avatares   = articulosTienda('avatar');
 $accesorios = articulosTienda('accesorio');
+$beneficios = articulosTienda('beneficio');
 
 $titulo        = 'Mi personaje · Actividades en Línea';
 $seccionActiva = 'espacio';
@@ -194,7 +197,10 @@ require RUTA_INCLUDES . '/cabecera.php';
                     echo '<p>' . e($it['description']) . '</p>';
                 }
 
-                if ($activo) {
+                if ($suyo && $it['kind'] === 'beneficio') {
+                    echo '<span class="sello-puesto">✓ Activo</span>';
+
+                } elseif ($activo) {
                     echo '<span class="sello-puesto">✓ Lo llevas puesto</span>';
 
                 } elseif ($suyo) {
@@ -257,6 +263,18 @@ require RUTA_INCLUDES . '/cabecera.php';
         rejillaTienda($accesorios, $tiene, $wallet, $r,
                       $usuario['accessory'] ?? null, $personaje['emoji']);
         ?>
+
+        <!-- ── Beneficios ──────────────────────────────────────────── -->
+        <?php if ($beneficios): ?>
+            <div class="titulo-seccion izquierda" style="margin-top:36px">
+                <small>Para jugar mejor</small>
+                <h2>Beneficios</h2>
+                <p>Se canjean una vez y te ayudan siempre. Las estrellas las sigues
+                   ganando tú, acertando.</p>
+            </div>
+
+            <?php rejillaTienda($beneficios, $tiene, $wallet, $r, null); ?>
+        <?php endif; ?>
 
         <!-- ── Logros ──────────────────────────────────────────────── -->
         <div class="titulo-seccion izquierda" style="margin-top:36px">

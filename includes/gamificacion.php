@@ -60,13 +60,22 @@ function billetera(?int $usuarioId = null): array
      * ya se encarga de que una estación pague una sola vez, así que la
      * segunda fila viene con ceros.
      */
+    /*
+     * Las monedas y estrellas cuentan TODAS, terminada o no la estación.
+     *
+     * Antes solo sumaban las terminadas, y «terminada» era sacar el 100 %:
+     * el niño que hacía bien un nivel con un error veía «+4 monedas» en
+     * pantalla y su saldo no se movía. Se midió el 2026-10-22: 1.068
+     * monedas de 85 niños estaban ganadas y no aparecían. No se pueden
+     * farmear igual: cada estación guarda su mejor resultado, no la suma.
+     */
     $p = traerUno(
         'SELECT COALESCE(SUM(coins), 0)  AS monedas,
                 COALESCE(SUM(stars), 0)  AS estrellas,
-                COUNT(DISTINCT station_id)  AS estaciones,
-                COUNT(DISTINCT activity_id) AS actividades
+                COUNT(DISTINCT CASE WHEN status = "completed" THEN station_id END)  AS estaciones,
+                COUNT(DISTINCT CASE WHEN status = "completed" THEN activity_id END) AS actividades
            FROM activity_progress
-          WHERE user_id = ? AND status = "completed"',
+          WHERE user_id = ?',
         [$usuarioId]
     );
 
@@ -121,10 +130,66 @@ const PRECIO_SALTAR = 12;
  */
 const FALLOS_PARA_AYUDA = 3;
 
-/** Precio de cada ayuda, para el navegador. */
+/** Precio de cada ayuda, para el navegador. La lupa abarata la pista. */
 function preciosAyuda(): array
 {
-    return ['pista' => PRECIO_PISTA, 'saltar' => PRECIO_SALTAR];
+    return [
+        'pista'  => tieneBeneficio('lupa') ? 2 : PRECIO_PISTA,
+        'saltar' => PRECIO_SALTAR,
+    ];
+}
+
+/**
+ * Lo que el motor necesita saber de las ayudas de este niño: precios,
+ * a los cuántos fallos se ofrecen y cuánto tiempo dan los juegos con reloj.
+ */
+function ayudasDelNino(): array
+{
+    $p = preciosAyuda();
+
+    return [
+        'pista'  => $p['pista'],
+        'saltar' => $p['saltar'],
+        'fallos' => tieneBeneficio('brujula') ? 2 : FALLOS_PARA_AYUDA,
+        'tiempo' => tieneBeneficio('reloj') ? 1.5 : 1,
+    ];
+}
+
+
+// =====================================================================
+//  BENEFICIOS
+//
+//  Se compran una vez y quedan activos para siempre. Ninguno regala
+//  mérito: abaratan o adelantan la ayuda, dan más tiempo o premian un
+//  trabajo perfecto. Las estrellas se siguen ganando acertando.
+//
+//    lupa     la pista cuesta 2 monedas en vez de 5
+//    brujula  la ayuda se ofrece al 2.º fallo, no al 3.º
+//    reloj    50 % más de tiempo en los juegos contrarreloj
+//    cofre    +2 monedas por cada estación con 3 estrellas
+// =====================================================================
+
+/** ¿El niño tiene comprado este beneficio? */
+function tieneBeneficio(string $slug, ?int $usuarioId = null): bool
+{
+    static $cache = [];
+
+    $usuarioId ??= usuarioActualId();
+
+    if ($usuarioId === null) {
+        return false;
+    }
+
+    if (!isset($cache[$usuarioId])) {
+        $cache[$usuarioId] = array_map(static fn($f) => $f['slug'], traerTodo(
+            'SELECT i.slug FROM user_items ui
+               JOIN shop_items i ON i.id = ui.item_id
+              WHERE ui.user_id = ? AND i.kind = "beneficio"',
+            [$usuarioId]
+        ));
+    }
+
+    return in_array($slug, $cache[$usuarioId], true);
 }
 
 /**
@@ -485,6 +550,11 @@ function equiparArticulo(string $slug): array
 
     if (!in_array($slug, articulosDe($usuarioId), true)) {
         return ['ok' => false, 'error' => 'Todavía no tienes eso.'];
+    }
+
+    // Un beneficio no se lleva puesto: queda activo al comprarlo.
+    if ($item['kind'] === 'beneficio') {
+        return ['ok' => true, 'error' => null];
     }
 
     $columna = $item['kind'] === 'avatar' ? 'avatar' : 'accessory';

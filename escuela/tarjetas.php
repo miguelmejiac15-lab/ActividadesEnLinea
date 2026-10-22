@@ -161,6 +161,28 @@ require __DIR__ . '/includes/cabecera-escuela.php';
 </section>
 
 
+<?php if ($modo === 'lista' && $codigo): ?>
+    <section class="bloque-panel no-imprimir">
+        <h2>🏠 Enlaces para casa</h2>
+        <p class="nota-panel">
+            Cada tarjeta trae un <b>enlace personal</b> para mandar a la familia. Al abrirlo,
+            el niño ve <b>solo su nombre</b>: ni la lista de la clase ni a sus compañeros.
+            Funciona a cualquier hora, aunque la clase esté cerrada.
+            <?php if (!$conPin): ?>
+                <br><b>Recomendado:</b> activa el PIN en
+                <a href="<?= e(url('escuela/acceso.php?curso=' . $cursoId)) ?>">cómo entran</a>.
+                Sin PIN, quien tenga el enlace entra como ese niño.
+            <?php endif; ?>
+        </p>
+        <p class="nota-panel">
+            Para probarlo, ábrelo en una <b>ventana de incógnito</b> u otro navegador: en
+            este, como tienes tu sesión de profesor abierta, verás una vista previa y tu
+            sesión no se cierra. Si un enlace circula donde no debía, cambia el código de
+            la clase y todos los enlaces viejos dejan de servir.
+        </p>
+    </section>
+<?php endif; ?>
+
 <?php /* ── La hoja ──────────────────────────────────────────────────── */ ?>
 
 <?php if (!$estudiantes): ?>
@@ -195,6 +217,23 @@ require __DIR__ . '/includes/cabecera-escuela.php';
                 <?php if ($modo === 'lista'): ?>
                     <div class="tarjeta-linea">
                         <span class="tl-eti">Y toca tu nombre</span>
+                    </div>
+
+                    <?php
+                    /*
+                     * El enlace para casa: solo enseña el nombre de este
+                     * niño, no la lista de la clase. Es el que se manda a
+                     * la familia por WhatsApp o por correo.
+                     */
+                    $enlaceCasa = urlPersonalDeAula($curso, (int) $a['id']);
+                    ?>
+                    <div class="tarjeta-linea casa">
+                        <span class="tl-eti">Desde casa</span>
+                        <span class="tl-val url enlace-casa"><?= e($enlaceCasa) ?></span>
+                        <button type="button" class="btn btn-secundario btn-chico no-imprimir"
+                                onclick="navigator.clipboard.writeText(<?= e(json_encode($enlaceCasa)) ?>).then(() => { this.textContent = '✓ Copiado'; })">
+                            Copiar enlace
+                        </button>
                     </div>
                 <?php else: ?>
                     <div class="tarjeta-linea">

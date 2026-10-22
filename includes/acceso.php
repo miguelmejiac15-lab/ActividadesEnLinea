@@ -107,6 +107,16 @@ function puedeGestionarCursos(): bool
     if (esAdmin()) {
         return true;
     }
+
+    /*
+     * Un estudiante nunca gestiona cursos, aunque su plan lo permita.
+     * Los niños matriculados reciben el plan Escuela —es lo que les abre
+     * el catálogo— y ese plan trae `manages_courses`: sin esta línea les
+     * aparecía el panel Escuela con «Crear curso».
+     */
+    if (tieneRol('student')) {
+        return false;
+    }
     $s = suscripcionVigente();
     return $s !== null && (int) $s['manages_courses'] === 1;
 }

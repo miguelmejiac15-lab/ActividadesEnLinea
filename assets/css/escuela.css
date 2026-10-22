@@ -1115,6 +1115,10 @@
 .tl-val { display: block; font-size: .88rem; color: var(--texto); word-break: break-all; }
 .tl-val.url { color: var(--azul); }
 
+/* El enlace para casa es largo: que parta donde haga falta y no rompa la tarjeta. */
+.tl-val.enlace-casa { font-size: .78rem; word-break: break-all; }
+.tarjeta-linea.casa .btn { margin-top: 6px; }
+
 /* El PIN, enorme: es lo que el niño va a leer del papel. */
 .tl-pin {
     display: block;

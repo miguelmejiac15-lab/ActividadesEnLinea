@@ -58,6 +58,7 @@
         fallosParaOfrecer: 3,
         precioPista: 5,
         precioSaltar: 12,
+        tiempo: 1,
     };
 
     // ── Utilidades ───────────────────────────────────────────────────
@@ -1112,8 +1113,12 @@
 
         c.appendChild(el('span', 'personaje-cara', estado.personaje.emoji));
 
+        // Con su slug en la clase, cada accesorio va donde va (estilo.css),
+        // igual que en la cabecera. Sin él todos caían en la cabeza.
         if (estado.personaje.accesorio) {
-            c.appendChild(el('span', 'personaje-accesorio', estado.personaje.accesorio));
+            const slug = String(estado.personaje.accesorio_slug || '').replace(/[^a-z0-9-]/g, '');
+            c.appendChild(el('span', 'personaje-accesorio' + (slug ? ' acc-' + slug : ''),
+                             estado.personaje.accesorio));
         }
 
         return c;
@@ -2171,7 +2176,8 @@
         juego_rapido(datos, fin) {
             const d = desempacar(datos, '¿Lleva la letra?', T('Responde rápido'));
             const items = d.items;
-            let i = 0, aciertos = 0, tiempo = 30, reloj = null;
+            // 30 s; con el reloj de arena de la tienda, 45.
+            let i = 0, aciertos = 0, tiempo = Math.round(30 * (AYUDA.tiempo || 1)), reloj = null;
 
             function acabar() {
                 if (reloj) clearInterval(reloj);
@@ -4231,6 +4237,15 @@
         // Idioma de la actividad (de-DE, en-US…), para la presentación.
         estado.idiomaActividad = config.idioma || null;
         estado.personaje = config.personaje || null;
+
+        // Los beneficios de la tienda cambian las ayudas. El cobro sigue
+        // siendo del servidor: esto solo dibuja el precio que cobrará.
+        if (config.ayuda) {
+            AYUDA.fallosParaOfrecer = Number(config.ayuda.fallos) || AYUDA.fallosParaOfrecer;
+            AYUDA.precioPista = Number(config.ayuda.pista) || AYUDA.precioPista;
+            AYUDA.precioSaltar = Number(config.ayuda.saltar) || AYUDA.precioSaltar;
+            AYUDA.tiempo = Number(config.ayuda.tiempo) || 1;
+        }
         estado.intro = config.intro || null;
 
         document.querySelectorAll('.mapa-estacion[data-id]').forEach((n) => {

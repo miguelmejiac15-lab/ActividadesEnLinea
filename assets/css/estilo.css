@@ -1012,87 +1012,87 @@ a   { color: inherit; text-decoration: none; }
 
 .personaje { position: relative; display: inline-block; line-height: 1; }
 
-/* La cara va por delante de los accesorios que se llevan a la espalda.
-   Se hace subiendo la cara y no bajando la mochila: con `z-index:-1` la
-   mochila se iría detrás del fondo de la tarjeta y desaparecería. */
+/* La cara en su capa; los accesorios van en la de encima (z-index 2). */
 .personaje-cara { display: block; font-size: 1em; position: relative; z-index: 1; }
 
 .personaje-accesorio {
     position: absolute;
+    /* SIEMPRE por delante de la cara. Antes la mochila iba detrás a
+       propósito y el cohete o el trofeo flotaban al lado: los niños no
+       veían lo que habían comprado. Todo se lleva PUESTO, encima. */
+    z-index: 2;
     line-height: 1;
     /* Un contorno claro lo separa de la cara que tiene debajo. */
     filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff);
     pointer-events: none;
 
-    /* Por defecto, arriba y centrado: es donde va lo que se pone en la
-       cabeza, que son la mitad de los accesorios de la tienda. Un slug
+    /* Por defecto, en la cabeza: arriba y centrado, apoyado. Un slug
        nuevo aterriza en un sitio razonable sin tocar nada. */
-    top: -.30em;
+    top: -.24em;
     left: 50%;
     transform: translateX(-50%);
-    font-size: .58em;
+    font-size: .56em;
 }
 
-/* Sombreros y coronas: apoyados en la cabeza, no encima del aire. */
-.personaje-accesorio.acc-gorra    { top: -.26em; font-size: .60em; }
-.personaje-accesorio.acc-sombrero { top: -.34em; font-size: .58em; }
-.personaje-accesorio.acc-corona   { top: -.28em; font-size: .52em; }
-.personaje-accesorio.acc-casco    { top: -.24em; font-size: .62em; }
+/* ── En la cabeza ─────────────────────────────────────────────────────
+   Apoyados sobre la cabeza, tapando un poco el borde: así se ve que lo
+   lleva puesto y no que le está cayendo encima. */
+.personaje-accesorio.acc-gorra    { top: -.22em; font-size: .60em; }
+.personaje-accesorio.acc-sombrero { top: -.30em; font-size: .58em; }
+.personaje-accesorio.acc-corona   { top: -.30em; font-size: .52em; }
+.personaje-accesorio.acc-casco    { top: -.32em; font-size: .62em; }
+.personaje-accesorio.acc-birrete  { top: -.26em; font-size: .58em; }
+.personaje-accesorio.acc-pamela   { top: -.38em; font-size: .64em; }
+.personaje-accesorio.acc-lazo     { top: -.14em; left: 70%; font-size: .42em; }
+.personaje-accesorio.acc-audifonos { top: -.12em; font-size: .80em; }
+.personaje-accesorio.acc-estrella { top: -.20em; left: 72%; font-size: .40em; }
 
-/* Gafas: sobre los ojos. En las caras de animal quedan hacia un tercio
-   de la altura, no en el centro. */
-.personaje-accesorio.acc-gafas {
-    top: .30em;
-    font-size: .54em;
+/* Flor: en la oreja, por delante. */
+.personaje-accesorio.acc-flor {
+    top: .02em; left: .02em; transform: none; font-size: .38em;
+}
+
+/* ── En los ojos ──────────────────────────────────────────────────────
+   En las caras de animal los ojos quedan hacia un tercio de la altura. */
+.personaje-accesorio.acc-gafas,
+.personaje-accesorio.acc-lentes,
+.personaje-accesorio.acc-gafas-nadar {
+    top: .28em;
+    font-size: .56em;
     filter: none;   /* aquí el contorno blanco las despega de la cara */
 }
 
-/* Bufanda: en el cuello, o sea abajo y por delante. */
-.personaje-accesorio.acc-bufanda {
-    top: auto;
-    bottom: -.06em;
-    font-size: .50em;
-}
+/* ── En el cuello y el pecho ──────────────────────────────────────────
+   Abajo y al centro, por delante de la barbilla. */
+.personaje-accesorio.acc-bufanda { top: auto; bottom: -.10em; font-size: .52em; }
+.personaje-accesorio.acc-corbata { top: auto; bottom: -.20em; font-size: .38em; }
+.personaje-accesorio.acc-collar  { top: auto; bottom: -.08em; font-size: .44em; }
+.personaje-accesorio.acc-medalla { top: auto; bottom: -.12em; font-size: .42em; }
 
-/* Medalla: al pecho, ligeramente a un lado. */
-.personaje-accesorio.acc-medalla {
+/* ── En la mano ───────────────────────────────────────────────────────
+   Lo que se sostiene va abajo, a un lado y MONTADO sobre el borde de la
+   cara: lo tiene agarrado, no está suelto al lado. */
+.personaje-accesorio.acc-trofeo,
+.personaje-accesorio.acc-cohete,
+.personaje-accesorio.acc-globo,
+.personaje-accesorio.acc-varita,
+.personaje-accesorio.acc-balon,
+.personaje-accesorio.acc-osito,
+.personaje-accesorio.acc-helado,
+.personaje-accesorio.acc-guitarra {
     top: auto;
-    bottom: -.02em;
+    bottom: -.10em;
     left: auto;
-    right: .04em;
+    right: -.04em;
     transform: none;
-    font-size: .40em;
+    font-size: .46em;
 }
 
-/* Mochila: al hombro. Queda detrás porque la cara sube, no porque esta
-   baje — ver la nota de `.personaje-cara`. */
+.personaje-accesorio.acc-globo { bottom: auto; top: -.06em; right: -.10em; }
+
+/* La mochila, colgada al hombro y por delante, al otro lado de la mano. */
 .personaje-accesorio.acc-mochila {
-    top: auto;
-    bottom: .04em;
-    left: -.16em;
-    transform: none;
-    font-size: .44em;
-}
-
-/* Flor: en la oreja. */
-.personaje-accesorio.acc-flor {
-    top: .02em;
-    left: -.06em;
-    transform: none;
-    font-size: .38em;
-}
-
-/* Los que no se «llevan puestos» acompañan al lado, y eso está bien:
-   nadie se pone un cohete. */
-.personaje-accesorio.acc-estrella {
-    top: -.08em; left: auto; right: -.08em; transform: none; font-size: .40em;
-}
-.personaje-accesorio.acc-cohete {
-    top: -.02em; left: auto; right: -.22em; transform: none; font-size: .46em;
-}
-.personaje-accesorio.acc-trofeo {
-    top: auto; bottom: -.04em; left: auto; right: -.14em;
-    transform: none; font-size: .44em;
+    top: auto; bottom: -.08em; left: -.04em; transform: none; font-size: .46em;
 }
 
 .personaje.chico  { font-size: 2.1rem; }

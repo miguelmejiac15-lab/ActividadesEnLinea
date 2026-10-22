@@ -76,7 +76,17 @@ $estrellas  = max(0, min(3,    (int) ($_POST['estrellas']  ?? 0)));
 $monedas    = max(0, min(100,  (int) ($_POST['monedas']    ?? 0)));
 $segundos   = max(0, min(7200, (int) ($_POST['segundos']   ?? 0)));
 
-$completada = $porcentaje >= 100;
+/*
+ * Terminada desde el 70 %, que es cuando el juego le dice al niño
+ * «¡Muy bien! Terminaste». Antes hacía falta el 100 %: quien llegaba al
+ * final con un error veía «¡Muy bien!» y sus monedas, pero la estación
+ * quedaba «empezada», la actividad nunca se completaba y la ruta del
+ * curso no avanzaba. Por debajo del 70 % el juego dice «¡Casi! Puedes
+ * volver a intentarlo», y queda empezada.
+ */
+const PORCENTAJE_PARA_TERMINAR = 70;
+
+$completada = $porcentaje >= PORCENTAJE_PARA_TERMINAR;
 $estado     = $completada ? 'completed' : 'in_progress';
 
 /*
@@ -117,6 +127,11 @@ if ($yaCobrada > 0) {
     $estrellas = 0;
 }
 
+// El cofre del tesoro: +2 monedas por cada estación perfecta.
+if ($monedas > 0 && $estrellas === 3 && tieneBeneficio('cofre', $usuarioId)) {
+    $monedas = min(100, $monedas + 2);
+}
+
 /*
  * ─────────────────────────────────────────────────────────────────────
  *  QUÉ LOGROS TENÍA ANTES DE ESTA ESTACIÓN
@@ -144,7 +159,7 @@ ejecutar(
          attempts, time_spent_seconds, completed_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ' . ($completada ? 'NOW()' : 'NULL') . ')
      ON DUPLICATE KEY UPDATE
-        status             = IF(VALUES(percent) >= percent, VALUES(status), status),
+        status             = IF(status = "completed" OR VALUES(status) = "completed", "completed", VALUES(status)),
         percent            = GREATEST(percent, VALUES(percent)),
         score              = GREATEST(score,   VALUES(score)),
         stars              = GREATEST(stars,   VALUES(stars)),

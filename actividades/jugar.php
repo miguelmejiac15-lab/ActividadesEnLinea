@@ -250,7 +250,11 @@ require RUTA_INCLUDES . '/cabecera.php';
          * las monedas y el personaje existían sin llegar nunca al
          * momento en que de verdad importan.
          */
-        personaje: <?= jsonSeguro($usuario ? personajeDe($usuario) : null) ?>
+        personaje: <?= jsonSeguro($usuario ? personajeDe($usuario) : null) ?>,
+
+        // Precios y momento de las ayudas, con los beneficios que haya
+        // comprado en la tienda (lupa, brújula, reloj). Ver gamificacion.php.
+        ayuda: <?= jsonSeguro($usuario ? ayudasDelNino() : null) ?>
     });
 </script>
 

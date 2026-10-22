@@ -239,15 +239,9 @@ body.jugando { background: var(--fondo); }
 
 .personaje-juego .personaje-cara { display: block; position: relative; z-index: 1; }
 
-.personaje-juego .personaje-accesorio {
-    position: absolute;
-    top: -.30em;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: .58em;
-    line-height: 1;
-    filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff);
-}
+/* El accesorio dentro del juego se coloca con las mismas reglas que en
+   la cabecera (estilo.css, `.personaje-accesorio.acc-…`). Aquí antes se
+   repetía una posición fija que mandaba TODOS a la cabeza. */
 
 .personaje-juego.grande { font-size: 7rem; display: block; margin: 0 auto 4px; }
 .personaje-juego.mini   { font-size: 1.5rem; margin-right: 8px; vertical-align: middle; }

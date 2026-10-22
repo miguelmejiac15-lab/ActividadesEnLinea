@@ -625,6 +625,94 @@ function urlDeAula(string $codigo): string
 
 
 // =====================================================================
+//  EL ENLACE PERSONAL, PARA CASA
+// =====================================================================
+//
+// El enlace de la clase enseña la lista entera: sirve en el salón, con
+// el docente delante. Para mandar a casa no: cada familia vería los
+// nombres de todos los compañeros y el niño podría tocar el de otro.
+//
+// El enlace personal enseña UN nombre, el suyo. Lleva el id del niño y
+// una firma que depende del curso, del niño y del código de la clase:
+//
+//   - no se puede fabricar el de otro cambiando el número;
+//   - cambiar el código de la clase anula todos los personales a la vez,
+//     que es lo que se hace si uno circula donde no debía.
+//
+// No se guarda nada nuevo en la base: la firma se recalcula.
+
+/** La firma del enlace personal. */
+function firmaPersonal(int $cursoId, int $alumnoId, string $codigo): string
+{
+    $clave = APP_KEY !== '' ? APP_KEY : 'ael-sin-clave';
+
+    return substr(hash_hmac('sha256', "aula-casa|$cursoId|$alumnoId|$codigo", $clave), 0, 12);
+}
+
+/** El enlace que se manda a la casa de un niño. */
+function urlPersonalDeAula(array $curso, int $alumnoId): string
+{
+    $codigo = (string) ($curso['access_code'] ?? '');
+
+    return urlDeAula($codigo) . '?yo=' . $alumnoId . '-'
+         . firmaPersonal((int) $curso['id'], $alumnoId, $codigo);
+}
+
+/**
+ * El curso de un enlace personal, aunque la clase esté cerrada.
+ *
+ * El horario de clase es para la lista del salón. Un enlace para casa
+ * que solo abriera en horario de clase no serviría para practicar en
+ * casa, que es justo para lo que se manda. Un curso archivado sigue sin
+ * abrir.
+ */
+function cursoDeEnlacePersonal(string $codigo): ?array
+{
+    if (!aulaInstalada()) {
+        return null;
+    }
+
+    $codigo = limpiarCodigo($codigo);
+
+    $curso = $codigo === '' ? null : traerUno(
+        'SELECT c.*, u.name AS docente
+           FROM courses c
+      LEFT JOIN users u ON u.id = c.teacher_id
+          WHERE c.access_code = ? AND c.status = "active"',
+        [$codigo]
+    );
+
+    return $curso && usaLista($curso) ? $curso : null;
+}
+
+/**
+ * El niño de un enlace personal, o null si la firma no cuadra o ya no
+ * está en el curso.
+ */
+function alumnoDeEnlace(array $curso, string $yo): ?array
+{
+    if (!preg_match('/^(\d{1,10})-([0-9a-f]{12})$/', $yo, $m)) {
+        return null;
+    }
+
+    $alumnoId = (int) $m[1];
+    $esperada = firmaPersonal((int) $curso['id'], $alumnoId, (string) $curso['access_code']);
+
+    if (!hash_equals($esperada, $m[2])) {
+        return null;
+    }
+
+    foreach (rosterDeAula((int) $curso['id']) as $r) {
+        if ((int) $r['id'] === $alumnoId) {
+            return $r;
+        }
+    }
+
+    return null;
+}
+
+
+// =====================================================================
 //  LA ACTIVIDAD DE HOY
 // =====================================================================
 //

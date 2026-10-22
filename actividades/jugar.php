@@ -157,10 +157,16 @@ require RUTA_INCLUDES . '/cabecera.php';
             </p>
 
             <?php if ($intro): ?>
+                <?php /* No es una estación: no se califica ni se guarda, y
+                         no puede quedar «pendiente». Antes llevaba el ▶️ de
+                         una estación sin hacer, y al niño que empezó sin
+                         leerla le parecía que le faltaba algo. */ ?>
                 <button class="mapa-estacion mapa-intro" id="abrir-intro" type="button">
                     <span class="num">📖</span>
-                    <span class="etiqueta">Antes de empezar</span>
-                    <span class="marca" aria-hidden="true">▶️</span>
+                    <span class="etiqueta">
+                        Antes de empezar
+                        <small class="mapa-intro-nota">Para leer · no cuenta</small>
+                    </span>
                 </button>
             <?php endif; ?>
 

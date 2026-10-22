@@ -1665,6 +1665,72 @@
     // Cada función recibe el contenido de la estación y una función
     // `fin(aciertos, total)` que llama al terminar.
 
+    /*
+     * ─────────────────────────────────────────────────────────────────
+     *  QUE QUEPA EN LA PANTALLA
+     * ─────────────────────────────────────────────────────────────────
+     *
+     * Memorias de 24 cartas y crucigramas de 13×12 con ocho pistas
+     * debajo obligaban a desplazarse hacia abajo, y a los más pequeños
+     * eso les cuesta. Se juega con menos; el contenido guardado no cambia.
+     */
+    const MAX_PAREJAS = 8;
+    const MAX_PAREJAS_PEQUENOS = 6;
+    const MAX_PALABRAS = 6;
+    const MAX_PALABRAS_PEQUENOS = 4;
+
+    /** Casillas de una palabra del crucigrama, como «fila,columna». */
+    function casillasDe(p) {
+        return String(p.w).split('').map((_, k) =>
+            (p.fila + (p.dir === 'v' ? k : 0)) + ',' + (p.col + (p.dir === 'h' ? k : 0)));
+    }
+
+    /**
+     * Elige hasta `max` palabras que se crucen entre sí y recorta la
+     * rejilla a lo que ocupan. Empieza por la primera y va sumando las
+     * que comparten alguna casilla con las ya elegidas: un crucigrama
+     * con palabras sueltas no parece un crucigrama.
+     */
+    function crucigramaCompacto(todas, max) {
+        if (todas.length <= max) {
+            return { palabras: todas, filas: 0, columnas: 0 };
+        }
+
+        const elegidas = [todas[0]];
+        const ocupadas = new Set(casillasDe(todas[0]));
+        const resto = todas.slice(1);
+
+        let cambio = true;
+        while (elegidas.length < max && cambio) {
+            cambio = false;
+            for (let i = 0; i < resto.length && elegidas.length < max; i++) {
+                const cs = casillasDe(resto[i]);
+                if (cs.some((c) => ocupadas.has(c))) {
+                    elegidas.push(resto[i]);
+                    cs.forEach((c) => ocupadas.add(c));
+                    resto.splice(i, 1);
+                    i--;
+                    cambio = true;
+                }
+            }
+        }
+        // Si no hay más que se crucen, se completan con las que queden.
+        while (elegidas.length < max && resto.length) elegidas.push(resto.shift());
+
+        let minF = Infinity, minC = Infinity, maxF = 0, maxC = 0;
+        elegidas.forEach((p) => casillasDe(p).forEach((c) => {
+            const [f, k] = c.split(',').map(Number);
+            minF = Math.min(minF, f); minC = Math.min(minC, k);
+            maxF = Math.max(maxF, f); maxC = Math.max(maxC, k);
+        }));
+
+        return {
+            palabras: elegidas.map((p) => Object.assign({}, p, { fila: p.fila - minF, col: p.col - minC })),
+            filas: maxF - minF + 1,
+            columnas: maxC - minC + 1,
+        };
+    }
+
     const JUEGOS = {
 
         /* 1 · Conoce la letra: escuchar y decir sí o no
@@ -2235,7 +2301,14 @@
 
         /* 9 · Memoria: encontrar las parejas */
         memoria(datos, fin) {
-            const base = Array.isArray(datos) ? datos : [];
+            /*
+             * Pocas parejas, para que quepan en la pantalla sin bajar.
+             * Había memorias de 12 parejas —24 cartas— y a un niño de
+             * cinco años le cuesta desplazarse para encontrar la otra. Se
+             * eligen al azar en cada partida: jugando otra vez salen otras.
+             */
+            const todas = Array.isArray(datos) ? datos : [];
+            const base = barajar(todas.slice()).slice(0, sinLectura ? MAX_PAREJAS_PEQUENOS : MAX_PAREJAS);
             const cartas = barajar(base.concat(base));
             const volteadas = [];
             let halladas = 0, bloqueo = false;
@@ -3431,10 +3504,17 @@
          * Con dibujo, el mismo motor sirve para un niño que aún no lee.
          */
         crucigrama(datos, fin) {
-            const d        = datos || {};
-            const filas    = Number(d.filas) || 1;
-            const columnas = Number(d.columnas) || 1;
-            const palabras = Array.isArray(d.palabras) ? d.palabras : [];
+            const d = datos || {};
+
+            // Menos palabras y la rejilla recortada a su medida: así el
+            // crucigrama y sus pistas caben sin tener que bajar.
+            const compacto = crucigramaCompacto(
+                Array.isArray(d.palabras) ? d.palabras : [],
+                sinLectura ? MAX_PALABRAS_PEQUENOS : MAX_PALABRAS
+            );
+            const filas    = compacto.filas || Number(d.filas) || 1;
+            const columnas = compacto.columnas || Number(d.columnas) || 1;
+            const palabras = compacto.palabras;
             const resueltas = new Set();
 
             limpiar();
@@ -4158,7 +4238,7 @@
 
             const completar = q.tipo === 'completar';
             titular(completar ? 'Completa la frase' : q.enunciado,
-                    'Comprueba lo que entendiste · ' + (n + 1) + ' de ' + preguntas.length);
+                    'Para practicar, no se califica · ' + (n + 1) + ' de ' + preguntas.length);
 
             const c = panel('juego-centro');
 

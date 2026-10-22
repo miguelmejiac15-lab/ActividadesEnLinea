@@ -90,6 +90,7 @@ body.jugando { background: var(--fondo); }
    porque no es una estación: no se puntúa ni se bloquea. */
 .mapa-intro { margin-bottom: 10px; background: var(--fondo-suave); }
 .mapa-intro .num { background: var(--blanco); font-size: .9rem; }
+.mapa-intro-nota { display: block; font-size: .72rem; font-weight: 400; color: var(--texto-tenue); }
 
 /* Corte entre lo gratuito y lo premium, dentro del mapa. */
 .mapa-corte {
@@ -1031,7 +1032,12 @@ body.sin-lectura .juego-boton {
     max-width: 620px;
     margin: 0 auto;
 }
-.juego-rejilla.memoria { grid-template-columns: repeat(4, 1fr); max-width: 420px; }
+.juego-rejilla.memoria { grid-template-columns: repeat(4, 1fr); max-width: 420px; gap: 10px; }
+
+/* Cartas de memoria cuadradas y más bajas: tres o cuatro filas caben en
+   la pantalla sin bajar. El dibujo sigue grande para los pequeños. */
+.juego-rejilla.memoria .juego-carta { padding: 8px 6px; aspect-ratio: 1; justify-content: center; }
+.juego-rejilla.memoria .juego-carta .juego-emoji { font-size: 2.8rem; }
 
 .juego-carta {
     background: var(--blanco);
@@ -1204,7 +1210,18 @@ body.sin-lectura .juego-boton {
     justify-content: center;
     width: 100%;
 }
-.cruci-grupo { flex: 1 1 240px; max-width: 320px; }
+/* Las pistas en rejilla, dos o tres por fila: una debajo de otra
+   estiraban el crucigrama hacia abajo y los pequeños tenían que bajar. */
+.cruci-grupo {
+    flex: 1 1 240px;
+    max-width: 380px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+    gap: 6px;
+    align-content: start;
+}
+.cruci-grupo .cruci-grupo-titulo { grid-column: 1 / -1; margin-bottom: 0; }
+.cruci-grupo .cruci-pista { margin-bottom: 0; padding: 5px 9px; min-height: 0; }
 .cruci-grupo-titulo {
     font-size: .82rem;
     font-weight: 700;

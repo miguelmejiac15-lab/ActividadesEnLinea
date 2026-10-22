@@ -209,8 +209,8 @@ function registrarSolicitud(array $d): array
              [$correo['ok'] ? 1 : 0, $correo['ok'] ? null : mb_substr((string) $correo['error'], 0, 255), $id]);
 
     // Para la pauta: llegó un interesado. Solo el perfil, nada de la persona.
-    if (function_exists('metaEvento')) {
-        metaEvento('Lead', ['content_name' => $d['profile']], 'solicitud-' . $id);
+    if (function_exists('metaLead')) {
+        metaLead((string) $d['profile'], 'solicitud-' . $id);
     }
 
     return ['id' => $id, 'correo' => $correo];

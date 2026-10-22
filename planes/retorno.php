@@ -132,8 +132,12 @@ $estado = etiquetaEstadoPago($pago['status']);
 
 // Para Meta: la compra, una sola vez por referencia aunque se recargue.
 if ($pago['status'] === PAGO_CONFIRMADO) {
-    metaEvento('Purchase', ['value' => (int) $pago['amount_cop'], 'currency' => 'COP'],
-               'compra-' . $pago['reference']);
+    metaEvento('Purchase', [
+        'value'        => (int) $pago['amount_cop'],
+        'currency'     => 'COP',
+        'content_name' => (string) (traerValor('SELECT name FROM plans WHERE id = ?',
+                                               [(int) $pago['plan_id']]) ?: ''),
+    ], metaIdCompra((string) $pago['reference']));
 }
 
 $titulo        = 'Pago ' . $pago['reference'];

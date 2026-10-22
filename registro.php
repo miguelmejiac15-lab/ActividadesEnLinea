@@ -85,7 +85,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Para Meta: una cuenta nueva, solo si es de un adulto. Este
         // formulario también acepta cuentas de menores con acudiente.
         if ($v['birth_year'] === '' || !esCuentaDeMenor(['birth_year' => (int) $v['birth_year']])) {
-            metaEvento('CompleteRegistration', [], 'registro-' . (int) $r['usuario_id']);
+            // Sale en la primera página que vea: normalmente /usuario/,
+            // que lo deja pasar una sola vez (esPrimeraVisitaTrasRegistro).
+            metaEvento('CompleteRegistration', [],
+                       metaIdEvento('registro', (string) $r['usuario_id']));
         }
 
         /*

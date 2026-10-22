@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // El píxel de Meta es un número de 15 o 16 cifras.
-        if ($clave === 'meta_pixel_id' && $valor !== '' && !preg_match('/^d{10,20}$/', $valor)) {
+        if ($clave === 'meta_pixel_id' && $valor !== '' && !preg_match('/^\d{10,20}$/', $valor)) {
             mensaje('error', 'El identificador del píxel de Meta es solo un número (15 o 16 cifras).');
             continue;
         }

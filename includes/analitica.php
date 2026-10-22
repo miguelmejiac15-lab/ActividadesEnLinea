@@ -101,7 +101,7 @@ function analiticaPermitida(): bool
  * y el día que una zona de niños se añadiera a una sola, el otro tercero
  * seguiría recibiendo datos de ella.
  */
-function paginaMedible(): bool
+function paginaMedible(bool $ignorarZona = false): bool
 {
     // En XAMPP no se mide: son visitas de quien está programando.
     if (defined('ES_DESARROLLO') && ES_DESARROLLO) {
@@ -145,6 +145,12 @@ function paginaMedible(): bool
      * servidor va a ejecutar de verdad.
      */
     $ruta = (string) ($_SERVER['SCRIPT_NAME'] ?? '');
+
+    // Las puertas de arriba —niños— no se saltan nunca. Esto solo
+    // permite, a quien lo pida a propósito, mirar una zona privada.
+    if ($ignorarZona) {
+        return true;
+    }
 
     foreach (['/admin/', '/escuela/', '/colegio/', '/aula/', '/usuario/', '/api/'] as $zona) {
         if (str_contains($ruta, $zona)) {
@@ -311,28 +317,131 @@ function metaEvento(string $nombre, array $datos = [], ?string $clave = null): v
     ];
 }
 
+/**
+ * Un identificador de evento que no dice quién es la persona.
+ *
+ * Meta lo usa para no contar dos veces el mismo evento —y, más adelante,
+ * para emparejar el del navegador con el de la API de Conversiones—. No
+ * hace falta que sea legible: basta con que sea siempre el mismo para la
+ * misma cosa. Antes llevaba el número interno del usuario
+ * («registro-123»); con la firma, Meta no recibe ese número.
+ */
+function metaIdEvento(string $tipo, string $valor): string
+{
+    $clave = APP_KEY !== '' ? APP_KEY : 'ael-sin-clave';
+
+    return $tipo . '-' . substr(hash_hmac('sha256', $tipo . '|' . $valor, $clave), 0, 16);
+}
+
+/**
+ * El id de una compra: el mismo en el navegador y, cuando se haga, en la
+ * API de Conversiones desde el webhook. Por eso sale de la referencia del
+ * pago, que conocen los dos, y no del id de Mercado Pago, que el
+ * navegador no siempre trae.
+ */
+function metaIdCompra(string $referencia): string
+{
+    return metaIdEvento('compra', $referencia);
+}
+
+/**
+ * Un Lead: alguien pidió que le contactemos (formulario de Escuela).
+ *
+ * `$contenido` es QUÉ pidió —«colegio», «docente»—, nunca quién es.
+ */
+function metaLead(string $contenido, string $referencia): void
+{
+    metaEvento('Lead', ['content_name' => $contenido], metaIdEvento('lead', $referencia));
+}
+
+/**
+ * ¿Es esta la primera carga del espacio del usuario después de crear
+ * su cuenta?
+ *
+ * `/usuario/` no lleva píxel: es donde la familia ve el progreso del
+ * niño, y desde ahí el niño entra a jugar. Pero es a donde va quien acaba
+ * de registrarse, y sin esta excepción el CompleteRegistration esperaba
+ * a que visitara una página pública y muchas veces se perdía.
+ *
+ * Se abre UNA vez: solo `usuario/index.php`, solo si hay un registro
+ * pendiente de enviar, y solo si quien mira pasa las puertas de los
+ * niños (estudiante, aula, modo niño, cuenta de menor). En cuanto sale el
+ * evento, la zona vuelve a quedar cerrada.
+ */
+function esPrimeraVisitaTrasRegistro(): bool
+{
+    $ruta = (string) ($_SERVER['SCRIPT_NAME'] ?? '');
+
+    if (!str_ends_with($ruta, '/usuario/index.php')) {
+        return false;
+    }
+
+    // Uno que ya salió (aceptó el aviso en la página anterior) no cuenta.
+    $hechos = array_filter(explode(',', (string) ($_COOKIE['ael_meta_hechos'] ?? '')));
+
+    $hay = false;
+    foreach ($_SESSION['meta_eventos'] ?? [] as $ev) {
+        if (($ev['nombre'] ?? '') === 'CompleteRegistration'
+            && !in_array((string) $ev['id'], $hechos, true)) {
+            $hay = true;
+        }
+    }
+
+    return $hay && paginaMedible(true);
+}
+
 /** Lo que va dentro del `<head>` para Meta. Vacío si no corresponde. */
 function etiquetaMeta(): string
 {
     $id = metaPixelId();
 
-    if ($id === '' || !paginaMedible()) {
+    if ($id === '' || !(paginaMedible() || esPrimeraVisitaTrasRegistro())) {
         return '';
     }
 
-    // Los eventos pendientes salen ahora, y solo una vez.
+    /*
+     * ─────────────────────────────────────────────────────────────────
+     *  LOS EVENTOS ESPERAN A QUE LA PERSONA DECIDA
+     * ─────────────────────────────────────────────────────────────────
+     *
+     * Antes salían de la sesión en la primera página medible, hubiera
+     * aceptado o no el aviso de cookies: quien navegaba sin contestarlo
+     * perdía su registro o su compra para siempre.
+     *
+     * Ahora, mientras no haya decidido, se le ofrecen a la página (por si
+     * acepta aquí) pero se quedan en la sesión. Si acepta, el navegador
+     * los envía y deja apuntado cuáles (`ael_meta_hechos`), para que la
+     * página siguiente no los repita. Si dice que no, se descartan.
+     */
+    $decision = $_COOKIE['ael_cookies'] ?? null;
+    $decision = in_array($decision, ['si', 'no'], true) ? $decision : null;
+    $consentir = metaPideConsentimiento();
+
+    $hechos = array_filter(explode(',', (string) ($_COOKIE['ael_meta_hechos'] ?? '')));
+
     $eventos = [];
     foreach ($_SESSION['meta_eventos'] ?? [] as $ev) {
-        if (time() - (int) $ev['cuando'] <= 1800) {
-            $eventos[] = ['n' => $ev['nombre'], 'd' => (object) $ev['datos'], 'id' => $ev['id']];
+        if (time() - (int) $ev['cuando'] > 1800 || in_array((string) $ev['id'], $hechos, true)) {
+            continue;
         }
+        $eventos[] = ['n' => $ev['nombre'], 'd' => (object) $ev['datos'], 'id' => $ev['id']];
     }
-    unset($_SESSION['meta_eventos']);
+
+    if (!$consentir || $decision !== null) {
+        unset($_SESSION['meta_eventos']);
+    } else {
+        // Sin decidir: se quedan, ya filtrados y sin los caducados.
+        $_SESSION['meta_eventos'] = array_values(array_filter(
+            $_SESSION['meta_eventos'] ?? [],
+            static fn($ev) => time() - (int) $ev['cuando'] <= 1800
+                           && !in_array((string) $ev['id'], $hechos, true)
+        ));
+    }
 
     $config = [
         'id'          => $id,
-        'eventos'     => $eventos,
-        'consentir'   => metaPideConsentimiento(),
+        'eventos'     => $decision === 'no' ? [] : $eventos,
+        'consentir'   => $consentir,
     ];
 
     /*
@@ -354,6 +463,11 @@ function etiquetaMeta(): string
          .   'fbq("init",C.id);'
          .   'fbq("track","PageView");'
          .   'C.eventos.forEach(function(ev){fbq("track",ev.n,ev.d,{eventID:ev.id});});'
+         // Si se aceptó en ESTA página, la sesión todavía los guarda: se
+         // apunta cuáles salieron para que la siguiente no los repita.
+         .   'if(C.consentir&&decision()==="si"&&C.eventos.length&&!C.yaDecidido){'
+         .     'document.cookie="ael_meta_hechos="+C.eventos.map(function(e){return e.id;}).join(",")+"; max-age=3600; path=/; SameSite=Lax"+(location.protocol==="https:"?"; Secure":"");'
+         .   '}'
          . '}'
          . 'function aviso(){'
          .   'var a=document.createElement("div");a.className="aviso-cookies";a.setAttribute("role","dialog");a.setAttribute("aria-label","Cookies");'
@@ -364,6 +478,9 @@ function etiquetaMeta(): string
          .   'a.addEventListener("click",function(e){var v=e.target&&e.target.getAttribute("data-v");if(!v)return;guardar(v);a.remove();if(v==="si")cargar();});'
          .   'document.body.appendChild(a);'
          . '}'
+         . 'C.yaDecidido=decision()!==null;'
+         // Ya decidido: el servidor ya usó la lista de enviados; se borra.
+         . 'if(C.yaDecidido)document.cookie="ael_meta_hechos=; max-age=0; path=/";'
          . 'if(!C.consentir||decision()==="si"){cargar();}'
          . 'else if(decision()===null){'
          .   'if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",aviso);else aviso();'

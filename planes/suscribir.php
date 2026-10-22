@@ -38,6 +38,21 @@ if ($plan['slug'] === PLAN_FREE) {
 }
 
 /*
+ * Para Meta: alguien tocó el botón de un plan de pago. Se apunta al
+ * LLEGAR aquí —que es lo que hace el clic— y no con JavaScript en el
+ * botón: un clic que navega corta el envío del píxel a medias.
+ * Una vez por plan y por día en la misma sesión, para que volver atrás y
+ * adelante no lo cuente diez veces.
+ */
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    metaEvento('InitiateCheckout', [
+        'content_name' => (string) $plan['name'],
+        'currency'     => 'COP',
+        'value'        => (int) montoDePlan($plan, 'monthly'),
+    ], metaIdEvento('checkout', $plan['slug'] . '|' . session_id() . '|' . date('Y-m-d')));
+}
+
+/*
  * ─────────────────────────────────────────────────────────────────────
  *  DOS PUERTAS, Y SE PREGUNTA CUÁL
  * ─────────────────────────────────────────────────────────────────────
@@ -155,12 +170,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ]);
 
     if ($r['ok']) {
-        // Para Meta: alguien empezó a pagar. Solo el plan y el valor.
-        metaEvento('InitiateCheckout', [
-            'value'        => (int) $r['pago']['amount_cop'],
-            'currency'     => 'COP',
-            'content_name' => (string) $plan['slug'],
-        ], 'pago-' . $r['pago']['reference']);
+        // El InitiateCheckout ya salió al llegar desde el botón del plan.
         redirigir('planes/pagar.php?ref=' . urlencode($r['pago']['reference']));
     }
 

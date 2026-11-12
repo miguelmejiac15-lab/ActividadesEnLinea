@@ -76,6 +76,19 @@ function breve(string $idea, ?string $dibujo = null): array
 }
 
 /**
+ * Una introducción breve escrita ENTERA en alemán.
+ *
+ * Lo pidieron los docentes de alemán: inmersión también en «Antes de
+ * empezar». La pantalla se pinta en alemán («Bevor wir anfangen»,
+ * «Du wirst:», «Los geht's!»), la lista de lo que hará sale en alemán y
+ * todo se lee con la voz alemana.
+ */
+function breveAleman(string $idea, ?string $dibujo = null): array
+{
+    return breve($idea, $dibujo) + ['idioma' => 'de-DE'];
+}
+
+/**
  * Lo que se hace en una actividad, dicho para un niño, a partir de sus
  * estaciones. Sin repetir, en el orden en que aparecen, y el reto final
  * siempre al final. Como mucho cinco: más no se recuerda.
@@ -83,8 +96,35 @@ function breve(string $idea, ?string $dibujo = null): array
  * @param string[] $tipos game_type de cada estación, en orden
  * @return array<int, array{icono:string, texto:string}>
  */
-function queSeHaceEn(array $tipos): array
+function queSeHaceEn(array $tipos, string $idioma = 'es'): array
 {
+    // En alemán, la misma lista dicha en alemán (ver breveAleman()).
+    static $wie = [
+        'sonido_letra'       => 'Wörter hören',
+        'pronunciacion'      => 'laut nachsprechen',
+        'seleccion_imagenes' => 'die richtigen Bilder antippen',
+        'opcion_multiple'    => 'die richtige Antwort wählen',
+        'juego_rapido'       => 'Ja oder Nein sagen',
+        'emparejar'          => 'Paare verbinden',
+        'parejas_dibujo'     => 'Bilder verbinden',
+        'completar_palabra'  => 'Wörter ergänzen',
+        'completar_texto'    => 'Sätze ergänzen',
+        'puzle_silabas'      => 'Wörter aus Silben bauen',
+        'armar_palabras'     => 'Wörter Buchstabe für Buchstabe bauen',
+        'teclado'            => 'mit der Tastatur schreiben',
+        'ortografia'         => 'die richtige Schreibweise wählen',
+        'ordenar_secuencia'  => 'in die richtige Reihenfolge bringen',
+        'operacion'          => 'zählen und rechnen',
+        'secuencia_numerica' => 'Zahlenreihen ergänzen',
+        'memoria'            => 'versteckte Paare finden',
+        'sopa_letras'        => 'versteckte Wörter suchen',
+        'crucigrama'         => 'ein Kreuzworträtsel lösen',
+        'cuento'             => 'eine Geschichte hören',
+        'laberinto'          => 'einen Roboter führen',
+        'desafio_final'      => 'eine Abschlussaufgabe lösen',
+    ];
+    $aleman = strtolower(substr($idioma, 0, 2)) === 'de';
+
     static $como = [
         'sonido_letra'       => ['👂', 'escuchar palabras'],
         'pronunciacion'      => ['🗣️', 'repetir en voz alta'],
@@ -124,6 +164,10 @@ function queSeHaceEn(array $tipos): array
 
         [$icono, $texto] = $como[$t];
 
+        if ($aleman && isset($wie[$t])) {
+            $texto = $wie[$t];
+        }
+
         if (isset($vistos[$texto])) {
             continue;
         }
@@ -134,7 +178,7 @@ function queSeHaceEn(array $tipos): array
     $lista = array_slice($lista, 0, $reto ? 4 : 5);
 
     if ($reto) {
-        $lista[] = ['icono' => '🏆', 'texto' => 'superar un reto final'];
+        $lista[] = ['icono' => '🏆', 'texto' => $aleman ? $wie['desafio_final'] : 'superar un reto final'];
     }
 
     return $lista;
@@ -218,7 +262,10 @@ function introduccionDe(array $actividad): ?array
         'ejemplo'   => $i['ejemplo'],
         'preguntas' => $preguntas,
         // Lo que va a hacer, sacado de sus estaciones reales.
-        'haras'     => $breve ? queSeHaceEn(tiposDeEstaciones((int) ($actividad['id'] ?? 0))) : [],
+        'haras'     => $breve ? queSeHaceEn(tiposDeEstaciones((int) ($actividad['id'] ?? 0)),
+                                            (string) ($i['idioma'] ?? 'es')) : [],
+        // Sin idioma, la pantalla es la de siempre: explicación en español.
+        'idioma'    => $i['idioma'] ?? null,
     ];
 }
 

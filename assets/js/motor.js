@@ -913,6 +913,9 @@
         "Toca una pista y escribe la palabra": { en: "Tap a clue and write the word", de: "Tippe auf einen Hinweis und schreib das Wort" },
         "Escucha y escribe": { en: "Listen and write", de: "Hör zu und schreib" },
         "Escucha y elige": { en: "Listen and choose", de: "Hör zu und wähle" },
+        "Antes de empezar": { en: "Before we start", de: "Bevor wir anfangen" },
+        "Vas a:": { en: "You will:", de: "Du wirst:" },
+        "¡A jugar! →": { en: "Let's play! →", de: "Los geht's! →" },
     };
 
     function T(es) {
@@ -1415,7 +1418,8 @@
         const texto = $('#texto-juego');
         const pct = total > 0 ? Math.round((hechos / total) * 100) : 0;
         if (barra) barra.style.width = pct + '%';
-        if (texto) texto.textContent = hechos + ((estado.actual && { en: ' of ', de: ' von ' }[String(idiomaVoz || '').slice(0, 2)]) || ' de ') + total;
+        const enOtro = estado.actual || (estado.introEnIdioma && !estado.actual);
+        if (texto) texto.textContent = hechos + ((enOtro && { en: ' of ', de: ' von ' }[String(idiomaVoz || '').slice(0, 2)]) || ' de ') + total;
     }
 
     /**
@@ -4102,8 +4106,16 @@
         }
         marcarActivo(null);
 
+        /*
+         * Una presentación con `idioma` (alemán) se pinta y se lee entera
+         * en ese idioma. Sin él, es la de siempre: explicación en español.
+         */
+        const enIdioma = !!intro.idioma && !enEspanol(intro.idioma);
+        const Ti = (es) => (enIdioma ? T(es) : es);
+        estado.introEnIdioma = enIdioma;
+
         const cab = $('#titulo-estacion');
-        if (cab) cab.textContent = '📖 Antes de empezar';
+        if (cab) cab.textContent = '📖 ' + Ti('Antes de empezar');
         marcarIntro(true);
 
         const preguntas = intro.preguntas || [];
@@ -4143,7 +4155,7 @@
 
             const haras = intro.haras || [];
             if (haras.length) {
-                c.appendChild(el('p', 'intro-breve-vas', 'Vas a:'));
+                c.appendChild(el('p', 'intro-breve-vas', Ti('Vas a:')));
                 const ul = el('ul', 'intro-breve-lista');
                 haras.forEach((h) => {
                     const li = el('li');
@@ -4156,15 +4168,19 @@
 
             const dicho = [String(intro.idea || '').replace(/\*\*/g, '')];
             if (haras.length) {
-                dicho.push('Vas a: ' + haras.map((h) => h.texto).join(', ') + '.');
+                dicho.push(Ti('Vas a:') + ' ' + haras.map((h) => h.texto).join(', ') + '.');
+            }
+            // En alemán, todo con la voz alemana: {{ }} lo marca entero.
+            if (enIdioma) {
+                for (let k = 0; k < dicho.length; k++) dicho[k] = '{{' + dicho[k] + '}}';
             }
 
             const acciones = el('div', 'juego-opciones');
-            const oir = el('button', 'btn btn-secundario juego-boton', '🔊 Escuchar');
+            const oir = el('button', 'btn btn-secundario juego-boton', Ti('🔊 Escuchar'));
             oir.onclick = () => { callar(); hablarSeguido(dicho); };
             acciones.appendChild(oir);
 
-            const ir = el('button', 'btn btn-principal juego-boton', '¡A jugar! →');
+            const ir = el('button', 'btn btn-principal juego-boton', Ti('¡A jugar! →'));
             ir.onclick = () => { callar(); empezar(); };
             acciones.appendChild(ir);
             c.appendChild(acciones);

@@ -161,11 +161,12 @@ require RUTA_INCLUDES . '/cabecera.php';
                          no puede quedar «pendiente». Antes llevaba el ▶️ de
                          una estación sin hacer, y al niño que empezó sin
                          leerla le parecía que le faltaba algo. */ ?>
+                <?php $introAleman = str_starts_with((string) ($intro['idioma'] ?? ''), 'de'); ?>
                 <button class="mapa-estacion mapa-intro" id="abrir-intro" type="button">
                     <span class="num">📖</span>
                     <span class="etiqueta">
-                        Antes de empezar
-                        <small class="mapa-intro-nota">Para leer · no cuenta</small>
+                        <?= $introAleman ? 'Bevor wir anfangen' : 'Antes de empezar' ?>
+                        <small class="mapa-intro-nota"><?= $introAleman ? 'Zum Lesen · zählt nicht' : 'Para leer · no cuenta' ?></small>
                     </span>
                 </button>
             <?php endif; ?>

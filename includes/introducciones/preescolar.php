@@ -138,9 +138,9 @@ return [
 
 
     // ── Alemán · Kindergarten ────────────────────────────────────────
-    'deutsch-die-farben' => breve('Vas a aprender los **colores en alemán**: {{rot}} es rojo y {{blau}} es azul.'),
-    'deutsch-die-tiere' => breve('Vas a aprender los **animales en alemán**. Cada uno trae su compañero: {{der Hund}}, {{die Katze}}.'),
-    'deutsch-mein-koerper' => breve('Vas a aprender las partes del **cuerpo en alemán**: {{die Hand}} es la mano y {{der Fuß}} es el pie.'),
-    'deutsch-hallo' => breve('En alemán, {{Hallo}} es hola, {{Tschüss}} es chao y {{Danke}} es gracias.'),
+    'deutsch-die-farben' => breveAleman('Wir lernen die **Farben**: **rot**, **blau**, **gelb** und **grün**.'),
+    'deutsch-die-tiere' => breveAleman('Wir lernen die **Tiere**: **der Hund**, **die Katze** und **der Vogel**.'),
+    'deutsch-mein-koerper' => breveAleman('Wir lernen den **Körper**: **die Hand**, **der Fuß** und **der Kopf**.'),
+    'deutsch-hallo' => breveAleman('Wir sagen **Hallo!**, **Tschüss!** und **Danke!**'),
 
 ];

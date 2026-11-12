@@ -1,6 +1,6 @@
 <?php
 /**
- * migracion-aleman.php — Alemán en Idiomas (fase 1: Kindergarten y Klasse 1–2)
+ * migracion-aleman.php — Alemán en Idiomas (Kindergarten y Klasse 1 a 4)
  *
  *     php database/migracion-aleman.php             # simulacion
  *     php database/migracion-aleman.php --aplicar   # escribe
@@ -41,6 +41,15 @@ mt_srand(20260827);   // igual que el sembrador
 
 $contenido = require __DIR__ . '/contenido/idiomas-aleman.php';
 $cat       = $contenido['categoria'];
+
+/*
+ * Fase 2 (Klasse 3 y 4): sus bloques y actividades se suman a los de la
+ * fase 1. Todo lo de abajo solo CREA lo que falta, así que las de la
+ * fase 1, que ya existen, no se tocan.
+ */
+$fase2 = require __DIR__ . '/contenido/idiomas-aleman-mittelstufe.php';
+$contenido['bloques']     = array_merge($contenido['bloques'], $fase2['bloques']);
+$contenido['actividades'] = array_merge($contenido['actividades'], $fase2['actividades']);
 
 $categoria = traerUno('SELECT id, tagline FROM categories WHERE slug = ?', [$cat['slug']]);
 if (!$categoria) {

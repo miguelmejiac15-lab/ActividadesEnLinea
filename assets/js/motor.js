@@ -914,6 +914,20 @@
         "Escucha y escribe": { en: "Listen and write", de: "Hör zu und schreib" },
         "Escucha y elige": { en: "Listen and choose", de: "Hör zu und wähle" },
         "Antes de empezar": { en: "Before we start", de: "Bevor wir anfangen" },
+        "Siguiente →": { en: "Next →", de: "Weiter →" },
+        "💡 Una pista": { en: "💡 A hint", de: "💡 Ein Tipp" },
+        "⏭️ Saltar esta estación": { en: "⏭️ Skip this station", de: "⏭️ Station überspringen" },
+        "Responder preguntas →": { en: "Answer the questions →", de: "Fragen beantworten →" },
+        "Estación saltada": { en: "Station skipped", de: "Station übersprungen" },
+        "Puedes volver cuando quieras y hacerla para ganar sus estrellas.": { en: "You can come back any time and play it to win its stars.", de: "Du kannst jederzeit zurückkommen und die Sterne gewinnen." },
+        "¡Perfecto!": { en: "Perfect!", de: "Perfekt!" },
+        "¡Casi! Vas a poder": { en: "Almost! You can do it", de: "Fast! Du schaffst das" },
+        "¡Perfecto! Lo hiciste todo bien.": { en: "Perfect! You got everything right.", de: "Perfekt! Du hast alles richtig gemacht." },
+        "¡Muy bien! Terminaste.": { en: "Great job! You finished.", de: "Super! Du bist fertig." },
+        "¡Casi! Puedes volver a intentarlo.": { en: "Almost! You can try again.", de: "Fast! Du kannst es noch einmal versuchen." },
+        "↻ Repetir": { en: "↻ Play again", de: "↻ Noch einmal" },
+        "Siguiente estación →": { en: "Next station →", de: "Nächste Station →" },
+        "¿Te atascaste? Puedes usar tus monedas.": { en: "Stuck? You can use your coins.", de: "Kommst du nicht weiter? Du kannst deine Münzen benutzen." },
         "Vas a:": { en: "You will:", de: "Du wirst:" },
         "¡A jugar! →": { en: "Let's play! →", de: "Los geht's! →" },
     };
@@ -1344,19 +1358,19 @@
         if ($('.juego-ayuda')) return;
 
         const caja = el('div', 'juego-ayuda');
-        caja.appendChild(el('p', 'juego-ayuda-titulo', '¿Te atascaste? Puedes usar tus monedas.'));
+        caja.appendChild(el('p', 'juego-ayuda-titulo', T('¿Te atascaste? Puedes usar tus monedas.')));
 
         const fila = el('div', 'juego-ayuda-botones');
 
         if (typeof estado.pista === 'function') {
             const b = el('button', 'btn btn-secundario btn-chico',
-                '💡 Una pista · 🪙 ' + AYUDA.precioPista);
+                T('💡 Una pista') + ' · 🪙 ' + AYUDA.precioPista);
             b.onclick = () => usarAyuda('pista', b, caja);
             fila.appendChild(b);
         }
 
         const s = el('button', 'btn btn-secundario btn-chico',
-            '⏭️ Saltar esta estación · 🪙 ' + AYUDA.precioSaltar);
+            T('⏭️ Saltar esta estación') + ' · 🪙 ' + AYUDA.precioSaltar);
         s.onclick = () => usarAyuda('saltar', s, caja);
         fila.appendChild(s);
 
@@ -2471,7 +2485,7 @@
                 c.appendChild(oir);
 
                 const sig = el('button', 'btn btn-principal',
-                    i < slides.length - 1 ? 'Siguiente →' : 'Responder preguntas →');
+                    i < slides.length - 1 ? T('Siguiente →') : T('Responder preguntas →'));
                 sig.onclick = () => {
                     i++;
                     marcarProgreso(i, slides.length + preguntas.length);
@@ -3846,9 +3860,9 @@
 
         if (saltada) {
             c.appendChild(el('div', 'juego-emoji grande', '⏭️'));
-            c.appendChild(el('h2', null, 'Estación saltada'));
+            c.appendChild(el('h2', null, T('Estación saltada')));
             c.appendChild(el('p', 'juego-texto',
-                'Puedes volver cuando quieras y hacerla para ganar sus estrellas.'));
+                T('Puedes volver cuando quieras y hacerla para ganar sus estrellas.')));
         } else {
             /*
              * ─────────────────────────────────────────────────────────
@@ -3879,7 +3893,7 @@
             }
 
             c.appendChild(el('h2', null,
-                perfecto ? '¡Perfecto!' : (bien ? '¡Muy bien!' : '¡Casi! Vas a poder')));
+                perfecto ? T('¡Perfecto!') : (bien ? T('¡Muy bien!') : T('¡Casi! Vas a poder'))));
 
             c.appendChild(el('p', 'juego-texto', aciertos + ' de ' + total + ' · ' + pct + '%'));
 
@@ -3897,9 +3911,9 @@
              * dicen nada todavía.
              */
             if (sinLectura) {
-                decir(perfecto ? '¡Perfecto! Lo hiciste todo bien.'
-                    : (bien ? '¡Muy bien! Terminaste.'
-                            : '¡Casi! Puedes volver a intentarlo.'));
+                decir(perfecto ? T('¡Perfecto! Lo hiciste todo bien.')
+                    : (bien ? T('¡Muy bien! Terminaste.')
+                            : T('¡Casi! Puedes volver a intentarlo.')));
             }
         }
         c.appendChild(el('div', 'juego-estrellas', '⭐'.repeat(estrellas) + '☆'.repeat(3 - estrellas)));
@@ -3914,8 +3928,10 @@
 
         if (monedas > 0) {
             premio = el('p', 'juego-premio');
+            const palabraMoneda = ({ en: [' coin', ' coins'], de: [' Münze', ' Münzen'] }
+                                   [String(idiomaVoz || '').slice(0, 2)]) || [' moneda', ' monedas'];
             premio.innerHTML = '<span aria-hidden="true">🪙</span> +' + monedas +
-                               (monedas === 1 ? ' moneda' : ' monedas');
+                               (monedas === 1 ? palabraMoneda[0] : palabraMoneda[1]);
             c.appendChild(premio);
 
             // Las monedas suben desde el premio. Es lo que liga el número
@@ -3946,7 +3962,10 @@
             if (res.ok && res.guardado) {
                 marcarHecha(estado.actual.id);
                 c.appendChild(el('p', 'juego-nota',
-                    'Progreso guardado · ' + res.resumen.completadas + ' de ' + res.resumen.total + ' estaciones'));
+                    ({ en: 'Progress saved · ' + res.resumen.completadas + ' of ' + res.resumen.total + ' stations',
+                       de: 'Gespeichert · ' + res.resumen.completadas + ' von ' + res.resumen.total + ' Stationen' }
+                     [String(idiomaVoz || '').slice(0, 2)])
+                    || 'Progreso guardado · ' + res.resumen.completadas + ' de ' + res.resumen.total + ' estaciones'));
 
                 // El contador de la cabecera, al día en el momento.
                 refrescarMarcador(res.cartera);
@@ -3979,13 +3998,13 @@
 
         const acciones = el('div', 'juego-opciones');
 
-        const otra = el('button', 'btn btn-secundario', '↻ Repetir');
+        const otra = el('button', 'btn btn-secundario', T('↻ Repetir'));
         otra.onclick = () => abrirEstacion(estado.actual.id);
         acciones.appendChild(otra);
 
         const sig = siguienteDesbloqueada(estado.actual.id);
         if (sig) {
-            const b = el('button', 'btn btn-principal', 'Siguiente estación →');
+            const b = el('button', 'btn btn-principal', T('Siguiente estación →'));
             b.onclick = () => abrirEstacion(sig.id);
             acciones.appendChild(b);
         } else if (estado.estaciones.some((e) => !e.desbloqueada)) {
